@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Máscara de Laudo — Biópsias endoscópicas/colonoscópicas pediátricas</title>
+<style>
+:root{
+  --bg:#22303f; --bg2:#1b2733; --card:#ffffff; --ink:#1c2430; --muted:#5b6675;
+  --accent:#1f6f8b; --accent-d:#175566; --accent-soft:#e3eef2; --line:#d7dde3;
+  --ok:#0e7c5a; --warn:#b4690e; --danger:#b3261e; --chip:#f1f4f7;
+  /* acentos por seção */
+  --c-id:#2563eb; --c-dx:#7c3aed; --c-crit:#059669; --c-notas:#d97706; --c-refs:#dc2626;
+}
+*{box-sizing:border-box;}
+body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
+  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%) fixed;color:var(--ink);line-height:1.4;padding:18px 14px 70px;font-size:14px;}
+.wrap{max-width:1280px;margin:0 auto;}
+header.top h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.3px;color:#eef4f9;font-weight:800;}
+header.top p{margin:0;color:#a9b7c6;font-size:.88rem;}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;
+  box-shadow:0 6px 20px rgba(8,15,25,.28);}
+.card>h2{font-size:1.18rem;margin:0 0 16px;color:var(--accent-d);border-bottom:2px solid var(--accent-soft);
+  padding-bottom:9px;font-weight:800;letter-spacing:-.2px;}
+/* blocos com acento colorido por seção */
+.acc{border-left:4px solid var(--line);border-radius:10px;padding-left:12px;}
+.acc-id{border-left-color:var(--c-id);}
+.acc-dx{border-left-color:var(--c-dx);}
+.acc-dx h3{color:var(--c-dx)!important;}
+.acc-crit{border-left-color:var(--c-crit);}
+.acc-crit h3{color:var(--c-crit)!important;}
+.acc-notas{border-left:4px solid var(--c-notas);padding-left:12px;border-radius:10px;}
+.acc-notas>.fld{color:var(--c-notas);}
+.acc-refs{border-left:4px solid var(--c-refs);padding-left:12px;border-radius:10px;}
+.grid2{display:grid;grid-template-columns:1.05fr 1fr;gap:16px;}
+.grid-id{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 14px;align-items:end;}
+label.fld{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+input[type=text],input[type=number],select,textarea{font:inherit;border:1px solid var(--line);border-radius:8px;
+  padding:8px 10px;background:#fff;color:var(--ink);outline:none;width:100%;}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
+textarea{resize:vertical;line-height:1.45;font-size:.92rem;}
+.seg-row{display:flex;gap:6px;}
+.seg-row select{flex:1;}
+button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);
+  border-radius:8px;padding:7px 12px;font-weight:600;transition:.12s;}
+button:hover{border-color:var(--accent);background:var(--accent-soft);}
+button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+button.primary:hover{background:var(--accent-d);}
+button.ghost{background:#fff;}
+button.mini{padding:4px 9px;font-size:.8rem;border-radius:7px;}
+button.danger{color:var(--danger);}button.danger:hover{background:#fbe9e8;border-color:var(--danger);}
+.muted{color:var(--muted);}
+.subpanel{border:1px solid var(--line);border-radius:10px;padding:10px 12px;max-height:560px;overflow:auto;background:#fbfcfd;}
+.subpanel h3{margin:0 0 8px;font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;color:var(--accent);font-weight:800;}
+.preset{display:block;width:100%;text-align:left;margin:0 0 7px;padding:9px 11px;border-radius:9px;border:1px solid var(--line);
+  background:#fff;line-height:1.25;}
+.preset:hover{border-color:var(--accent);background:var(--accent-soft);}
+.preset b{display:block;font-size:.82rem;color:var(--accent-d);margin-bottom:2px;}
+.preset span{font-size:.72rem;color:var(--muted);}
+.crit{margin:0 0 11px;padding:0 0 9px;border-bottom:1px dashed #e4e9ee;}
+.crit:last-child{border-bottom:none;}
+.crit .glabel{display:block;font-size:.92rem;font-weight:800;color:var(--ink);margin-bottom:6px;}
+.crit .opts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
+.opts button{padding:5px 10px;font-size:.84rem;border-radius:20px;background:var(--chip);font-weight:600;}
+.opts .num{display:flex;gap:5px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:2px 4px 2px 10px;}
+.opts .num input{width:62px;border:none;padding:4px 2px;text-align:center;}
+.opts .num input:focus{box-shadow:none;}
+.opts .num button{border-radius:16px;}
+.editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
+.editor-actions .spacer{flex:1;}
+.sample-list{list-style:none;margin:0 0 12px;padding:0;}
+.sample-list li{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-bottom:7px;background:#fbfcfd;}
+.sample-list .si-letter{font-weight:800;color:var(--accent-d);font-size:1rem;min-width:20px;}
+.sample-list .si-body{flex:1;min-width:0;}
+.sample-list .si-name{font-weight:700;font-size:.88rem;}
+.sample-list .si-prev{font-size:.76rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sample-list .si-ctrl{display:flex;gap:4px;flex-shrink:0;}
+.notas-toggles{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
+.notas-toggles button{font-size:.78rem;padding:5px 9px;border-radius:8px;text-align:left;max-width:100%;}
+.notas-toggles button.on{background:var(--ok);color:#fff;border-color:var(--ok);}
+.eospanel{border:1px solid var(--line);border-radius:10px;background:#fff;margin:14px 0;overflow:hidden;}
+.eospanel summary{cursor:pointer;padding:11px 16px;font-weight:800;color:var(--accent-d);list-style:none;}
+.eospanel summary::-webkit-details-marker{display:none;}
+.eospanel summary::before{content:"▸ ";color:var(--accent);}
+.eospanel[open] summary::before{content:"▾ ";}
+.eospanel .inner{padding:4px 16px 16px;}
+table.eos{width:100%;border-collapse:collapse;font-size:.82rem;}
+table.eos th,table.eos td{border:1px solid var(--line);padding:7px 9px;vertical-align:top;text-align:left;}
+table.eos th{background:var(--accent-soft);font-weight:800;}
+table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowrap;}
+.eos-refs{font-size:.74rem;color:var(--muted);margin-top:10px;line-height:1.5;}
+.out{width:100%;min-height:340px;max-height:72vh;overflow:auto;border:1px solid var(--line);border-radius:10px;
+  padding:14px 18px;background:#fff;}
+.out .ll{font-family:Arial,Helvetica,sans-serif;font-size:8pt;line-height:1.42;white-space:pre-wrap;word-break:break-word;}
+.out .ll.b{font-weight:bold;}
+.out .ll.sp{height:.6em;}
+.out .empty{color:var(--muted);font-size:.85rem;font-style:italic;}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+  padding:11px 20px;border-radius:9px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.hint{font-size:.78rem;color:var(--muted);margin:0 0 9px;}
+.flagbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
+/* barras de CRUD + controles por item */
+.crudbar{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 10px;}
+.crudbar button{padding:4px 9px;font-size:.76rem;border-radius:7px;}
+.preset-row{display:flex;gap:6px;align-items:stretch;margin:0 0 7px;}
+.preset-row .preset{flex:1;margin:0;}
+.pr-ctrl{display:flex;flex-direction:column;gap:3px;justify-content:center;}
+.pr-ctrl button{padding:2px 7px;font-size:.72rem;border-radius:6px;line-height:1.1;}
+.crit .glabel{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.crit .c-ctrl{display:flex;gap:4px;flex-shrink:0;}
+.crit .c-ctrl button{padding:2px 7px;font-size:.72rem;border-radius:6px;font-weight:600;}
+/* chips de notas/refs (tag + preview) com CRUD */
+.chip-row{display:flex;gap:6px;align-items:stretch;margin:0 0 6px;}
+.chip-tog{flex:1;min-width:0;text-align:left;padding:7px 10px;border-radius:8px;line-height:1.25;}
+.chip-tog b{display:inline;color:var(--accent-d);font-size:.8rem;}
+.chip-tog span{color:var(--muted);font-size:.74rem;}
+.chip-tog.on{background:var(--ok);border-color:var(--ok);}
+.chip-tog.on b,.chip-tog.on span{color:#fff;}
+/* modal genérico */
+.modal-ov{position:fixed;inset:0;background:rgba(10,16,24,.6);display:none;align-items:flex-start;justify-content:center;z-index:100;padding:38px 14px;overflow:auto;}
+.modal-ov.show{display:flex;}
+.modal{background:#fff;border-radius:14px;max-width:660px;width:100%;padding:22px 24px;box-shadow:0 24px 70px rgba(0,0,0,.45);}
+.modal h3{margin:0 0 16px;font-size:1.12rem;color:var(--accent-d);font-weight:800;}
+.modal .mfield{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.modal .mfield label{font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
+.modal .mfield .mhint{display:block;font-size:.74rem;color:var(--muted);font-weight:400;text-transform:none;letter-spacing:0;margin-top:2px;}
+.modal .mfoot{display:flex;gap:8px;justify-content:flex-end;margin-top:8px;}
+@media(max-width:880px){.grid2{grid-template-columns:1fr;}}
+@media print{
+  body{background:#fff;padding:0;font-size:12px;}
+  .noprint{display:none !important;}
+  .card{border:none;padding:0;margin:0;box-shadow:none;}
+  #laudoMontado{border:none;padding:0;max-height:none;overflow:visible;min-height:auto;}
+  #laudoMontado .ll{font-family:Arial,Helvetica,sans-serif;font-size:8pt;line-height:1.4;}
+  #laudoMontado .ll.b{font-weight:bold;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top noprint">
+  <h1>Máscara de Laudo — Biópsias endoscópicas/colonoscópicas pediátricas</h1>
+  <p>Monte cada amostra por cliques → edite o texto → <b>Salvar amostra</b> empilha no laudo. Copie tudo ao final. Tudo é salvo no navegador (localStorage).</p>
+</header>
+
+<!-- ===================== PAINEL EOSINÓFILOS ===================== -->
+<details class="eospanel noprint">
+  <summary>Limiares de eosinófilos por sítio (consulta rápida — EoE / EoG / EoN / EoC)</summary>
+  <div class="inner">
+    <table class="eos">
+      <thead><tr><th>Sítio</th><th>Limiar (peak eos/HPF)</th><th>Achados associados</th></tr></thead>
+      <tbody>
+        <tr><td>EoE — Esôfago</td><td>≥15/HPF (pico). Esôfago normal = 0 eosinófilos.</td>
+          <td>Microabscessos eosinofílicos, surface layering, degranulação, hiperplasia da camada basal, espongiose, alongamento de papilas, fibrose de lâmina própria (criança: avaliar com cautela).</td></tr>
+        <tr><td>EoG — Estômago</td><td>≥30/HPF em ≥5 HPF (critério Collins). Estômago normal: raros/ausentes.</td>
+          <td>Infiltrado em lâmina própria + epitélio glandular/foveolar, microabscessos, eosinófilos em muscular da mucosa, alterações arquiteturais.</td></tr>
+        <tr><td>EoN — Duodeno/delgado</td><td>Proposto ≥30–52/HPF (variável; sem corte consolidado). Delgado normal já contém eosinófilos.</td>
+          <td>Infiltrado em lâmina própria, criptas, e — conforme forma — muscular própria/serosa; atrofia vilositária, abscessos crípticos eosinofílicos.</td></tr>
+        <tr><td>EoC — Cólon</td><td>Gradiente proximal→distal: ceco/cólon D ~50/HPF, transverso ~35, esquerdo/retossigmoide ~25–30. Maior densidade fisiológica.</td>
+          <td>Eosinófilos em lâmina própria entre/dentro de criptas, intraepiteliais, em muscular da mucosa; criptite/abscesso eosinofílico.</td></tr>
+      </tbody>
+    </table>
+    <p class="eos-refs"><b>Pontos comuns:</b> procurar extensão para epitélio, microabscessos eosinofílicos (≥4 agrupados), degranulação, eosinófilos em camadas profundas (muscular da mucosa/submucosa). Densidade isolada é insuficiente — integrar com distribuição e arquitetura.<br>
+    <b>Refs (verificar antes de citar):</b> Dellon ES, et al. Clin Gastroenterol Hepatol. 2022;20(11):2474-2484. · Papadopoulou A, et al. J Pediatr Gastroenterol Nutr. 2024;78(1):122-152. · Spergel JM, et al. Ann Allergy Asthma Immunol. 2018;121(3):281-284.</p>
+  </div>
+</details>
+
+<!-- ===================== 1. AMOSTRA ATUAL ===================== -->
+<section class="card noprint">
+  <h2>1 · Montar amostra</h2>
+
+  <div class="crudbar">
+    <button type="button" class="mini" id="btnSiteAdd">➕ Novo sítio</button>
+    <button type="button" class="mini" id="btnSiteEdit">✏️ Editar sítio</button>
+    <button type="button" class="mini danger" id="btnSiteDel">🗑 Apagar sítio</button>
+    <button type="button" class="mini" id="btnSiteRestore" title="Re-adiciona sítios padrão que foram apagados">↺ Restaurar sítios padrão</button>
+  </div>
+
+  <div class="grid-id acc acc-id" style="margin-bottom:16px;padding:6px 0 6px 14px;">
+    <label class="fld">Letra do frasco
+      <input type="text" id="fLetra" maxlength="3" style="text-transform:uppercase;">
+    </label>
+    <label class="fld">Sítio / órgão
+      <select id="fSitio"></select>
+    </label>
+    <label class="fld">Segmento (grupo)
+      <span class="seg-row">
+        <select id="fSeg"></select>
+        <button type="button" class="mini" id="btnAddSeg" title="Registrar nova opção">+</button>
+        <button type="button" class="mini" id="btnSegEdit" title="Editar segmento selecionado">✏️</button>
+        <button type="button" class="mini danger" id="btnSegDel" title="Apagar segmento selecionado">🗑</button>
+        <button type="button" class="mini" id="btnSegRestore" title="Restaurar segmentos padrão">↺</button>
+      </span>
+    </label>
+    <label class="fld" style="grid-column:span 2;">Nome da amostra (vai em “Materiais” e no cabeçalho do bloco)
+      <input type="text" id="fNome" placeholder="ex.: Mucosa esofágica">
+    </label>
+  </div>
+
+  <div class="grid2">
+    <div class="subpanel acc-dx">
+      <h3>Diagnósticos prontos (1 clique = bloco no editor)</h3>
+      <div class="crudbar">
+        <button type="button" class="mini" id="btnPresetAdd">➕ Novo diagnóstico</button>
+        <button type="button" class="mini" id="btnPresetRestore" title="Re-adiciona diagnósticos padrão do sítio">↺ Restaurar padrões</button>
+      </div>
+      <div id="presetBox"></div>
+    </div>
+    <div class="subpanel acc-crit">
+      <h3>Critérios histológicos (clique insere a linha)</h3>
+      <div class="crudbar">
+        <button type="button" class="mini" id="btnCritAdd">➕ Novo critério</button>
+        <button type="button" class="mini" id="btnCritRestore" title="Re-adiciona critérios padrão do sítio">↺ Restaurar padrões</button>
+      </div>
+      <div id="critBox"></div>
+    </div>
+  </div>
+
+  <label class="fld" style="margin-top:14px;">Editor da amostra — texto livre/editável
+    <textarea id="corpo" rows="11" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
+  </label>
+  <div class="editor-actions">
+    <button class="primary" id="btnSalvar">✓ Salvar amostra (empilhar)</button>
+    <button class="ghost" id="btnCancelEdit" style="display:none;">Cancelar edição</button>
+    <span class="spacer"></span>
+    <button class="ghost" id="btnLimparEditor">Limpar editor</button>
+  </div>
+</section>
+
+<!-- ===================== 2. LAUDO ACUMULADO ===================== -->
+<section class="card">
+  <h2>2 · Laudo acumulado</h2>
+
+  <div class="noprint">
+    <ul class="sample-list" id="sampleList"></ul>
+    <p class="hint" id="emptyHint">Nenhuma amostra salva ainda. Monte a amostra acima e clique <b>Salvar amostra</b>.</p>
+
+    <div class="acc-notas" style="margin-top:10px;padding-top:8px;padding-bottom:8px;">
+      <label class="fld">NOTAS — clique nas tags p/ incluir/remover; busque por tag ou texto</label>
+      <input type="text" id="notaSearch" placeholder="🔎 buscar nota (tag ou texto)…" style="margin-bottom:8px;">
+      <div class="crudbar">
+        <button type="button" class="mini" id="btnNotaAdd">➕ Nova nota</button>
+        <button type="button" class="mini" id="btnNotaRestore" title="Re-adiciona notas padrão apagadas">↺ Restaurar notas padrão</button>
+      </div>
+      <div class="notas-toggles" id="notasToggles"></div>
+      <label class="fld" style="margin-top:8px;">Notas livres (texto extra)</label>
+      <textarea id="notas" rows="3" placeholder="Notas adicionais (texto livre)."></textarea>
+    </div>
+
+    <div class="acc-refs" style="margin-top:12px;padding-top:8px;padding-bottom:8px;">
+      <label class="fld">REFERÊNCIAS — clique nas tags p/ incluir/remover; busque por tag ou texto</label>
+      <input type="text" id="refSearch" placeholder="🔎 buscar referência…" style="margin-bottom:8px;">
+      <div class="crudbar">
+        <button type="button" class="mini" id="btnRefAdd">➕ Nova referência</button>
+        <button type="button" class="mini" id="btnRefRestore" title="Re-adiciona referências padrão apagadas">↺ Restaurar refs padrão</button>
+      </div>
+      <div class="notas-toggles" id="refsToggles"></div>
+      <label class="fld" style="margin-top:8px;">Referências livres (uma por linha)</label>
+      <textarea id="refsFree" rows="2" placeholder="Referências adicionais (texto livre, 1 por linha)."></textarea>
+    </div>
+  </div>
+
+  <label class="fld noprint">Laudo montado (pré-visualização rich — Arial 8pt; títulos em negrito; copiável formatado)</label>
+  <div class="out" id="laudoMontado"></div>
+
+  <div class="editor-actions noprint">
+    <button class="primary" id="btnCopiar">📋 Copiar tudo</button>
+    <button class="ghost" id="btnImprimir">🖨 Imprimir / PDF</button>
+    <button class="ghost" id="btnRegenerar" title="Reconstrói a partir das amostras salvas">↻ Regenerar</button>
+    <span class="spacer"></span>
+    <button class="danger" id="btnLimparTudo">Apagar laudo inteiro</button>
+  </div>
+</section>
+
+<!-- ===================== 3. BACKUP & DADOS ===================== -->
+<section class="card noprint">
+  <h2>3 · Backup &amp; dados</h2>
+  <p class="hint">Backup completo (biblioteca + laudo atual) como JSON — rede de segurança offline; leve entre PCs manualmente e restaure.</p>
+  <div class="editor-actions">
+    <button class="ghost" id="btnBackup">⬇ Baixar backup (JSON)</button>
+    <button class="ghost" id="btnRestore">⬆ Restaurar backup</button>
+    <input type="file" id="fileRestore" accept="application/json,.json" style="display:none;">
+  </div>
+</section>
+
+<!-- ===================== 4. GOOGLE DRIVE (SYNC) ===================== -->
+<section class="card noprint">
+  <h2>4 · Google Drive (sync entre PCs)</h2>
+  <p class="hint">Opcional. Cole o Client ID OAuth (escopo <code>drive.appdata</code>) e conecte — os dados sincronizam em <code>appDataFolder</code> (nenhum dado pessoal vai ao host). O app funciona 100% sem isto.</p>
+  <div class="grid-id" style="align-items:end;">
+    <label class="fld" style="grid-column:span 2;">Client ID (OAuth Web)
+      <input type="text" id="cfgClientId" placeholder="xxxxx.apps.googleusercontent.com">
+    </label>
+    <button class="primary" id="btnConnectDrive">Conectar Google</button>
+  </div>
+  <p class="hint" id="syncStatus" style="margin-top:10px;font-weight:600;">Google: desconectado</p>
+  <details style="margin-top:8px;">
+    <summary style="cursor:pointer;font-size:.82rem;font-weight:700;color:var(--accent-d);">Como obter o Client ID (passo a passo)</summary>
+    <ol class="hint" style="line-height:1.7;margin:8px 0 0;padding-left:20px;">
+      <li>console.cloud.google.com → <b>APIs &amp; Services → Credentials → Create OAuth client ID</b> (tipo <i>Web application</i>).</li>
+      <li><b>Authorized JavaScript origins:</b> a URL do app (ex.: <code>https://haunei.github.io</code>; p/ testar local, <code>http://localhost</code>).</li>
+      <li>Ative a <b>Google Drive API</b> no projeto.</li>
+      <li><b>OAuth consent screen:</b> <i>External</i> + adicione seu e-mail como <i>test user</i>.</li>
+      <li>Copie o <b>Client ID</b>, cole acima e clique <b>Conectar Google</b>.</li>
+    </ol>
+  </details>
+</section>
+
+</div>
+
+<!-- ===================== MODAL GENÉRICO ===================== -->
+<div class="modal-ov noprint" id="modalOv">
+  <div class="modal" role="dialog" aria-modal="true">
+    <h3 id="modalTitle"></h3>
+    <div id="modalBody"></div>
+    <div class="mfoot">
+      <button class="ghost" id="modalCancel">Cancelar</button>
+      <button class="primary" id="modalSave">Salvar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ============================ DADOS (da máscara) ============================ */
+const L="\n";
+// helper p/ preset (SEED): guarda título + bullets crus; texto é derivado (data-driven)
+function P(titulo, bullets){ return {titulo, bullets}; }
+function presetText(p){ return "- "+p.titulo+":"+L+(p.bullets||[]).map(b=>". "+b).join(L); }
+
+const NEUTRO = {
+  ausente:". Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+  leve:". Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, sem criptite, microabscessos, erosões ou ulcerações.",
+  leveCrip:". Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
+  moderado:". Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite, sem formar microabscessos.",
+  acentuado:". Presença de infiltrado inflamatório neutrofílico acentuado em lâmina própria, com criptite, microabscessos de cripta e erosões, não sendo identificadas ulcerações."
+};
+
+const SEED_SITES = {
+  esofago:{
+    nome:"Esôfago", nomeAmostra:"Mucosa esofágica", eos:"EoE",
+    segmentos:["Terço proximal","Terço médio","Terço distal","Transição esôfago-gástrica"],
+    presets:[
+      P("MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+        "Ausência de hiperplasia da camada basal.",
+        "Ausência de ascensão vascular capilar intraepitelial.",
+        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
+        "Não foi identificada metaplasia intestinal."]),
+      P("ESOFAGITE CRÔNICA MODERADA, INATIVA",[
+        "Hiperplasia da camada basal.",
+        "Espongiose moderada.",
+        "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
+        "Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
+        "Não foi identificada metaplasia intestinal."]),
+      P("ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)",[
+        "Hiperplasia exuberante (papilar) da camada basal.",
+        "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
+        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
+        "Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).",
+        "A exocitose de eosinófilos é localizada predominantemente do terço médio da espessura do epitélio mucoso, não sendo evidenciados microabscessos eosinofílicos.",
+        "Não foi evidenciada degranulação franca de eosinófilos intraepiteliais, no material examinado.",
+        "Presença de áreas de descamação superficial de células epiteliais escamosas de aspecto reativo, não sendo evidenciados eosinófilos entremeados.",
+        "Não foi representada lâmina própria.",
+        "Não foi identificada metaplasia intestinal."]),
+      P("ESOFAGITE EROSIVA FÚNGICA (VIDE NOTAS)",[
+        "Hiperplasia da camada basal.",
+        "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
+        "Exocitose de leucócitos mononucleados (até 40 linfócitos/campo de grande aumento).",
+        "Exocitose discreta de eosinófilos (até 3 eosinófilos/campo de grande aumento).",
+        "Não foi identificada ulceração.",
+        "Presença de induto fibrinoleucocitário superficial contendo alguns neutrófilos, outros leucócitos, além de hifas e leveduras PAS-diastase-positivas, compatíveis com estruturas fúngicas.",
+        "Não foi identificada metaplasia intestinal."])
+    ],
+    criterios:[
+      {g:"Hiperplasia da camada basal", opt:[
+        ["Ausente",". Ausência de hiperplasia da camada basal."],
+        ["Presente",". Hiperplasia da camada basal."],
+        ["Exuberante (papilar)",". Hiperplasia exuberante (papilar) da camada basal."]]},
+      {g:"Espongiose", opt:[
+        ["Leve",". Espongiose leve."],["Moderada",". Espongiose moderada."],["Acentuada",". Espongiose acentuada."]]},
+      {g:"Ascensão vascular", opt:[
+        ["Ausente",". Ausência de ascensão vascular capilar intraepitelial."],
+        ["Terço inferior",". Ascensão vascular até o terço inferior da espessura do epitélio mucoso."],
+        ["Terço médio",". Ascensão vascular até o terço médio da espessura do epitélio mucoso."],
+        ["Terço superior",". Ascensão vascular até o terço superior da espessura do epitélio mucoso."]]},
+      {g:"Exocitose de linfócitos", num:{tpl:". Exocitose de linfócitos pequenos (até {n} linfócitos/campo de grande aumento).", btn:"inserir (até n)"}},
+      {g:"Exocitose de eosinófilos", opt:[
+        ["Sem eosinófilos",". Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento)."]],
+        num:{tpl:". Exocitose de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+      {g:"Neutrófilos / erosão / ulceração", opt:[
+        ["Ausentes",". Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."],
+        ["Presentes",". Presença de exocitose de neutrófilos."]]},
+      {g:"Metaplasia intestinal", opt:[
+        ["Não identificada",". Não foi identificada metaplasia intestinal."],
+        ["Identificada",". Metaplasia intestinal identificada."]]},
+      {g:"Lâmina própria", opt:[
+        ["Não representada",". Não foi representada lâmina própria."],
+        ["Superficial c/ infiltrado",". Lâmina própria superficialmente representada, apresentando infiltrado inflamatório mononuclear leve."]]}
+    ]
+  },
+
+  gastrica:{
+    nome:"Mucosa gástrica", nomeAmostra:"Mucosa gástrica", eos:"EoG",
+    segmentos:["Antro","Corpo/fundo (oxíntico)","Misto oxíntico/mucinoso","Incisura","Transição esôfago-gástrica"],
+    presets:[
+      P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+        "Amostragem: Mucosa gástrica de padrão antral.",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa.","Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
+      P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa."]),
+      P("GASTROPATIA REATIVA EM MUCOSA OXÍNTICA (PADRÃO CORPO/FUNDO)",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa.","Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
+      P("GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO",[
+        "Amostragem: Mucosa gástrica de padrão antral.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (contagem: até 1 eosinófilo/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa."]),
+      P("GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO)",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
+        "Celularidade levemente aumentada de leucócitos mononucleares e eosinófilos em lâmina própria (contagem: até 8 eosinófilos/campo de grande aumento, sendo identificados eosinófilos degranulados).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa."]),
+      P("GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA OXÍNTICA (CORPO/FUNDO), COM PESQUISA PARA H. pylori POSITIVA (+2/+3)",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, sem criptite, microabscessos, erosões ou ulcerações.",
+        "Hiperplasia folicular linfoide: Presente.","Hiperplasia foveolar: Não identificada.",
+        "Ausência de metaplasia intestinal.","Ausência de atrofia.","Pesquisa para H. pylori: Positiva (+2/+3)."]),
+      P("GASTRITE CRÔNICA COM METAPLASIA INTESTINAL COMPLETA E ACENTUADA, SEM DISPLASIA, INATIVA (VIDE NOTAS)",[
+        "Amostragem: Mucosa gástrica superficial, não sendo identificadas glândulas profundas.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia franca (contagem: até 10 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Presente, completa, acentuada.","Atrofia: Presente, acentuada.",
+        "Displasia: Não identificada.","Pesquisa para H. pylori: Negativa."]),
+      P("GASTROPATIA DE PADRÃO LINFOCITÁRIO, EM ATIVIDADE MODERADA (VIDE NOTAS)",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo) e padrão misto oxíntico/mucinoso.",
+        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento).",
+        "Presença de evidente exocitose de linfócitos ao epitélio gástrico foveolar e glandular.",
+        "Presença de infiltrado inflamatório neutrofílico leve, com criptite apenas em mucosa gástrica de padrão oxíntico.",
+        "Agregados linfoides: Presentes.","Hiperplasia foveolar: Leve.","Metaplasia intestinal: Não identificada.",
+        "Atrofia: Leve (em mucosa de padrão oxíntico) e moderada (em mucosa de padrão misto oxíntico/mucinoso).",
+        "Pesquisa para H. pylori: Negativa."])
+    ],
+    criterios:[
+      {g:"Amostragem (padrão)", opt:[
+        ["Antral",". Amostragem: Mucosa gástrica de padrão antral."],
+        ["Oxíntico (corpo/fundo)",". Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo)."],
+        ["Misto oxínt./mucinoso",". Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso."]]},
+      {g:"Celularidade mononuclear (lâmina própria)", opt:[
+        ["Habitual",". Celularidade habitual de leucócitos mononucleares em lâmina própria."],
+        ["Levemente aumentada",". Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria."],
+        ["Moderadamente aumentada",". Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria."],
+        ["Severamente aumentada",". Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada."]]},
+      {g:"Eosinófilos", opt:[
+        ["Sem eosinofilia",". Não foi identificada eosinofilia (0 eosinófilos/campo de grande aumento)."]],
+        num:{tpl:". Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+      {g:"Infiltrado neutrofílico", opt:[
+        ["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve],["Moderado c/ criptite",NEUTRO.moderado],["Acentuado",NEUTRO.acentuado]]},
+      {g:"Hiperplasia foveolar", opt:[
+        ["Não identificada",". Hiperplasia foveolar: Não identificada."],["Leve",". Hiperplasia foveolar: Leve."],
+        ["Moderada",". Hiperplasia foveolar: Moderada."],["Acentuada",". Hiperplasia foveolar: Acentuada."]]},
+      {g:"Metaplasia intestinal", opt:[
+        ["Não identificada",". Metaplasia intestinal: Não identificada."],
+        ["Completa, acentuada",". Metaplasia intestinal: Presente, completa, acentuada."],
+        ["Incompleta",". Metaplasia intestinal: Presente, incompleta."]]},
+      {g:"Atrofia", opt:[
+        ["Não identificada",". Atrofia: Não identificada."],["Leve",". Atrofia: Leve."],
+        ["Moderada",". Atrofia: Moderada."],["Acentuada",". Atrofia: Presente, acentuada."]]},
+      {g:"Displasia", opt:[
+        ["Não identificada",". Displasia: Não identificada."],["Baixo grau",". Displasia: Presente, de baixo grau."],["Alto grau",". Displasia: Presente, de alto grau."]]},
+      {g:"Hiperplasia folicular linfoide", opt:[
+        ["Presente",". Hiperplasia folicular linfoide: Presente."],["Ausente",". Hiperplasia folicular linfoide: Não identificada."]]},
+      {g:"H. pylori", opt:[
+        ["Negativa",". Pesquisa para H. pylori: Negativa."],["Positiva (+1)",". Pesquisa para H. pylori: Positiva (+1)."],
+        ["Positiva (+2/+3)",". Pesquisa para H. pylori: Positiva (+2/+3)."]]},
+      {g:"OLGA", opt:[["0",". Classificação OLGA: Estágio 0."],["I",". Classificação OLGA: Estágio I."],["II",". Classificação OLGA: Estágio II."],["III",". Classificação OLGA: Estágio III."],["IV",". Classificação OLGA: Estágio IV."]]},
+      {g:"OLGIM", opt:[["0",". Classificação OLGIM: Estágio 0."],["I",". Classificação OLGIM: Estágio I."],["II",". Classificação OLGIM: Estágio II."],["III",". Classificação OLGIM: Estágio III."],["IV",". Classificação OLGIM: Estágio IV."]]}
+    ]
+  },
+
+  duodeno:{
+    nome:"Duodeno", nomeAmostra:"Mucosa duodenal", eos:"EoN",
+    segmentos:["Bulbo","2ª porção (descendente)","Distal"],
+    presets:[
+      P("MUCOSA DUODENAL SEM PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+        "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
+        "Presença de glândulas de Brünner.",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos nas pontas das vilosidades).",
+        "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
+        "Classificação de Marsh-Oberhuber (1999): 0."]),
+      P("DUODENITE CRÔNICA INESPECÍFICA, INATIVA",[
+        "Arquitetura alterada: Mucosa entérica com vilosidades focalmente hipotróficas, não sendo identificadas criptas hipertróficas.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Linfocitose intraepitelial: Não identificada (exocitose de até 15 linfócitos/100 enterócitos nas pontas das vilosidades).",
+        "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
+        "Classificação de Marsh-Oberhuber (1999): 0."]),
+      P("DUODENITE CRÔNICA, DE PADRÃO LINFOCÍTICO, EM ATIVIDADE LEVE, COM VILOSIDADES ATRÓFICAS (APLAINAMENTO SEVERO) E CRIPTAS HIPERTRÓFICAS (VIDE NOTAS)",[
+        "Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, sem criptite, microabscessos, erosões ou ulcerações.",
+        "Linfocitose intraepitelial: Presente (exocitose de aproximadamente 40 linfócitos/100 enterócitos nas pontas das vilosidades).",
+        "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
+        "Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo)."])
+    ],
+    criterios:[
+      {g:"Arquitetura vilositária", opt:[
+        ["Preservada",". Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas."],
+        ["Focalmente hipotrófica",". Arquitetura alterada: Mucosa entérica com vilosidades focalmente hipotróficas, não sendo identificadas criptas hipertróficas."],
+        ["Atrofia global/severa",". Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas."]]},
+      {g:"Glândulas de Brünner", opt:[["Presentes",". Presença de glândulas de Brünner."]]},
+      {g:"Celularidade mononuclear", opt:[
+        ["Preservada",". Celularidade preservada de leucócitos mononucleares em lâmina própria."],
+        ["Levemente aumentada",". Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria."]]},
+      {g:"Eosinófilos", num:{tpl:". Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+      {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve]]},
+      {g:"Linfocitose intraepitelial (n/100 enter.)", num:{tpl:". Linfocitose intraepitelial: Presente (exocitose de aproximadamente {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"Presente (n)",
+         alt:{tpl:". Linfocitose intraepitelial: Não identificada (exocitose de até {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"Não ident. (até n)"}}},
+      {g:"Agregados linfoides", opt:[["Presentes",". Agregados linfoides: Presentes."],["Ausentes",". Agregados linfoides: Não identificados."]]},
+      {g:"Parasitos", opt:[["Não identificados",". Parasitos: Não identificados."],["Identificados",". Parasitos: Identificados."]]},
+      {g:"Linfangiectasias", opt:[["Não identificadas",". Linfangiectasias: Não identificadas."],["Identificadas",". Linfangiectasias: Identificadas."]]},
+      {g:"Marsh-Oberhuber (1999)", opt:[
+        ["0",". Classificação de Marsh-Oberhuber (1999): 0."],["1",". Classificação de Marsh-Oberhuber (1999): 1."],
+        ["2",". Classificação de Marsh-Oberhuber (1999): 2."],["3A",". Classificação de Marsh-Oberhuber (1999): 3A."],
+        ["3B",". Classificação de Marsh-Oberhuber (1999): 3B."],["3C",". Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo)."]]}
+    ]
+  },
+
+  ileo:{
+    nome:"Íleo", nomeAmostra:"Mucosa de íleo terminal", eos:"EoN",
+    segmentos:["Íleo terminal","Íleo (neoterminal)","Bolsa ileal"],
+    presets:[
+      P("MUCOSA DE ÍLEO APRESENTANDO",[
+        "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
+      P("ILEÍTE ATIVA MODERADA",[
+        "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
+        "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
+      P("ILEÍTE CRÔNICA EM ATIVIDADE MODERADA",[
+        "Arquitetura alterada: Encurtamento focal de vilosidades, focalmente associado a leve linfocitose intraepitelial das mesmas.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite, sem formar microabscessos.",
+        "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."])
+    ],
+    criterios:[
+      {g:"Arquitetura", opt:[
+        ["Preservada",". Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas."],
+        ["Encurtamento focal de vilos.",". Arquitetura alterada: Encurtamento focal de vilosidades, focalmente associado a leve linfocitose intraepitelial das mesmas."],
+        ["Atrofia global/severa",". Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas."]]},
+      {g:"Celularidade mononuclear", opt:[
+        ["Preservada",". Celularidade preservada de leucócitos mononucleares em lâmina própria."],
+        ["Levemente aumentada",". Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve."]]},
+      {g:"Eosinófilos", num:{tpl:". Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+      {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve],["Moderado c/ criptite",NEUTRO.moderado],["Acentuado",NEUTRO.acentuado]]},
+      {g:"Hiperplasia folicular linfoide", opt:[["Presente",". Hiperplasia folicular linfoide: Presente."],["Ausente",". Hiperplasia folicular linfoide: Não identificada."]]},
+      {g:"Edema / vasocongestão", opt:[["Presente",". Presença de edema e vasocongestão."]]}
+    ]
+  },
+
+  colon:{
+    nome:"Cólon", nomeAmostra:"Mucosa colônica", eos:"EoC",
+    segmentos:["Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Anastomose íleo-retal"],
+    presets:[
+      P("MUCOSA COLÔNICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+        "Arquitetura glandular preservada.",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Presença de edema e vasocongestão."]),
+      P("COLITE CRÔNICA EM ATIVIDADE LEVE",[
+        "Arquitetura alterada: Perda do paralelismo glandular.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
+      P("COLITE CRÔNICA EM ATIVIDADE MODERADA",[
+        "Arquitetura alterada: Perda do paralelismo glandular.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
+        "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
+      P("COLITE CRÔNICA EM ATIVIDADE ACENTUADA, DESTRUTIVA",[
+        "Arquitetura alterada: Perda do paralelismo, ramificação e rarefação glandular; metaplasia de células Paneth e metaplasia mucinosa; áreas de atrofia glandular, com áreas de destruição de glândulas pelo infiltrado inflamatório.",
+        "Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada, não sendo identificada eosinofilia franca (até 60 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico acentuado em lâmina própria, com criptite, microabscessos de cripta e erosões, não sendo identificadas ulcerações.",
+        "Agregado linfoide: Presente.","Presença de edema e vasocongestão."]),
+      P("COLITE CRÔNICA INATIVA",[
+        "Arquitetura alterada: Perda do paralelismo glandular.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Agregado linfoide: Presente."]),
+      P("EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA",[
+        "Amostra exígua, pouco representativa.","Arquitetura alterada: Perda do paralelismo glandular.",
+        "Presença de infiltrado inflamatório mononuclear (linfohistoplasmocitário) moderado em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Agregado linfoide: Presente."]),
+      P("COLOPATIA DE PADRÃO LINFOCITÁRIO, INATIVA (VIDE NOTAS)",[
+        "Arquitetura alterada: Perda do paralelismo glandular e hiperplasia de células caliciformes focal.",
+        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento).",
+        "Presença de evidente exocitose de linfócitos ao epitélio.",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Agregados foliculares linfoides: Presentes, exuberantes, com linfócitos de tamanhos variáveis.","Presença de edema e vasocongestão."])
+    ],
+    criterios:null // preenchido abaixo (compartilhado com reto)
+  },
+
+  reto:{
+    nome:"Reto", nomeAmostra:"Reto", eos:"EoC",
+    segmentos:["Reto","Junção retossigmoide","Canal anal"],
+    presets:[
+      P("RETITE ATIVA LEVE",[
+        "Arquitetura glandular preservada.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Presença de edema e vasocongestão."]),
+      P("COLITE CRÔNICA INATIVA",[
+        "Arquitetura alterada: Perda do paralelismo glandular.",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Agregado linfoide: Não identificado.","Presença de edema e vasocongestão."])
+    ],
+    criterios:null
+  }
+};
+
+// critérios compartilhados cólon/reto
+const CRIT_COLON = [
+  {g:"Arquitetura glandular", opt:[
+    ["Preservada",". Arquitetura glandular preservada."],
+    ["Perda do paralelismo",". Arquitetura alterada: Perda do paralelismo glandular."],
+    ["Paral. + caliciformes focal",". Arquitetura alterada: Perda do paralelismo glandular e hiperplasia de células caliciformes focal."],
+    ["Ramificação/rarefação",". Arquitetura alterada: Perda do paralelismo, ramificação e rarefação glandular."],
+    ["Destrutiva (Paneth/mucinosa)",". Arquitetura alterada: Perda do paralelismo, ramificação e rarefação glandular; metaplasia de células Paneth e metaplasia mucinosa; áreas de atrofia glandular, com áreas de destruição de glândulas pelo infiltrado inflamatório."]]},
+  {g:"Celularidade mononuclear", opt:[
+    ["Habitual",". Celularidade habitual de leucócitos mononucleares em lâmina própria."],
+    ["Levemente aumentada",". Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve."],
+    ["Moderadamente aumentada",". Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria."],
+    ["Severamente aumentada",". Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada."]]},
+  {g:"Eosinófilos (atenção ao gradiente)", opt:[
+    ["Sem eosinofilia",". Não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento)."]],
+    num:{tpl:". Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+  {g:"Exocitose de linfócitos ao epitélio", opt:[["Presente",". Presença de evidente exocitose de linfócitos ao epitélio."]]},
+  {g:"Infiltrado neutrofílico", opt:[
+    ["Ausente",NEUTRO.ausente],
+    ["Leve, sem criptite",". Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, não sendo identificadas criptite, microabscessos, erosão ou ulceração."],
+    ["Leve/moderado, sem criptite",". Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração."],
+    ["Leve/moderado c/ criptite",NEUTRO.leveCrip],
+    ["Acentuado (microabsc./erosão)",NEUTRO.acentuado]]},
+  {g:"Folículos / agregados linfoides", opt:[
+    ["Hiperplasia folicular presente",". Hiperplasia folicular linfoide: Presente."],
+    ["Agregado linfoide presente",". Agregado linfoide: Presente."],
+    ["Agregados exuberantes",". Agregados foliculares linfoides: Presentes, exuberantes, com linfócitos de tamanhos variáveis."],
+    ["Não identificado",". Agregado linfoide: Não identificado."]]},
+  {g:"Edema / vasocongestão", opt:[["Presente",". Presença de edema e vasocongestão."]]}
+];
+SEED_SITES.colon.criterios = CRIT_COLON;
+SEED_SITES.reto.criterios = CRIT_COLON;
+
+// NOTAS padrão do SEED (tag ≤20 char + texto)
+const NOTAS_PADRAO = [
+  {tag:"Inespecífico", texto:"Os quadros histológicos descritos das amostras examinadas são discretos e inespecíficos."},
+  {tag:"EoE", texto:"Não foram identificados achados histológicos sugestivos de esofagite eosinofílica nos materiais examinados."},
+  {tag:"Correlação", texto:"Imprescindível correlação com dados clínicos, laboratoriais e endoscópicos/colonoscópicos para melhor definição diagnóstica."},
+  {tag:"Granulomas/Displasia", texto:"Não foram evidenciados granulomas ou displasia em nenhum dos materiais examinados."},
+  {tag:"Infecciosa", texto:"A pesquisa para agentes infecciosos específicos foi negativa nas amostras examinadas. Não foram identificadas alterações citopáticas sugestivas de ação viral. O exame histopatológico não é o método padrão-ouro para o diagnóstico de doenças infecciosas, sendo imprescindível a correlação com outros dados laboratoriais para melhor definição diagnóstica."},
+  {tag:"Correlação MV PEP", texto:"Foi feita correlação com dados clínicos disponíveis em prontuário eletrônico (MV PEP HCB)."},
+  {tag:"DII", texto:"Os quadros histológicos descritos são compatíveis com a hipótese diagnóstica clínica de DOENÇA INFLAMATÓRIA INTESTINAL EM ATIVIDADE."},
+  {tag:"Eosinofílico", texto:"O aumento da celularidade de eosinófilos nas amostras examinadas pode ser encontrado em diversos contextos clínicos, inclusive em DOENÇA INFLAMATÓRIA INTESTINAL. Vide referências bibliográficas."},
+  {tag:"Linfocitário", texto:"O achado histopatológico de gastropatia/colopatia de padrão linfocitário pode ser encontrado em diversas condições clínicas, sendo imprescindível a correlação com dados clínicos, de imagem, endoscópicos/colonoscópicos e demais dados laboratoriais para melhor definição diagnóstica (DII? OUTRA?)."}
+];
+
+const REFS_HEADER = "REFERÊNCIAS BIBLIOGRÁFICAS:";
+// REFS do SEED (tag eosinofílica; tags/CRUD chegam na Etapa 3)
+const SEED_REFS = [
+  {tag:"Eosinofílico", texto:"Dellon ES, Gonsalves N, Abonia JP, et al. International Consensus Recommendations for Eosinophilic Gastrointestinal Disease Nomenclature. Clin Gastroenterol Hepatol. 2022;20(11):2474-2484.e3."},
+  {tag:"Eosinofílico", texto:"Papadopoulou A, Amil-Dias J, Auth MKH, et al. Joint ESPGHAN/NASPGHAN Guidelines on Childhood Eosinophilic Gastrointestinal Disorders Beyond Eosinophilic Esophagitis. J Pediatr Gastroenterol Nutr. 2024;78(1):122-152."},
+  {tag:"Eosinofílico", texto:"Spergel JM, Dellon ES, Liacouras CA, et al. Summary of the updated international consensus diagnostic criteria for eosinophilic esophagitis: AGREE conference. Ann Allergy Asthma Immunol. 2018;121(3):281-284."}
+];
+
+/* ============================ ESTADO (modelo DB v2) ============================ */
+const LS_DB="laudoGI_db_v2";
+const LS_STATE="laudoGI_state_v1", LS_SEG="laudoGI_segs_v1"; // chaves v1 (migração)
+let editIndex = -1; // -1 = nova amostra; >=0 = editando
+
+function load(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;} }
+const $=id=>document.getElementById(id);
+const letterOf=i=>String.fromCharCode(65+i);
+
+// uid p/ browser (Date.now()+random é permitido)
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,8); }
+
+// Constrói um objeto de sítio (deep copy do SEED, ids frescos)
+function seedSiteObj(k){
+  const s=SEED_SITES[k];
+  return {
+    id:k, nome:s.nome, nomeAmostra:s.nomeAmostra, eos:s.eos,
+    segmentos:(s.segmentos||[]).slice(),
+    presets:(s.presets||[]).map(p=>({id:uid(), titulo:p.titulo, bullets:(p.bullets||[]).slice()})),
+    criterios:(s.criterios||[]).map(c=>({
+      id:uid(), g:c.g,
+      opt:c.opt?c.opt.map(o=>o.slice()):null,
+      num:c.num?JSON.parse(JSON.stringify(c.num)):null
+    }))
+  };
+}
+
+// Constrói o DB mutável a partir do SEED imutável (deep copy; sem referências ao SEED)
+function buildSeedDB(){
+  const sites={}, siteOrder=[];
+  Object.keys(SEED_SITES).forEach(k=>{ siteOrder.push(k); sites[k]=seedSiteObj(k); });
+  return {
+    v:2, updatedAt:Date.now(), settings:{clientId:""},
+    library:{
+      siteOrder, sites,
+      notas:NOTAS_PADRAO.map(n=>({id:uid(), tag:n.tag||"", texto:n.texto})),
+      refs:SEED_REFS.map(r=>({id:uid(), tag:r.tag||"", texto:r.texto}))
+    },
+    work:{ samples:[], notasSel:[], refsSel:[], notasFree:"", refsFree:"" }
+  };
+}
+
+// Migração v1 → v2 (sem perda): estado + segmentos custom
+function migrateV1(db){
+  const oldState=load(LS_STATE), oldSeg=load(LS_SEG);
+  if(oldState){
+    if(Array.isArray(oldState.samples)) db.work.samples=oldState.samples.map(s=>({nome:s.nome||"", corpo:s.corpo||""}));
+    if(oldState.notas) db.work.notasFree=String(oldState.notas); // texto v1 vai íntegro p/ campo livre
+    if(oldState.refs) db.work.refsSel=db.library.refs.map(r=>r.id); // checkbox v1 = todas as refs do SEED
+  }
+  if(oldSeg && typeof oldSeg==="object"){
+    Object.keys(oldSeg).forEach(sid=>{
+      if(db.library.sites[sid] && Array.isArray(oldSeg[sid])){
+        oldSeg[sid].forEach(v=>{ if(v && !db.library.sites[sid].segmentos.includes(v)) db.library.sites[sid].segmentos.push(v); });
+      }
+    });
+  }
+  return db;
+}
+
+// Carrega/inicializa DB
+let DB = load(LS_DB);
+if(!DB || DB.v!==2){
+  DB = buildSeedDB();
+  if(load(LS_STATE) || load(LS_SEG)) migrateV1(DB); // só migra se havia estado v1
+  saveNow();
+}
+
+// Save debounced (+ saveNow imediato p/ fluxos críticos)
+let saveT;
+function saveNow(){ DB.updatedAt=Date.now(); try{ localStorage.setItem(LS_DB, JSON.stringify(DB)); }catch(e){} scheduleDrivePush(); }
+function save(){ clearTimeout(saveT); saveT=setTimeout(saveNow, 400); }
+
+// Acessores da library
+function siteById(id){ return DB.library.sites[id]; }
+function notaById(id){ return DB.library.notas.find(n=>n.id===id); }
+function refById(id){ return DB.library.refs.find(r=>r.id===id); }
+
+/* ===================== CRUD da library (Etapa 2) ===================== */
+// Sítios (item 1)
+function addSite(d){
+  const id=uid();
+  DB.library.sites[id]={ id, nome:d.nome, nomeAmostra:d.nomeAmostra||d.nome, eos:d.eos||"", segmentos:[], presets:[], criterios:[] };
+  DB.library.siteOrder.push(id); saveNow(); return id;
+}
+function updateSite(id,d){ const s=siteById(id); if(!s) return; s.nome=d.nome; s.nomeAmostra=d.nomeAmostra||d.nome; s.eos=d.eos||""; saveNow(); }
+function deleteSite(id){ if(DB.library.siteOrder.length<=1) return false; delete DB.library.sites[id]; DB.library.siteOrder=DB.library.siteOrder.filter(k=>k!==id); saveNow(); return true; }
+
+// Segmentos (string simples)
+function addSeg(sid,v){ const s=siteById(sid); if(v&&!s.segmentos.includes(v)) s.segmentos.push(v); saveNow(); }
+function updateSeg(sid,i,v){ const s=siteById(sid); if(i>=0&&i<s.segmentos.length&&v) s.segmentos[i]=v; saveNow(); }
+function deleteSeg(sid,i){ const s=siteById(sid); if(i>=0&&i<s.segmentos.length) s.segmentos.splice(i,1); saveNow(); }
+
+// Diagnósticos prontos / presets (item 5)
+function addPreset(sid,d){ siteById(sid).presets.push({id:uid(), titulo:d.titulo, bullets:d.bullets||[]}); saveNow(); }
+function updatePreset(sid,pid,d){ const p=siteById(sid).presets.find(x=>x.id===pid); if(p){ p.titulo=d.titulo; p.bullets=d.bullets||[]; } saveNow(); }
+function deletePreset(sid,pid){ const s=siteById(sid); s.presets=s.presets.filter(x=>x.id!==pid); saveNow(); }
+
+// Critérios (item 6)
+function addCriterio(sid,d){ siteById(sid).criterios.push({id:uid(), g:d.g, opt:d.opt||null, num:d.num||null}); saveNow(); }
+function updateCriterio(sid,cid,d){ const c=siteById(sid).criterios.find(x=>x.id===cid); if(c){ c.g=d.g; c.opt=d.opt||null; c.num=d.num||null; } saveNow(); }
+function deleteCriterio(sid,cid){ const s=siteById(sid); s.criterios=s.criterios.filter(x=>x.id!==cid); saveNow(); }
+
+// Parsers de texto ↔ estrutura (para os modais)
+function parseBullets(text){ return (text||"").split("\n").map(s=>s.replace(/^[.\-\s]+/,"").trim()).filter(Boolean); }
+function bulletsToText(bullets){ return (bullets||[]).join("\n"); }
+function parseOpt(text){
+  const rows=(text||"").split("\n").map(l=>l.trim()).filter(Boolean).map(l=>{
+    const i=l.indexOf("::"); if(i<0) return null;
+    const rot=l.slice(0,i).trim(); let txt=l.slice(i+2).trim();
+    if(txt && !txt.startsWith(".")) txt=". "+txt; // normaliza p/ formato de linha do laudo
+    return rot?[rot,txt]:null;
+  }).filter(Boolean);
+  return rows.length?rows:null;
+}
+function optToText(opt){ return (opt||[]).map(([r,t])=>r+" :: "+String(t).replace(/^\.\s*/,"")).join("\n"); }
+
+// Restaurar padrões por seção (re-semeia do SEED SEM apagar o resto)
+function restoreSeedPresets(sid){ const seed=SEED_SITES[sid]; if(!seed) return false; const have=new Set(siteById(sid).presets.map(p=>p.titulo)); seed.presets.forEach(p=>{ if(!have.has(p.titulo)) siteById(sid).presets.push({id:uid(), titulo:p.titulo, bullets:(p.bullets||[]).slice()}); }); saveNow(); return true; }
+function restoreSeedCriterios(sid){ const seed=SEED_SITES[sid]; if(!seed) return false; const have=new Set(siteById(sid).criterios.map(c=>c.g)); (seed.criterios||[]).forEach(c=>{ if(!have.has(c.g)) siteById(sid).criterios.push({id:uid(), g:c.g, opt:c.opt?c.opt.map(o=>o.slice()):null, num:c.num?JSON.parse(JSON.stringify(c.num)):null}); }); saveNow(); return true; }
+function restoreSeedSegs(sid){ const seed=SEED_SITES[sid]; if(!seed) return false; (seed.segmentos||[]).forEach(v=>{ if(!siteById(sid).segmentos.includes(v)) siteById(sid).segmentos.push(v); }); saveNow(); return true; }
+function restoreSeedSites(){ Object.keys(SEED_SITES).forEach(k=>{ if(!DB.library.sites[k]){ DB.library.sites[k]=seedSiteObj(k); DB.library.siteOrder.push(k); } }); saveNow(); }
+
+// Notas & Refs (tags + CRUD) — Etapa 3
+function addNota(d){ DB.library.notas.push({id:uid(), tag:(d.tag||"").slice(0,20), texto:d.texto||""}); saveNow(); }
+function updateNota(id,d){ const n=notaById(id); if(n){ n.tag=(d.tag||"").slice(0,20); n.texto=d.texto||""; } saveNow(); }
+function deleteNota(id){ DB.library.notas=DB.library.notas.filter(n=>n.id!==id); DB.work.notasSel=DB.work.notasSel.filter(x=>x!==id); saveNow(); }
+function addRef(d){ DB.library.refs.push({id:uid(), tag:(d.tag||"").slice(0,20), texto:d.texto||""}); saveNow(); }
+function updateRef(id,d){ const r=refById(id); if(r){ r.tag=(d.tag||"").slice(0,20); r.texto=d.texto||""; } saveNow(); }
+function deleteRef(id){ DB.library.refs=DB.library.refs.filter(r=>r.id!==id); DB.work.refsSel=DB.work.refsSel.filter(x=>x!==id); saveNow(); }
+function restoreSeedNotas(){ const have=new Set(DB.library.notas.map(n=>n.texto)); NOTAS_PADRAO.forEach(n=>{ if(!have.has(n.texto)) DB.library.notas.push({id:uid(), tag:n.tag, texto:n.texto}); }); saveNow(); }
+function restoreSeedRefs(){ const have=new Set(DB.library.refs.map(r=>r.texto)); SEED_REFS.forEach(r=>{ if(!have.has(r.texto)) DB.library.refs.push({id:uid(), tag:r.tag, texto:r.texto}); }); saveNow(); }
+// busca por tag OU corpo
+function matchQ(item,q){ if(!q) return true; q=q.toLowerCase(); return (item.tag||"").toLowerCase().indexOf(q)>=0 || (item.texto||"").toLowerCase().indexOf(q)>=0; }
+function toggleIn(arr,id){ const i=arr.indexOf(id); if(i>=0) arr.splice(i,1); else arr.push(id); }
+
+/* ============================ TOAST ============================ */
+let toastT;
+function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1700); }
+
+/* ============================ MODAL GENÉRICO ============================ */
+let _modalSave=null;
+// opts: {title, fields:[{key,label,type:'text'|'textarea',value,rows,placeholder,hint}], onSave(vals)->false p/ manter aberto, saveLabel}
+function modalOpen(opts){
+  $("modalTitle").textContent=opts.title||"";
+  const body=$("modalBody"); body.innerHTML="";
+  (opts.fields||[]).forEach(f=>{
+    const w=document.createElement("div"); w.className="mfield";
+    const lab=document.createElement("label"); lab.textContent=f.label||"";
+    w.appendChild(lab);
+    let inp;
+    if(f.type==="textarea"){ inp=document.createElement("textarea"); inp.rows=f.rows||6; }
+    else { inp=document.createElement("input"); inp.type="text"; }
+    inp.value=f.value!=null?f.value:""; if(f.placeholder) inp.placeholder=f.placeholder;
+    inp.setAttribute("data-key",f.key);
+    w.appendChild(inp);
+    if(f.hint){ const h=document.createElement("span"); h.className="mhint"; h.textContent=f.hint; w.appendChild(h); }
+    body.appendChild(w);
+  });
+  $("modalSave").textContent=opts.saveLabel||"Salvar";
+  _modalSave=()=>{
+    const vals={};
+    body.querySelectorAll("[data-key]").forEach(el=>{ vals[el.getAttribute("data-key")]=el.value; });
+    const res=opts.onSave? opts.onSave(vals) : true;
+    if(res!==false) modalClose();
+  };
+  $("modalOv").classList.add("show");
+  const first=body.querySelector("input,textarea"); if(first) first.focus();
+}
+function modalClose(){ $("modalOv").classList.remove("show"); _modalSave=null; }
+$("modalCancel").onclick=modalClose;
+$("modalSave").onclick=()=>{ if(_modalSave) _modalSave(); };
+$("modalOv").onclick=(e)=>{ if(e.target===$("modalOv")) modalClose(); };
+
+/* ============================ EDITOR / INSERÇÃO ============================ */
+function appendLine(line){
+  const ta=$("corpo"); let v=ta.value;
+  if(v && !v.endsWith("\n")) v+="\n";
+  ta.value = v + line;
+  ta.focus(); ta.scrollTop = ta.scrollHeight;
+}
+function appendBlock(block){
+  const ta=$("corpo"); let v=ta.value.trim();
+  ta.value = v ? v+"\n \n"+block : block;
+  ta.focus(); ta.scrollTop = ta.scrollHeight;
+}
+
+/* ============================ RENDER SÍTIO ============================ */
+function currentSite(){ return siteById($("fSitio").value); }
+
+function renderSitioSelect(){
+  $("fSitio").innerHTML = DB.library.siteOrder.map(k=>`<option value="${k}">${DB.library.sites[k].nome}</option>`).join("");
+}
+function renderSeg(){
+  const sid=$("fSitio").value, base=siteById(sid).segmentos||[];
+  const all=[""].concat(base);
+  $("fSeg").innerHTML = all.map(s=>`<option value="${s.replace(/"/g,'&quot;')}">${s||"— (sem segmento)"}</option>`).join("");
+}
+function renderPresets(){
+  const site=currentSite(); const box=$("presetBox"); box.innerHTML="";
+  if(!site.presets.length){ box.innerHTML='<p class="hint">Nenhum diagnóstico pronto. Use “➕ Novo diagnóstico” ou “↺ Restaurar padrões”.</p>'; return; }
+  site.presets.forEach((p,i)=>{
+    const row=document.createElement("div"); row.className="preset-row";
+    const b=document.createElement("button"); b.type="button"; b.className="preset";
+    b.innerHTML=`<b>${esc(p.titulo)}</b><span>${(p.bullets||[]).length} itens · clique p/ inserir bloco</span>`;
+    b.onclick=()=>{ appendBlock(presetText(site.presets[i])); toast("Bloco inserido"); };
+    const ctrl=document.createElement("span"); ctrl.className="pr-ctrl";
+    const ed=document.createElement("button"); ed.type="button"; ed.className="mini"; ed.textContent="✏️"; ed.title="Editar"; ed.onclick=()=>editPresetModal(site.id,p.id);
+    const dl=document.createElement("button"); dl.type="button"; dl.className="mini danger"; dl.textContent="🗑"; dl.title="Apagar";
+    dl.onclick=()=>{ if(confirm("Apagar diagnóstico “"+p.titulo+"”?")){ deletePreset(site.id,p.id); renderPresets(); toast("Apagado"); } };
+    ctrl.appendChild(ed); ctrl.appendChild(dl);
+    row.appendChild(b); row.appendChild(ctrl); box.appendChild(row);
+  });
+}
+function renderCrit(){
+  const site=currentSite();
+  const box=$("critBox"); box.innerHTML="";
+  if(!site.criterios.length){ box.innerHTML='<p class="hint">Nenhum critério. Use “➕ Novo critério” ou “↺ Restaurar padrões”.</p>'; return; }
+  site.criterios.forEach(c=>{
+    const div=document.createElement("div"); div.className="crit";
+    const lab=document.createElement("span"); lab.className="glabel";
+    const gname=document.createElement("span"); gname.textContent=c.g; lab.appendChild(gname);
+    const cctrl=document.createElement("span"); cctrl.className="c-ctrl";
+    const ed=document.createElement("button"); ed.type="button"; ed.className="mini"; ed.textContent="✏️"; ed.title="Editar critério"; ed.onclick=()=>editCriterioModal(site.id,c.id);
+    const dl=document.createElement("button"); dl.type="button"; dl.className="mini danger"; dl.textContent="🗑"; dl.title="Apagar critério";
+    dl.onclick=()=>{ if(confirm("Apagar critério “"+c.g+"”?")){ deleteCriterio(site.id,c.id); renderCrit(); toast("Apagado"); } };
+    cctrl.appendChild(ed); cctrl.appendChild(dl); lab.appendChild(cctrl);
+    div.appendChild(lab);
+    const opts=document.createElement("div"); opts.className="opts";
+    (c.opt||[]).forEach(([label,text])=>{
+      const btn=document.createElement("button"); btn.type="button"; btn.textContent=label;
+      btn.onclick=()=>{ appendLine(text); toast(label); };
+      opts.appendChild(btn);
+    });
+    if(c.num){
+      const mk=(numCfg)=>{
+        const wrap=document.createElement("span"); wrap.className="num";
+        const inp=document.createElement("input"); inp.type="number"; inp.min="0"; inp.placeholder="nº"; inp.step="1";
+        const go=document.createElement("button"); go.type="button"; go.textContent=numCfg.btn;
+        go.onclick=()=>{ const n=inp.value.trim(); if(n==="" ) {toast("Digite o nº");return;} appendLine(numCfg.tpl.replace("{n}",n)); toast("Inserido: "+n); };
+        wrap.appendChild(inp); wrap.appendChild(go); return wrap;
+      };
+      opts.appendChild(mk(c.num));
+      if(c.num.alt) opts.appendChild(mk(c.num.alt));
+    }
+    div.appendChild(opts); box.appendChild(div);
+  });
+}
+function applyDefaultName(){
+  const site=currentSite(), seg=$("fSeg").value;
+  let base=site.nomeAmostra;
+  if(seg){ base = (site.nome==="Cólon"||site.nome==="Reto") ? seg : base+" ("+seg.toLowerCase()+")"; }
+  $("fNome").value=base;
+}
+function onSiteChange(){ renderSeg(); renderPresets(); renderCrit(); applyDefaultName(); }
+
+/* ============================ SALVAR AMOSTRA ============================ */
+function nextLetter(){ return letterOf(DB.work.samples.length); }
+function resetEditor(){
+  editIndex=-1;
+  $("corpo").value="";
+  $("fLetra").value = nextLetter();
+  $("fSitio").selectedIndex=0; onSiteChange();
+  $("btnSalvar").textContent="✓ Salvar amostra (empilhar)";
+  $("btnCancelEdit").style.display="none";
+}
+$("btnSalvar").onclick=()=>{
+  const nome=$("fNome").value.trim(), corpo=$("corpo").value.trim();
+  if(!nome){ toast("Falta o nome da amostra"); $("fNome").focus(); return; }
+  if(!corpo){ toast("Editor vazio"); $("corpo").focus(); return; }
+  const obj={nome, corpo};
+  if(editIndex>=0){ DB.work.samples[editIndex]=obj; toast("Amostra atualizada"); }
+  else { DB.work.samples.push(obj); toast("Amostra salva"); }
+  saveNow(); resetEditor(); renderAll();
+};
+$("btnCancelEdit").onclick=()=>{ resetEditor(); };
+$("btnLimparEditor").onclick=()=>{ $("corpo").value=""; $("corpo").focus(); };
+
+/* ============================ LISTA / MONTAGEM ============================ */
+function renderSampleList(){
+  const ul=$("sampleList"); ul.innerHTML="";
+  $("emptyHint").style.display = DB.work.samples.length? "none":"block";
+  DB.work.samples.forEach((s,i)=>{
+    const li=document.createElement("li");
+    const prev=s.corpo.split("\n").find(x=>x.trim().startsWith("-"))||s.corpo.slice(0,60);
+    li.innerHTML=`<span class="si-letter">${letterOf(i)})</span>
+      <span class="si-body"><span class="si-name">${esc(s.nome)}</span><br><span class="si-prev">${esc(prev.replace(/^[-.\s]+/,""))}</span></span>`;
+    const ctrl=document.createElement("span"); ctrl.className="si-ctrl";
+    ctrl.appendChild(mkBtn("↑",()=>move(i,-1)));
+    ctrl.appendChild(mkBtn("↓",()=>move(i,1)));
+    ctrl.appendChild(mkBtn("editar",()=>editSample(i)));
+    const del=mkBtn("excluir",()=>{ if(confirm("Excluir amostra "+letterOf(i)+") "+s.nome+"?")){ DB.work.samples.splice(i,1); saveNow(); if(editIndex===i)resetEditor(); renderAll(); }});
+    del.className="mini danger"; ctrl.appendChild(del);
+    li.appendChild(ctrl); ul.appendChild(li);
+  });
+}
+function mkBtn(txt,fn){ const b=document.createElement("button"); b.type="button"; b.className="mini"; b.textContent=txt; b.onclick=fn; return b; }
+function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;"); }
+function move(i,d){ const j=i+d; if(j<0||j>=DB.work.samples.length)return; const t=DB.work.samples[i]; DB.work.samples[i]=DB.work.samples[j]; DB.work.samples[j]=t; saveNow(); renderAll(); }
+function editSample(i){
+  editIndex=i; const s=DB.work.samples[i];
+  $("fNome").value=s.nome; $("corpo").value=s.corpo; $("fLetra").value=letterOf(i);
+  $("btnSalvar").textContent="✓ Atualizar amostra "+letterOf(i);
+  $("btnCancelEdit").style.display="inline-block";
+  window.scrollTo({top:0,behavior:"smooth"}); toast("Editando "+letterOf(i));
+}
+
+function buildLaudo(){
+  const samples=DB.work.samples;
+  if(!samples.length) return "";
+  const mats = "Materiais: Biópsias endoscópicas/colonoscópicas de: " +
+    samples.map((s,i)=>letterOf(i)+") "+s.nome).join("; ") + ".";
+  const blocks = samples.map((s,i)=> letterOf(i)+") "+s.nome+":"+L+s.corpo).join(L+" "+L);
+  let out = mats + L+" "+L + blocks;
+  // NOTAS: notas selecionadas (por id) + campo livre
+  const selNotas = DB.work.notasSel.map(notaById).filter(Boolean).map(n=>"- "+n.texto);
+  const free = (DB.work.notasFree||"").trim();
+  let notasBlock = selNotas.join(L);
+  if(free) notasBlock = notasBlock ? notasBlock+L+free : free;
+  if(notasBlock) out += L+" "+L+"NOTAS:"+L+notasBlock;
+  // REFERÊNCIAS: refs selecionadas (por id) + campo livre (uma por linha)
+  const selRefs = DB.work.refsSel.map(refById).filter(Boolean).map(r=>"- "+r.texto);
+  const freeRefs = (DB.work.refsFree||"").split("\n").map(s=>s.trim()).filter(Boolean).map(s=> s.startsWith("-")? s : "- "+s);
+  const refsBlock = selRefs.concat(freeRefs).join(L);
+  if(refsBlock) out += L+" "+L+REFS_HEADER+L+refsBlock;
+  return out;
+}
+// Renderiza o laudo em linhas: "-" => negrito; linha vazia => espaçador; demais => normal
+function laudoLines(txt){
+  return txt.split("\n").map(line=>{
+    if(line.trim()==="") return {cls:"sp", text:""};
+    const bold = line.trim().startsWith("-");
+    return {cls: bold?"b":"", text:line};
+  });
+}
+function laudoToPreviewHTML(txt){
+  if(!txt.trim()) return '<span class="empty">Nenhuma amostra salva ainda — monte acima e clique “Salvar amostra”.</span>';
+  return laudoLines(txt).map(o=> o.cls==="sp"
+    ? '<div class="ll sp"></div>'
+    : '<div class="ll'+(o.cls?" "+o.cls:"")+'">'+esc(o.text)+'</div>'
+  ).join("");
+}
+// HTML rich p/ clipboard (estilos inline: Arial 8pt; negrito nas linhas "-")
+function laudoToRichHTML(txt){
+  const body = laudoLines(txt).map(o=>{
+    const st="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:8pt;line-height:1.4;"+(o.cls==="b"?"font-weight:bold;":"");
+    if(o.cls==="sp") return '<p style="'+st+'">&nbsp;</p>';
+    return '<p style="'+st+'">'+esc(o.text)+'</p>';
+  }).join("");
+  return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:8pt;">'+body+'</div>';
+}
+function renderLaudo(){ $("laudoMontado").innerHTML = laudoToPreviewHTML(buildLaudo()); }
+
+/* ============================ NOTAS TOGGLES ============================ */
+function mkMini(txt,fn,danger){ const b=document.createElement("button"); b.type="button"; b.className="mini"+(danger?" danger":""); b.textContent=txt; b.onclick=fn; return b; }
+
+function renderChipList(boxId, list, selArr, rerender, onEdit, onDel){
+  const box=$(boxId); box.innerHTML="";
+  if(!list.length){ box.innerHTML='<p class="hint">Nada encontrado.</p>'; return; }
+  list.forEach(item=>{
+    const row=document.createElement("div"); row.className="chip-row";
+    const b=document.createElement("button"); b.type="button"; b.className="chip-tog";
+    if(selArr.includes(item.id)) b.classList.add("on");
+    const prev = item.texto.length>62? item.texto.slice(0,60)+"…" : item.texto;
+    b.innerHTML='<b>'+esc(item.tag||"—")+'</b> — <span>'+esc(prev)+'</span>';
+    b.title=item.texto;
+    b.onclick=()=>{ toggleIn(selArr,item.id); saveNow(); rerender(); renderLaudo(); };
+    const ctrl=document.createElement("span"); ctrl.className="pr-ctrl";
+    ctrl.appendChild(mkMini("✏️",()=>onEdit(item.id)));
+    ctrl.appendChild(mkMini("🗑",()=>onDel(item.id),true));
+    row.appendChild(b); row.appendChild(ctrl); box.appendChild(row);
+  });
+}
+function renderNotasToggles(){
+  const q=$("notaSearch")?$("notaSearch").value:"";
+  const list=DB.library.notas.filter(n=>matchQ(n,q));
+  renderChipList("notasToggles", list, DB.work.notasSel, renderNotasToggles, editNotaModal, delNota);
+}
+function renderRefsToggles(){
+  const q=$("refSearch")?$("refSearch").value:"";
+  const list=DB.library.refs.filter(r=>matchQ(r,q));
+  renderChipList("refsToggles", list, DB.work.refsSel, renderRefsToggles, editRefModal, delRef);
+}
+function delNota(id){ if(confirm("Apagar esta nota da biblioteca?")){ deleteNota(id); renderNotasToggles(); renderLaudo(); toast("Nota apagada"); } }
+function delRef(id){ if(confirm("Apagar esta referência da biblioteca?")){ deleteRef(id); renderRefsToggles(); renderLaudo(); toast("Referência apagada"); } }
+
+/* ============================ EXPORT ============================ */
+$("btnCopiar").onclick=async()=>{
+  const txt=buildLaudo();
+  if(!txt.trim()){ toast("Nada para copiar"); return; }
+  const html=laudoToRichHTML(txt);
+  try{
+    if(typeof ClipboardItem!=="undefined" && navigator.clipboard && navigator.clipboard.write){
+      const item=new ClipboardItem({
+        "text/html": new Blob([html],{type:"text/html"}),
+        "text/plain": new Blob([txt],{type:"text/plain"})
+      });
+      await navigator.clipboard.write([item]);
+      toast("Laudo copiado ✓ (Arial 8, formatado)");
+    } else {
+      await navigator.clipboard.writeText(txt);
+      toast("Laudo copiado ✓ (texto)");
+    }
+  }catch(e){
+    try{ await navigator.clipboard.writeText(txt); toast("Laudo copiado ✓ (texto)"); }
+    catch(e2){ toast("Falha ao copiar"); }
+  }
+};
+$("btnImprimir").onclick=()=>{ renderLaudo(); window.print(); };
+$("btnRegenerar").onclick=()=>{ renderLaudo(); toast("Regenerado"); };
+$("btnLimparTudo").onclick=()=>{
+  if(!confirm("Apagar TODAS as amostras e notas do laudo? (não desfaz)")) return;
+  DB.work={ samples:[], notasSel:[], refsSel:[], notasFree:"", refsFree:"" };
+  saveNow(); $("notas").value=""; $("refsFree").value=""; resetEditor(); renderAll(); toast("Laudo apagado");
+};
+
+/* ============================ EVENTOS ID ============================ */
+$("fSitio").onchange=onSiteChange;
+$("fSeg").onchange=applyDefaultName;
+$("btnAddSeg").onclick=()=>{
+  const sid=$("fSitio").value;
+  const v=prompt("Nova opção de segmento para "+siteById(sid).nome+":");
+  if(!v||!v.trim())return;
+  const segs=siteById(sid).segmentos;
+  if(!segs.includes(v.trim())) segs.push(v.trim());
+  saveNow(); renderSeg(); $("fSeg").value=v.trim(); applyDefaultName(); toast("Opção registrada");
+};
+$("notas").oninput=()=>{ DB.work.notasFree=$("notas").value; save(); renderLaudo(); };
+
+/* ============================ CRUD — MODAIS (Etapa 2) ============================ */
+function addSiteModal(){
+  modalOpen({ title:"Novo sítio / órgão", saveLabel:"Criar sítio",
+    fields:[
+      {key:"nome",label:"Nome do sítio/órgão",placeholder:"ex.: Jejuno"},
+      {key:"nomeAmostra",label:"Nome padrão da amostra",placeholder:"ex.: Mucosa jejunal",hint:"Vai em “Materiais” e no cabeçalho do bloco."},
+      {key:"eos",label:"Rótulo eosinofílico (opcional)",placeholder:"ex.: EoN"}
+    ],
+    onSave:v=>{ if(!v.nome.trim()){ toast("Informe o nome"); return false; } const id=addSite({nome:v.nome.trim(),nomeAmostra:v.nomeAmostra.trim(),eos:v.eos.trim()}); renderSitioSelect(); $("fSitio").value=id; onSiteChange(); toast("Sítio criado"); }
+  });
+}
+function editSiteModal(){
+  const s=currentSite();
+  modalOpen({ title:"Editar sítio — "+s.nome, saveLabel:"Salvar",
+    fields:[
+      {key:"nome",label:"Nome do sítio/órgão",value:s.nome},
+      {key:"nomeAmostra",label:"Nome padrão da amostra",value:s.nomeAmostra},
+      {key:"eos",label:"Rótulo eosinofílico",value:s.eos||""}
+    ],
+    onSave:v=>{ if(!v.nome.trim()){ toast("Informe o nome"); return false; } updateSite(s.id,{nome:v.nome.trim(),nomeAmostra:v.nomeAmostra.trim(),eos:v.eos.trim()}); renderSitioSelect(); $("fSitio").value=s.id; onSiteChange(); toast("Sítio atualizado"); }
+  });
+}
+function addPresetModal(){
+  const s=currentSite();
+  modalOpen({ title:"Novo diagnóstico — "+s.nome, saveLabel:"Criar",
+    fields:[
+      {key:"titulo",label:"Título (CAIXA ALTA)",placeholder:"ex.: MUCOSA JEJUNAL SEM ALTERAÇÕES"},
+      {key:"bullets",label:"Itens do diagnóstico (1 por linha)",type:"textarea",rows:8,hint:"Cada linha vira um bullet “. …” no laudo."}
+    ],
+    onSave:v=>{ if(!v.titulo.trim()){ toast("Informe o título"); return false; } addPreset(s.id,{titulo:v.titulo.trim(),bullets:parseBullets(v.bullets)}); renderPresets(); toast("Diagnóstico criado"); }
+  });
+}
+function editPresetModal(sid,pid){
+  const p=siteById(sid).presets.find(x=>x.id===pid); if(!p) return;
+  modalOpen({ title:"Editar diagnóstico", saveLabel:"Salvar",
+    fields:[
+      {key:"titulo",label:"Título (CAIXA ALTA)",value:p.titulo},
+      {key:"bullets",label:"Itens (1 por linha)",type:"textarea",rows:10,value:bulletsToText(p.bullets)}
+    ],
+    onSave:v=>{ if(!v.titulo.trim()){ toast("Informe o título"); return false; } updatePreset(sid,pid,{titulo:v.titulo.trim(),bullets:parseBullets(v.bullets)}); renderPresets(); toast("Diagnóstico atualizado"); }
+  });
+}
+function addCriterioModal(){
+  const s=currentSite();
+  modalOpen({ title:"Novo critério — "+s.nome, saveLabel:"Criar",
+    fields:[
+      {key:"g",label:"Nome do grupo/critério",placeholder:"ex.: Atrofia"},
+      {key:"opt",label:"Opções (uma por linha: Rótulo :: texto da linha)",type:"textarea",rows:7,hint:"ex.: “Leve :: Atrofia: Leve.” → botão “Leve” insere a linha “. Atrofia: Leve.”"},
+      {key:"num_tpl",label:"Campo numérico — template (opcional; use {n})",placeholder:"ex.: . Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento)."},
+      {key:"num_btn",label:"Campo numérico — rótulo do botão (opcional)",placeholder:"ex.: até n eos"}
+    ],
+    onSave:v=>{ if(!v.g.trim()){ toast("Informe o nome do critério"); return false; } const num=v.num_tpl.trim()?{tpl:v.num_tpl.trim(),btn:(v.num_btn.trim()||"inserir")}:null; const opt=parseOpt(v.opt); if(!opt&&!num){ toast("Adicione ao menos 1 opção ou campo numérico"); return false; } addCriterio(s.id,{g:v.g.trim(),opt,num}); renderCrit(); toast("Critério criado"); }
+  });
+}
+function editCriterioModal(sid,cid){
+  const c=siteById(sid).criterios.find(x=>x.id===cid); if(!c) return;
+  modalOpen({ title:"Editar critério", saveLabel:"Salvar",
+    fields:[
+      {key:"g",label:"Nome do grupo/critério",value:c.g},
+      {key:"opt",label:"Opções (Rótulo :: texto)",type:"textarea",rows:8,value:optToText(c.opt)},
+      {key:"num_tpl",label:"Campo numérico — template ({n})",value:c.num?c.num.tpl:""},
+      {key:"num_btn",label:"Campo numérico — rótulo do botão",value:c.num?c.num.btn:""}
+    ],
+    onSave:v=>{ if(!v.g.trim()){ toast("Informe o nome"); return false; } const num=v.num_tpl.trim()?{tpl:v.num_tpl.trim(),btn:(v.num_btn.trim()||"inserir")}:null; const opt=parseOpt(v.opt); if(!opt&&!num){ toast("Adicione ao menos 1 opção ou campo numérico"); return false; } updateCriterio(sid,cid,{g:v.g.trim(),opt,num}); renderCrit(); toast("Critério atualizado"); }
+  });
+}
+
+$("btnSiteAdd").onclick=addSiteModal;
+$("btnSiteEdit").onclick=editSiteModal;
+$("btnSiteDel").onclick=()=>{ const s=currentSite(); if(DB.library.siteOrder.length<=1){ toast("Não pode apagar o último sítio"); return; } if(confirm("Apagar o sítio “"+s.nome+"” e todos os seus diagnósticos/critérios?")){ deleteSite(s.id); renderSitioSelect(); onSiteChange(); toast("Sítio apagado"); } };
+$("btnSiteRestore").onclick=()=>{ if(confirm("Re-adicionar os sítios padrão que foram apagados?")){ restoreSeedSites(); renderSitioSelect(); onSiteChange(); toast("Sítios padrão restaurados"); } };
+
+$("btnSegEdit").onclick=()=>{ const sid=$("fSitio").value, cur=$("fSeg").value; if(!cur){ toast("Selecione um segmento"); return; } const i=siteById(sid).segmentos.indexOf(cur); if(i<0){ toast("Segmento não encontrado"); return; } const v=prompt("Editar segmento:",cur); if(v&&v.trim()){ updateSeg(sid,i,v.trim()); renderSeg(); $("fSeg").value=v.trim(); applyDefaultName(); toast("Segmento atualizado"); } };
+$("btnSegDel").onclick=()=>{ const sid=$("fSitio").value, cur=$("fSeg").value; if(!cur){ toast("Selecione um segmento"); return; } const i=siteById(sid).segmentos.indexOf(cur); if(i<0) return; if(confirm("Apagar segmento “"+cur+"”?")){ deleteSeg(sid,i); renderSeg(); applyDefaultName(); toast("Segmento apagado"); } };
+$("btnSegRestore").onclick=()=>{ const sid=$("fSitio").value; if(restoreSeedSegs(sid)){ renderSeg(); toast("Segmentos padrão restaurados"); } else toast("Sítio custom (sem padrões)"); };
+
+$("btnPresetAdd").onclick=addPresetModal;
+$("btnPresetRestore").onclick=()=>{ const sid=$("fSitio").value; if(restoreSeedPresets(sid)){ renderPresets(); toast("Diagnósticos padrão restaurados"); } else toast("Sítio custom (sem padrões)"); };
+$("btnCritAdd").onclick=addCriterioModal;
+$("btnCritRestore").onclick=()=>{ const sid=$("fSitio").value; if(restoreSeedCriterios(sid)){ renderCrit(); toast("Critérios padrão restaurados"); } else toast("Sítio custom (sem padrões)"); };
+
+/* Notas & Refs — modais + busca + CRUD (Etapa 3) */
+function addNotaModal(){
+  modalOpen({ title:"Nova nota", saveLabel:"Criar",
+    fields:[
+      {key:"tag",label:"Tag (≤20 caracteres)",placeholder:"ex.: Correlação"},
+      {key:"texto",label:"Texto da nota",type:"textarea",rows:5}
+    ],
+    onSave:v=>{ if(!v.texto.trim()){ toast("Informe o texto"); return false; } addNota({tag:v.tag.trim(),texto:v.texto.trim()}); renderNotasToggles(); toast("Nota criada"); }
+  });
+}
+function editNotaModal(id){
+  const n=notaById(id); if(!n) return;
+  modalOpen({ title:"Editar nota", saveLabel:"Salvar",
+    fields:[
+      {key:"tag",label:"Tag (≤20 caracteres)",value:n.tag},
+      {key:"texto",label:"Texto da nota",type:"textarea",rows:6,value:n.texto}
+    ],
+    onSave:v=>{ if(!v.texto.trim()){ toast("Informe o texto"); return false; } updateNota(id,{tag:v.tag.trim(),texto:v.texto.trim()}); renderNotasToggles(); renderLaudo(); toast("Nota atualizada"); }
+  });
+}
+function addRefModal(){
+  modalOpen({ title:"Nova referência", saveLabel:"Criar",
+    fields:[
+      {key:"tag",label:"Tag (≤20 caracteres)",placeholder:"ex.: Eosinofílico"},
+      {key:"texto",label:"Referência (formato NLM)",type:"textarea",rows:5,hint:"Verifique a existência via PubMed/ClinicalTrials antes de citar."}
+    ],
+    onSave:v=>{ if(!v.texto.trim()){ toast("Informe a referência"); return false; } addRef({tag:v.tag.trim(),texto:v.texto.trim()}); renderRefsToggles(); toast("Referência criada"); }
+  });
+}
+function editRefModal(id){
+  const r=refById(id); if(!r) return;
+  modalOpen({ title:"Editar referência", saveLabel:"Salvar",
+    fields:[
+      {key:"tag",label:"Tag (≤20 caracteres)",value:r.tag},
+      {key:"texto",label:"Referência (formato NLM)",type:"textarea",rows:6,value:r.texto}
+    ],
+    onSave:v=>{ if(!v.texto.trim()){ toast("Informe a referência"); return false; } updateRef(id,{tag:v.tag.trim(),texto:v.texto.trim()}); renderRefsToggles(); renderLaudo(); toast("Referência atualizada"); }
+  });
+}
+$("btnNotaAdd").onclick=addNotaModal;
+$("btnNotaRestore").onclick=()=>{ restoreSeedNotas(); renderNotasToggles(); toast("Notas padrão restauradas"); };
+$("btnRefAdd").onclick=addRefModal;
+$("btnRefRestore").onclick=()=>{ restoreSeedRefs(); renderRefsToggles(); toast("Referências padrão restauradas"); };
+$("notaSearch").oninput=renderNotasToggles;
+$("refSearch").oninput=renderRefsToggles;
+$("refsFree").oninput=()=>{ DB.work.refsFree=$("refsFree").value; save(); renderLaudo(); };
+
+/* ============================ BACKUP / RESTAURAR (Etapa 4) ============================ */
+function validateDB(o){
+  return !!o && o.v===2 && o.library && o.library.sites && Array.isArray(o.library.siteOrder) && o.work && Array.isArray(o.work.samples);
+}
+function serializeDB(){ return JSON.stringify(DB, null, 2); }
+function applyRestoredDB(obj){
+  if(!validateDB(obj)) return false;
+  DB=obj;
+  DB.settings=DB.settings||{clientId:""};
+  DB.library.notas=DB.library.notas||[]; DB.library.refs=DB.library.refs||[];
+  DB.work.notasSel=DB.work.notasSel||[]; DB.work.refsSel=DB.work.refsSel||[];
+  DB.work.notasFree=DB.work.notasFree||""; DB.work.refsFree=DB.work.refsFree||"";
+  saveNow(); return true;
+}
+function refreshAfterRestore(){
+  $("notas").value=DB.work.notasFree||""; $("refsFree").value=DB.work.refsFree||"";
+  renderSitioSelect(); onSiteChange(); $("fLetra").value=nextLetter(); renderAll();
+}
+function downloadFile(filename, text, mime){
+  const blob=new Blob([text],{type:mime||"application/json"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a"); a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ if(a.parentNode) a.parentNode.removeChild(a); URL.revokeObjectURL(url); },0);
+}
+$("btnBackup").onclick=()=>{
+  const stamp=new Date().toISOString().slice(0,10);
+  downloadFile("laudo_gi_backup_"+stamp+".json", serializeDB());
+  toast("Backup baixado");
+};
+$("btnRestore").onclick=()=>$("fileRestore").click();
+$("fileRestore").onchange=(e)=>{
+  const f=e.target.files&&e.target.files[0]; if(!f){ return; }
+  const rd=new FileReader();
+  rd.onload=()=>{
+    let obj=null;
+    try{ obj=JSON.parse(rd.result); }catch(err){ toast("Arquivo não é JSON válido"); $("fileRestore").value=""; return; }
+    if(!validateDB(obj)){ toast("Backup inválido (não é um DB v2)"); $("fileRestore").value=""; return; }
+    if(!confirm("Restaurar backup? Isso substitui a biblioteca e o laudo atuais.")){ $("fileRestore").value=""; return; }
+    applyRestoredDB(obj); refreshAfterRestore(); $("fileRestore").value=""; toast("Backup restaurado ✓");
+  };
+  rd.readAsText(f);
+};
+
+/* ============================ GOOGLE DRIVE SYNC (Etapa 5) ============================ */
+// Inerte até colar o Client ID e conectar. GIS carrega só ao conectar.
+const DRIVE_SCOPE="https://www.googleapis.com/auth/drive.appdata";
+const DRIVE_FILE="laudo_db.json";
+var _tokenClient=null, _accessToken=null, _driveFileId=null, _syncTimer=null, _driveConnected=false;
+
+function setSyncStatus(txt){ const el=$("syncStatus"); if(el) el.textContent=txt; }
+function nowHM(){ const d=new Date(); return ("0"+d.getHours()).slice(-2)+":"+("0"+d.getMinutes()).slice(-2); }
+function markSynced(){ setSyncStatus("Google: conectado · sincronizado "+nowHM()); }
+// decisão last-write-wins (testável, pura)
+function syncDecision(remote, local){ if(!validateDB(remote)) return "push"; return (remote&&remote.updatedAt||0) > (local&&local.updatedAt||0) ? "pull" : "push"; }
+
+function loadGIS(){
+  return new Promise((res,rej)=>{
+    if(window.google && google.accounts && google.accounts.oauth2){ res(); return; }
+    const s=document.createElement("script");
+    s.src="https://accounts.google.com/gsi/client"; s.async=true; s.defer=true;
+    s.onload=()=>res(); s.onerror=()=>rej(new Error("falha ao carregar GIS"));
+    document.head.appendChild(s);
+  });
+}
+async function driveApi(url, opts){
+  opts=opts||{}; opts.headers=Object.assign({}, opts.headers, {Authorization:"Bearer "+_accessToken});
+  const r=await fetch(url, opts);
+  if(!r.ok) throw new Error("Drive "+r.status);
+  return r;
+}
+async function driveFindFile(){
+  const q=encodeURIComponent("name='"+DRIVE_FILE+"'");
+  const r=await driveApi("https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q="+q+"&fields=files(id,modifiedTime)");
+  const j=await r.json(); return (j.files&&j.files[0])||null;
+}
+async function driveDownload(id){ const r=await driveApi("https://www.googleapis.com/drive/v3/files/"+id+"?alt=media"); return await r.json(); }
+async function driveUpload(){
+  const content=serializeDB();
+  if(_driveFileId){
+    await driveApi("https://www.googleapis.com/upload/drive/v3/files/"+_driveFileId+"?uploadType=media",
+      {method:"PATCH", headers:{"Content-Type":"application/json"}, body:content});
+  } else {
+    const meta={name:DRIVE_FILE, parents:["appDataFolder"]};
+    const boundary="laudogi"+Date.now();
+    const body="--"+boundary+"\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n"+JSON.stringify(meta)+
+      "\r\n--"+boundary+"\r\nContent-Type: application/json\r\n\r\n"+content+"\r\n--"+boundary+"--";
+    const r=await driveApi("https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id",
+      {method:"POST", headers:{"Content-Type":"multipart/related; boundary="+boundary}, body});
+    const j=await r.json(); _driveFileId=j.id;
+  }
+}
+async function syncOnConnect(){
+  try{
+    setSyncStatus("Google: sincronizando…");
+    const f=await driveFindFile();
+    if(f){
+      _driveFileId=f.id;
+      const remote=await driveDownload(f.id);
+      if(syncDecision(remote, DB)==="pull"){ applyRestoredDB(remote); refreshAfterRestore(); }
+      else { await driveUpload(); }
+    } else { await driveUpload(); }
+    markSynced();
+  }catch(e){ setSyncStatus("Google: erro de sync ("+e.message+")"); }
+}
+function connectDrive(){
+  const cid=(DB.settings.clientId||"").trim();
+  if(!cid){ toast("Cole o Client ID em Configurações"); setSyncStatus("Google: falta Client ID"); return; }
+  setSyncStatus("Google: conectando…");
+  loadGIS().then(()=>{
+    _tokenClient = google.accounts.oauth2.initTokenClient({
+      client_id: cid, scope: DRIVE_SCOPE,
+      callback: (resp)=>{
+        if(resp && resp.access_token){ _accessToken=resp.access_token; _driveConnected=true; syncOnConnect(); }
+        else { setSyncStatus("Google: autorização negada"); }
+      }
+    });
+    _tokenClient.requestAccessToken({prompt:""});
+  }).catch(e=>setSyncStatus("Google: erro ("+e.message+")"));
+}
+// push debounced após qualquer alteração (só se conectado)
+function scheduleDrivePush(){
+  if(!_driveConnected) return;
+  clearTimeout(_syncTimer);
+  _syncTimer=setTimeout(()=>{ driveUpload().then(markSynced).catch(()=>setSyncStatus("Google: erro ao enviar")); }, 2500);
+}
+$("btnConnectDrive").onclick=connectDrive;
+$("cfgClientId").oninput=()=>{ DB.settings.clientId=$("cfgClientId").value.trim(); save(); };
+
+/* ============================ INIT ============================ */
+function renderAll(){ renderSampleList(); renderNotasToggles(); renderRefsToggles(); renderLaudo(); }
+function init(){
+  renderSitioSelect();
+  onSiteChange();
+  $("fLetra").value=nextLetter();
+  $("notas").value=DB.work.notasFree||"";
+  $("refsFree").value=DB.work.refsFree||"";
+  $("cfgClientId").value=DB.settings.clientId||"";
+  renderAll();
+}
+init();
+</script>
+</body>
+</html>
