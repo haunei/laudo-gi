@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.1 — 2026-10-02
+- Correção: o aviso de customizações da v2 aparecia para todos (o atributo `hidden` era anulado pelo `display:flex` de `.banner`), com os botões "Baixar customizações antigas" e "Dispensar" sem ação. Agora só aparece quando há customização antiga no navegador.
+
 ## v3.0.0 — 2026-09-29
 Redesenho: biblioteca em versões prontas, publicadas pelo mantenedor.
 - Removidos: sync Google Drive + guia OAuth, backup/restauração JSON, edição da biblioteca no app (sítios, segmentos, diagnósticos, critérios, notas, referências), modelo DB v2.

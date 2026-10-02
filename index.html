@@ -111,6 +111,7 @@ table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowra
 header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e6;border-radius:20px;padding:2px 9px;margin-left:8px;vertical-align:middle;letter-spacing:0;}
 .banner{background:#fff7e6;border:1.5px solid var(--warn);border-radius:12px;padding:12px 16px;margin:14px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .banner p{margin:0;flex:1;min-width:240px;font-size:.86rem;}
+.banner[hidden]{display:none;}
 @media(max-width:880px){.grid2{grid-template-columns:1fr;}}
 @media print{
   body{background:#fff;padding:0;font-size:12px;}
@@ -621,7 +622,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.0.0";
+const APP_VERSION="3.0.1";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
