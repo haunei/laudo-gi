@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.0.2 — 2026-10-03
+- Painel "Limiares de eosinófilos por sítio": limiares trocados pelos da Tabela 6 do guideline ESPGHAN/NASPGHAN 2024 (estômago ≥30, duodeno ≥50, íleo terminal ≥60, ceco/ascendente ≥100, transverso/descendente ≥80, sigmoide/reto ≥60 por 0,27 mm²), com o equivalente por mm² e no campo de 40× com ocular FN 22. Esôfago: ≥15 por 0,3 mm².
+
 ## v3.0.1 — 2026-10-02
 - Correção: o aviso de customizações da v2 aparecia para todos (o atributo `hidden` era anulado pelo `display:flex` de `.banner`), com os botões "Baixar customizações antigas" e "Dispensar" sem ação. Agora só aparece quando há customização antiga no navegador.
 

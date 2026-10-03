@@ -142,20 +142,20 @@ header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e
   <summary>Limiares de eosinófilos por sítio (consulta rápida — EoE / EoG / EoN / EoC)</summary>
   <div class="inner">
     <table class="eos">
-      <thead><tr><th>Sítio</th><th>Limiar (peak eos/HPF)</th><th>Achados associados</th></tr></thead>
+      <thead><tr><th>Sítio</th><th>Limiar (pico; campo-padrão de 0,27 mm²)</th><th>Achados associados</th></tr></thead>
       <tbody>
-        <tr><td>EoE — Esôfago</td><td>≥15/HPF (pico). Esôfago normal = 0 eosinófilos.</td>
+        <tr><td>EoE — Esôfago</td><td>≥15 por 0,3 mm² (≈ ≥12 no campo de 40× com ocular FN 22). Esôfago normal = 0 eosinófilos.</td>
           <td>Microabscessos eosinofílicos, surface layering, degranulação, hiperplasia da camada basal, espongiose, alongamento de papilas, fibrose de lâmina própria (criança: avaliar com cautela).</td></tr>
-        <tr><td>EoG — Estômago</td><td>≥30/HPF em ≥5 HPF (critério Collins). Estômago normal: raros/ausentes.</td>
+        <tr><td>EoG — Estômago</td><td>≥30 (≥110/mm²; ≈ ≥26 com FN 22). Estômago normal: raros/ausentes.</td>
           <td>Infiltrado em lâmina própria + epitélio glandular/foveolar, microabscessos, eosinófilos em muscular da mucosa, alterações arquiteturais.</td></tr>
-        <tr><td>EoN — Duodeno/delgado</td><td>Proposto ≥30–52/HPF (variável; sem corte consolidado). Delgado normal já contém eosinófilos.</td>
+        <tr><td>EoN — Duodeno / íleo terminal</td><td>Duodeno ≥50 (≥185/mm²; ≈ ≥44 com FN 22). Íleo terminal ≥60 (≥220/mm²; ≈ ≥52). Delgado normal já contém eosinófilos.</td>
           <td>Infiltrado em lâmina própria, criptas, e — conforme forma — muscular própria/serosa; atrofia vilositária, abscessos crípticos eosinofílicos.</td></tr>
-        <tr><td>EoC — Cólon</td><td>Gradiente proximal→distal: ceco/cólon D ~50/HPF, transverso ~35, esquerdo/retossigmoide ~25–30. Maior densidade fisiológica.</td>
+        <tr><td>EoC — Cólon</td><td>Ceco/ascendente ≥100 (≥370/mm²; ≈ ≥88 com FN 22). Transverso/descendente ≥80 (≥300/mm²; ≈ ≥71). Sigmoide/reto ≥60 (≥220/mm²; ≈ ≥52). Maior densidade fisiológica no cólon direito.</td>
           <td>Eosinófilos em lâmina própria entre/dentro de criptas, intraepiteliais, em muscular da mucosa; criptite/abscesso eosinofílico.</td></tr>
       </tbody>
     </table>
     <p class="eos-refs"><b>Pontos comuns:</b> procurar extensão para epitélio, microabscessos eosinofílicos (≥4 agrupados), degranulação, eosinófilos em camadas profundas (muscular da mucosa/submucosa). Densidade isolada é insuficiente — integrar com distribuição e arquitetura.<br>
-    <b>Refs (verificar antes de citar):</b> Dellon ES, et al. Clin Gastroenterol Hepatol. 2022;20(11):2474-2484. · Papadopoulou A, et al. J Pediatr Gastroenterol Nutr. 2024;78(1):122-152. · Spergel JM, et al. Ann Allergy Asthma Immunol. 2018;121(3):281-284.</p>
+    <b>Fonte dos limiares:</b> estômago, duodeno, íleo e cólon: Papadopoulou A, et al. J Pediatr Gastroenterol Nutr. 2024;78(1):122-152 (Tabela 6; consenso de especialistas, não dispensa clínica e exclusão de causas secundárias). Esôfago: Dellon ES, et al. Gastroenterology. 2018;155(4):1022-1033.e10.</p>
   </div>
 </details>
 
@@ -622,7 +622,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.0.1";
+const APP_VERSION="3.0.2";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
