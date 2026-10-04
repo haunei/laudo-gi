@@ -168,7 +168,7 @@ ok(t.LIB.refs.length >= 14, "mais referências para escolher");
 // 9. Atividade, DECH por sítio e variantes de atividade
 eq(t.ativGrade(0, 60), "INATIVA", "sem criptite"); eq(t.ativGrade(3, 60), "EM ATIVIDADE LEVE", "5%"); eq(t.ativGrade(4, 60), "EM ATIVIDADE MODERADA", ">5%");
 eq(t.ativGrade(30, 60), "EM ATIVIDADE MODERADA", "50%"); eq(t.ativGrade(31, 60), "EM ATIVIDADE ACENTUADA", ">50%"); eq(t.ativGrade(5, 0), null, "sem denominador");
-eq(t.ativLine(3, 60), "- Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, com criptite ocasional (3 de 60 criptas avaliadas; 5%), não sendo identificados microabscessos, erosão ou ulceração.", "linha de atividade leve");
+eq(t.ativLine(3, 60), "- Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, com criptite ocasional (3 de 60 criptas avaliadas; 5%), não sendo identificados microabscessos, erosão ou ulceração (graduação pela escala de Geboes [@geboes]).", "linha de atividade leve");
 ok(t.ativLine(40, 60).includes("com criptite em 40 de 60 criptas avaliadas (66,7%)"), "linha de atividade acentuada");
 ok(t.ativLine(0, 60).startsWith("- Ausência de infiltrado inflamatório neutrofílico"), "sem criptite: linha de ausência");
 eq(t.titleSetAtiv("- COLITE CRÔNICA INATIVA:", "EM ATIVIDADE LEVE"), "- COLITE CRÔNICA EM ATIVIDADE LEVE:", "troca INATIVA");
@@ -200,11 +200,24 @@ ok(/Categorias conforme o consenso NIH 2014 \[\d+\]\./.test(l9) && l9.includes(t
 eq(t.alertas().length, 1, "alerta de categoria DECH divergente");
 t.WORK.samples.push({ nome: "Reto", corpo: "- RETITE CRÔNICA INATIVA:\n- Presença de criptite neutrofílica (3 de 60 criptas avaliadas; 5%)." });
 eq(t.alertas().length, 2, "alerta de título INATIVA com criptite");
+t.WORK.samples.push({ nome: "Sigmoide", corpo: "- COLITE CRÔNICA EM ATIVIDADE MODERADA:
+- " + t.SEED_SITES.colon.criterios.find(c => c.g === "Infiltrado neutrofílico").opt[3][1].slice(2) });
+eq(t.alertas().length, 3, "alerta de grau do título diferente do grau da linha");
+t.WORK.samples.pop();
 for (const [k, base] of [["esofago", "ESOFAGITE CRÔNICA"], ["gastrica", "GASTRITE CRÔNICA"], ["duodeno", "DUODENITE CRÔNICA"], ["ileo", "ILEÍTE CRÔNICA"], ["colon", "COLITE CRÔNICA"], ["reto", "RETITE CRÔNICA"]])
-  for (const g of (k === "esofago" ? ["INATIVA", "EM ATIVIDADE", "EM ATIVIDADE, EROSIVA"] : ["INATIVA", "EM ATIVIDADE LEVE", "EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA"]))
+  for (const g of (k === "esofago" ? ["INATIVA", "EM ATIVIDADE", "EM ATIVIDADE, EROSIVA"] : k === "duodeno" ? ["INATIVA", "EM ATIVIDADE"] : ["INATIVA", "EM ATIVIDADE LEVE", "EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA"]))
     ok(t.SEED_SITES[k].presets.some(p => p.titulo.startsWith(base) && p.titulo.includes(g)), k + ": " + base + " " + g);
 ok(!t.SEED_SITES.esofago.presets.some(p => /EM ATIVIDADE (LEVE|MODERADA|ACENTUADA)/.test(p.titulo)), "esôfago sem graus de atividade");
 ok(!t.SEED_SITES.esofago.presets.some(p => /CRÔNICA (LEVE|MODERADA|ACENTUADA)/.test(p.titulo)), "esôfago sem grau de cronicidade");
+ok(!/ATIVIDADE (LEVE|MODERADA|ACENTUADA)|neutrofílico (leve|moderado|acentuado)/.test(JSON.stringify(t.SEED_SITES.duodeno)), "duodeno sem grau de atividade");
+for (const k of ["ileo", "colon", "reto"]) for (const p of t.SEED_SITES[k].presets) {
+  const m = p.titulo.match(/ATIV(?:IDADE|A) (LEVE|MODERADA|ACENTUADA)/), nl = p.bullets.find(b => /infiltrado inflamatório neutrofílico/.test(b));
+  if (m) ok(nl.includes("neutrofílico " + { LEVE: "leve", MODERADA: "moderado", ACENTUADA: "acentuado" }[m[1]] + " em") && nl.includes("[@geboes]"), k + ": linha de neutrófilos segue o título: " + p.titulo);
+  else if (nl) ok(nl.startsWith("Ausência"), k + ": sem atividade no título, linha de ausência: " + p.titulo);
+}
+ok(!/neutrofílico leve\/moderado/.test(JSON.stringify(t.SEED_SITES)), "sem 'leve/moderado' fora da escala");
+eq(t.SEED_SITES.colon.criterios.find(c => c.g === "Infiltrado neutrofílico").opt.length, 4, "achados de neutrófilos nos quatro níveis da escala");
+ok(t.SEED_SITES.gastrica.criterios.find(c => c.g === "Hiperplasia foveolar").opt[1][1].includes("[@dixon86]"), "hiperplasia foveolar graduada cita a referência");
 for (const k of ["duodeno", "ileo"]) ok(!/levemente|moderadamente|severamente|linfoplasmocitário leve/.test(JSON.stringify(t.SEED_SITES[k])), k + " sem grau de celularidade");
 ok(!/Espongiose (leve|moderada|acentuada)/.test(JSON.stringify(t.SEED_SITES.esofago)), "espongiose sem três graus");
 eq(t.SEED_SITES.esofago.presets.filter(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA").length, 1, "sem título duplicado");

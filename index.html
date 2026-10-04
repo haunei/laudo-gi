@@ -411,7 +411,7 @@ const SEED_SITES = {
         "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento).",
         "Presença de evidente exocitose de linfócitos ao epitélio gástrico foveolar e glandular.",
         "Presença de infiltrado inflamatório neutrofílico leve, com criptite apenas em mucosa gástrica de padrão oxíntico.",
-        "Agregados linfoides: Presentes.","Hiperplasia foveolar: Leve.","Metaplasia intestinal: Não identificada.",
+        "Agregados linfoides: Presentes.","Hiperplasia foveolar: Leve (graduação conforme Dixon 1986 [@dixon86]).","Metaplasia intestinal: Não identificada.",
         "Atrofia: Leve (em mucosa de padrão oxíntico) e moderada (em mucosa de padrão misto oxíntico/mucinoso).",
         "Pesquisa para H. pylori: Negativa."])
     ],
@@ -431,8 +431,8 @@ const SEED_SITES = {
       {g:"Infiltrado neutrofílico", opt:[
         ["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve],["Moderado c/ criptite",NEUTRO.moderado],["Acentuado",NEUTRO.acentuado]]},
       {g:"Hiperplasia foveolar", opt:[
-        ["Não identificada","- Hiperplasia foveolar: Não identificada."],["Leve","- Hiperplasia foveolar: Leve."],
-        ["Moderada","- Hiperplasia foveolar: Moderada."],["Acentuada","- Hiperplasia foveolar: Acentuada."]]},
+        ["Não identificada","- Hiperplasia foveolar: Não identificada."],["Leve","- Hiperplasia foveolar: Leve (graduação conforme Dixon 1986 [@dixon86])."],
+        ["Moderada","- Hiperplasia foveolar: Moderada (graduação conforme Dixon 1986 [@dixon86])."],["Acentuada","- Hiperplasia foveolar: Acentuada (graduação conforme Dixon 1986 [@dixon86])."]]},
       {g:"Metaplasia intestinal", dica:"O grau escolhido aqui também ajusta a linha de atrofia; mude a atrofia depois se for diferente.",
         opt:[["Não identificada","- Metaplasia intestinal: Não identificada."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
@@ -652,10 +652,26 @@ const LINHA_ATIV = {
   // estômago: leve, moderada e acentuada pela escala visual do Sistema Sydney atualizado
   gastrica:[NEUTRO.ausente, NEUTRO.leve, NEUTRO.moderado, NEUTRO.acentuado].map((x,i)=>x.slice(2).replace(/\.$/, i ? " (graduação pelo Sistema Sydney atualizado [@sydney])." : ".")),
   cripta:[NEUTRO.ausente.slice(2),
-    "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, com criptite ocasional (até 5% das criptas), não sendo identificados microabscessos, erosão ou ulceração.",
-    "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite (mais de 5% até 50% das criptas), sem erosão ou ulceração.",
-    "Presença de infiltrado inflamatório neutrofílico acentuado em lâmina própria, com criptite em mais de 50% das criptas, microabscessos de cripta e erosões."]
+    "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, com criptite ocasional (até 5% das criptas), não sendo identificados microabscessos, erosão ou ulceração (graduação pela escala de Geboes [@geboes]).",
+    "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite (mais de 5% até 50% das criptas), sem erosão ou ulceração (graduação pela escala de Geboes [@geboes]).",
+    "Presença de infiltrado inflamatório neutrofílico acentuado em lâmina própria, com criptite em mais de 50% das criptas, microabscessos de cripta e erosões (graduação pela escala de Geboes [@geboes])."],
+  // duodeno: sem escala publicada conferida para graduar a atividade; só presença ou ausência
+  duodeno:[NEUTRO.ausente.slice(2),
+    "Presença de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificados microabscessos, erosão ou ulceração."]
 };
+// íleo, cólon e reto: a linha de neutrófilos de cada texto pronto segue o grau do título; os achados oferecem os mesmos quatro níveis
+["ileo","colon","reto"].forEach(k=>{
+  SEED_SITES[k].presets.forEach(p=>{
+    const m=p.titulo.match(/ATIV(?:IDADE|A) (LEVE|MODERADA|ACENTUADA)/), i=p.bullets.findIndex(b=>/infiltrado inflamatório neutrofílico/.test(b));
+    if(m && i>=0) p.bullets[i]=LINHA_ATIV.cripta[["LEVE","MODERADA","ACENTUADA"].indexOf(m[1])+1];
+  });
+});
+const OPT_NEUTRO_CRIPTA = [["Ausente","- "+LINHA_ATIV.cripta[0]],["Leve (até 5% das criptas)","- "+LINHA_ATIV.cripta[1]],
+  ["Moderado (mais de 5% até 50%)","- "+LINHA_ATIV.cripta[2]],["Acentuado (mais de 50%, erosão ou úlcera)","- "+LINHA_ATIV.cripta[3]]];
+[CRIT_COLON, SEED_SITES.ileo.criterios].forEach(cr=>{ cr.find(c=>c.g==="Infiltrado neutrofílico").opt=OPT_NEUTRO_CRIPTA; });
+SEED_SITES.duodeno.criterios.find(c=>c.g==="Infiltrado neutrofílico").opt=[["Ausente","- "+LINHA_ATIV.duodeno[0]],["Presente","- "+LINHA_ATIV.duodeno[1]]];
+SEED_SITES.duodeno.presets.forEach(p=>{ if(/EM ATIVIDADE LEVE/.test(p.titulo)){ p.titulo=p.titulo.replace("EM ATIVIDADE LEVE","EM ATIVIDADE");
+  const i=p.bullets.findIndex(b=>/infiltrado inflamatório neutrofílico/.test(b)); if(i>=0) p.bullets[i]=LINHA_ATIV.duodeno[1]; } });
 function variantesAtiv(siteId, base, modelo, tipo, graus){
   const site=SEED_SITES[siteId], src=site.presets.find(p=>p.titulo===modelo), linhas=LINHA_ATIV[tipo];
   const i=src.bullets.findIndex(b=>/neutr/i.test(b));
@@ -664,7 +680,7 @@ function variantesAtiv(siteId, base, modelo, tipo, graus){
 }
 variantesAtiv("esofago","ESOFAGITE CRÔNICA","ESOFAGITE CRÔNICA INATIVA","esofago",["INATIVA","EM ATIVIDADE","EM ATIVIDADE, EROSIVA"]);
 variantesAtiv("gastrica","GASTRITE CRÔNICA","GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO","gastrica");
-variantesAtiv("duodeno","DUODENITE CRÔNICA","DUODENITE CRÔNICA INESPECÍFICA, INATIVA","cripta");
+variantesAtiv("duodeno","DUODENITE CRÔNICA","DUODENITE CRÔNICA INESPECÍFICA, INATIVA","duodeno",["INATIVA","EM ATIVIDADE"]);
 variantesAtiv("ileo","ILEÍTE CRÔNICA","ILEÍTE CRÔNICA EM ATIVIDADE MODERADA","cripta");
 
 // Pólipos (nomenclatura: OMS 6ª ed. e capítulos de pólipos lidos; ver catálogo de títulos)
@@ -739,6 +755,8 @@ const CITE = {
   youssef:"Youssef R, Saeed O, Lin J, González IA. Characterization of Esophageal Biopsies from Stem Cell Transplant Patients With and Without Esophageal Graft-Versus-Host Disease. Mod Pathol. 2025;38(6):100727. doi:10.1016/j.modpat.2025.100727.",
   mostafa:"Mostafa M, Hartley CP, Hagen CE. Evaluation of the lower histologic threshold for gastric graft versus host disease. Mod Pathol. 2020;33(5):962-970. doi:10.1038/s41379-019-0421-7.",
   sydney:"Dixon MF, Genta RM, Yardley JH, Correa P. Classification and grading of gastritis. The updated Sydney System. International Workshop on the Histopathology of Gastritis, Houston 1994. Am J Surg Pathol. 1996;20(10):1161-81. doi:10.1097/00000478-199610000-00001.",
+  geboes:"Geboes K, Riddell R, Ost A, Jensfelt B, Persson T, Löfberg R. A reproducible grading scale for histological assessment of inflammation in ulcerative colitis. Gut. 2000;47(3):404-9. doi:10.1136/gut.47.3.404.",
+  dixon86:"Dixon MF, O'Connor HJ, Axon AT, King RF, Johnston D. Reflux gastritis: distinct histopathological entity? J Clin Pathol. 1986;39(5):524-30. doi:10.1136/jcp.39.5.524.",
   rowan:"Rowan DJ, Hartley CP, Carrillo-Polanco LF, Oshima K, Hagen CE. Diagnostic phrasing is independently correlated with the decision to treat for graft-versus-host disease: retrospective review of colon biopsies with rare apoptosis. Histopathology. 2016;69(5):802-811. doi:10.1111/his.13003."
 };
 const CITE_RE=/\[@([a-z0-9]+(?:,[a-z0-9]+)*)\]/g;
@@ -788,7 +806,9 @@ const SEED_REFS = [
   {tag:"DECH (apoptose mínima)", texto:CITE.rowan},
   {tag:"DECH esôfago", texto:CITE.youssef},
   {tag:"DECH estômago", texto:CITE.mostafa},
-  {tag:"Gastrite (Sydney atualizado)", texto:CITE.sydney}
+  {tag:"Gastrite (Sydney atualizado)", texto:CITE.sydney},
+  {tag:"Atividade na colite (Geboes)", texto:CITE.geboes},
+  {tag:"Gastropatia reativa (hiperplasia foveolar)", texto:CITE.dixon86}
 ];
 
 /* ============================ VERSÃO ============================ */
@@ -1118,6 +1138,9 @@ function alertas(){
     const ls=(corpo||"").split("\n"), tit=ls.filter(l=>lineKind(l)==="b").join(" ");
     if(/INATIVA/.test(tit) && ls.some(l=>/^- Presença de (criptite|infiltrado inflamatório neutrofílico|exocitose de neutrófilos)/.test(l.trim())))
       out.push({conf:true, msg:rot+": o título diz INATIVA, mas há atividade neutrofílica descrita."});
+    const gt=tit.match(/ATIVIDADE (LEVE|MODERADA|ACENTUADA)/), gl=(corpo||"").match(/neutrofílico (leve|moderado|acentuado) em/);
+    if(gt && gl && gt[1].slice(0,3).toLowerCase()!==gl[1].slice(0,3))
+      out.push({conf:true, msg:rot+": o título diz atividade "+gt[1].toLowerCase()+", mas a linha de neutrófilos diz "+gl[1]+"."});
     if(dech && dech.manual && dech.manual!==dech.sug)
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
