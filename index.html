@@ -245,7 +245,6 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
   <div class="editor-actions noprint">
     <button class="primary" id="btnCopiar">📋 Copiar tudo</button>
     <button class="ghost" id="btnImprimir">🖨 Imprimir / PDF</button>
-    <button class="ghost" id="btnRegenerar" title="Reconstrói a partir das amostras salvas">↻ Regenerar</button>
     <span class="spacer"></span>
     <button class="danger" id="btnLimparTudo">Limpar laudo</button>
   </div>
@@ -639,7 +638,7 @@ SEED_SITES.reto.criterios = CRIT_COLON;
 
 // Reto: mesmos textos do cólon, com a nomenclatura de reto
 SEED_SITES.reto.presets = SEED_SITES.reto.presets.filter(p=>/^RETITE/.test(p.titulo)).concat(SEED_SITES.colon.presets.map(p=>
-  P(p.titulo.replace("MUCOSA COLÔNICA","MUCOSA RETAL").replace("COLITE","RETITE").replace("COLOPATIA","RETOPATIA"), p.bullets)));
+  P(p.titulo.replace("MUCOSA COLÔNICA","MUCOSA RETAL").replace("COLITE","RETITE").replace("COLOPATIA","RETITE"), p.bullets)));
 
 // Variantes de atividade: toda "crônica" tem inativa, leve, moderada e acentuada
 const GRAUS_ATIV = ["INATIVA","EM ATIVIDADE LEVE","EM ATIVIDADE MODERADA","EM ATIVIDADE ACENTUADA"];
@@ -734,6 +733,9 @@ const CITE = {
   shulman:"Shulman HM, Cardona DM, Greenson JK, Hingorani S, Horn T, Huber E, et al. NIH Consensus development project on criteria for clinical trials in chronic graft-versus-host disease: II. The 2014 Pathology Working Group Report. Biol Blood Marrow Transplant. 2015;21(4):589-603. doi:10.1016/j.bbmt.2014.12.031.",
   lerner:"Lerner KG, Kao GF, Storb R, Buckner CD, Clift RA, Thomas ED. Histopathology of graft-vs.-host reaction (GvHR) in human recipients of marrow from HL-A-matched sibling donors. Transplant Proc. 1974;6(4):367-71.",
   mast:"Mastracci L, Grillo F, Parente P, Unti E, Battista S, Spaggiari P, et al. Gastro-esophageal reflux disease and Barrett's esophagus: an overview with an histologic diagnostic approach. Pathologica. 2020;112(3):117-127. doi:10.32074/1591-951X-162.",
+  youssef:"Youssef R, Saeed O, Lin J, González IA. Characterization of Esophageal Biopsies from Stem Cell Transplant Patients With and Without Esophageal Graft-Versus-Host Disease. Mod Pathol. 2025;38(6):100727. doi:10.1016/j.modpat.2025.100727.",
+  mostafa:"Mostafa M, Hartley CP, Hagen CE. Evaluation of the lower histologic threshold for gastric graft versus host disease. Mod Pathol. 2020;33(5):962-970. doi:10.1038/s41379-019-0421-7.",
+  sydney:"Dixon MF, Genta RM, Yardley JH, Correa P. Classification and grading of gastritis. The updated Sydney System. International Workshop on the Histopathology of Gastritis, Houston 1994. Am J Surg Pathol. 1996;20(10):1161-81. doi:10.1097/00000478-199610000-00001.",
   rowan:"Rowan DJ, Hartley CP, Carrillo-Polanco LF, Oshima K, Hagen CE. Diagnostic phrasing is independently correlated with the decision to treat for graft-versus-host disease: retrospective review of colon biopsies with rare apoptosis. Histopathology. 2016;69(5):802-811. doi:10.1111/his.13003."
 };
 const CITE_RE=/\[@([a-z0-9]+(?:,[a-z0-9]+)*)\]/g;
@@ -780,7 +782,10 @@ const SEED_REFS = [
   {tag:"Esofagite linfocítica (revisão)", texto:CITE.habbal},
   {tag:"DECH (NIH 2014)", texto:CITE.shulman},
   {tag:"DECH (graus de Lerner)", texto:CITE.lerner},
-  {tag:"DECH (apoptose mínima)", texto:CITE.rowan}
+  {tag:"DECH (apoptose mínima)", texto:CITE.rowan},
+  {tag:"DECH esôfago", texto:CITE.youssef},
+  {tag:"DECH estômago", texto:CITE.mostafa},
+  {tag:"Gastrite (Sydney atualizado)", texto:CITE.sydney}
 ];
 
 /* ============================ VERSÃO ============================ */
@@ -794,7 +799,7 @@ const LS_LEGACY_DISMISS="laudoGI_v2_banner_off";
 const LS_MATS="laudoGI_mats_v3";               // nomes de material mais usados (autocompletar)
 let editIndex = -1; // -1 = nova amostra; >=0 = editando
 let draft = { dech:null }; // DECH da amostra em edição
-const DECH_UI0 = { n:"", cripta:"sem", viral:false, manual:null, apo:"aus", disq:false, liq:false, perda:false };
+const DECH_UI0 = { n:"", cripta:"sem", viral:false, manual:null, apo:"aus", disq:false, liq:false, perda:false, ulc:false };
 let dechUI = { ...DECH_UI0 };
 
 function load(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;} }
@@ -1019,27 +1024,30 @@ function dechCat(n, cripta, viral){
   if(n>=7 || cripta!=="sem") return "PROVÁVEL";
   return "POSSÍVEL";
 }
-function dechCatEso(apo, disq, viral){
-  if(apo==="aus" && !disq) return "NÃO IDENTIFICADA";
+// esôfago (Youssef 2025): só corpos apoptóticos ou só úlcera = possível; células disqueratóticas = provável
+function dechCatEso(apo, disq, viral, ulc){
+  if(apo==="aus" && !disq && !ulc) return "NÃO IDENTIFICADA";
   if(viral) return "POSSÍVEL";
   return disq ? "PROVÁVEL" : "POSSÍVEL";
 }
-function dechCatGas(apo, perda, viral){
-  if(apo==="aus" && !perda) return "NÃO IDENTIFICADA";
+// estômago (Mostafa 2020): limiar de 2 ou mais corpos apoptóticos por 10 fovéolas contíguas
+function dechCatGas(n, perda, viral){
+  if(n===0 && !perda) return "NÃO IDENTIFICADA";
   if(viral) return "POSSÍVEL";
-  return (apo==="freq" || perda) ? "PROVÁVEL" : "POSSÍVEL";
+  return (n>=2 || perda) ? "PROVÁVEL" : "POSSÍVEL";
 }
 const LINHA_VIRAL=v=> v ? "- Presença de alterações citopáticas sugestivas de ação viral (VIDE NOTA)." : "- Não foram identificados achados sugestivos de ação viral.";
-function dechLinesEso(apo, disq, liq, viral){
+function dechLinesEso(apo, disq, liq, viral, ulc){
   return [apo==="aus" ? "- Não foi evidenciada vacuolização/corpos apoptóticos na camada basal do epitélio escamoso."
       : "- Presença de corpos apoptóticos na camada basal do epitélio escamoso"+(apo==="freq"?", frequentes":", focalmente")+" (VIDE NOTA).",
-    disq ? "- Presença de células disqueratóticas no epitélio escamoso (VIDE NOTA)." : "- Não foram identificadas células disqueratóticas.",
+    disq ? "- Presença de células disqueratóticas no epitélio escamoso (achado de alta especificidade para DECH esofágica [@youssef]) (VIDE NOTA)." : "- Não foram identificadas células disqueratóticas.",
     liq ? "- Presença de inflamação liquenoide." : "- Não foi evidenciada inflamação liquenoide.",
+    ulc ? "- Presença de área de ulceração." : "- Não foi identificada ulceração.",
     LINHA_VIRAL(viral)];
 }
-function dechLinesGas(apo, perda, viral){
-  const out=[apo==="aus" ? "- Não foram identificados corpos apoptóticos na camada basal do epitélio glandular gástrico."
-      : "- Presença de corpos apoptóticos no colo glandular"+(apo==="freq"?", frequentes":", focalmente")+" (VIDE NOTA)."];
+function dechLinesGas(n, perda, viral){
+  const out=[n===0 ? "- Não foram identificados corpos apoptóticos na camada basal do epitélio glandular gástrico."
+      : "- Presença de corpos apoptóticos no colo glandular ("+n+" por 10 fovéolas contíguas; limiar: 2 ou mais [@mostafa]) (VIDE NOTA)."];
   if(perda) out.push("- Presença de glândulas dilatadas contendo debris apoptóticos, com perda glandular.");
   out.push(LINHA_VIRAL(viral));
   return out;
@@ -1122,7 +1130,7 @@ function renderAlertas(){
 function renderDech(){
   const box=$("dechBox"); box.innerHTML="";
   const tipo=dechTipo($("fSitio").value), u=dechUI, n=parseFloat(u.n);
-  const sug = tipo==="eso" ? dechCatEso(u.apo,u.disq,u.viral) : tipo==="gas" ? dechCatGas(u.apo,u.perda,u.viral) : (isNaN(n)?null:dechCat(n,u.cripta,u.viral));
+  const sug = tipo==="eso" ? dechCatEso(u.apo,u.disq,u.viral,u.ulc) : isNaN(n) ? null : tipo==="gas" ? dechCatGas(n,u.perda,u.viral) : dechCat(n,u.cripta,u.viral);
   const cat=u.manual||sug;
   const set=(k,v)=>()=>{ u[k]=v; renderDech(); };
   const grp=(label)=>{ const d=document.createElement("div"); d.className="crit"; const l=document.createElement("span"); l.className="glabel"; l.textContent=label; d.appendChild(l);
@@ -1133,8 +1141,12 @@ function renderDech(){
     apo("Corpos apoptóticos na camada basal do epitélio escamoso");
     const o=grp("Células disqueratóticas (presentes: provável)"); bt(o,"ausentes",!u.disq,set("disq",false)); bt(o,"presentes",u.disq,set("disq",true),"citoplasma eosinofílico denso, núcleo picnótico");
     const o2=grp("Inflamação liquenoide"); bt(o2,"ausente",!u.liq,set("liq",false)); bt(o2,"presente",u.liq,set("liq",true));
+    const o5=grp("Ulceração (sozinha: possível)"); bt(o5,"ausente",!u.ulc,set("ulc",false)); bt(o5,"presente",u.ulc,set("ulc",true));
   } else if(tipo==="gas"){
-    apo("Corpos apoptóticos no colo glandular (procurar em grande aumento)");
+    const o1=grp("Corpos apoptóticos no colo glandular, por 10 fovéolas contíguas");
+    const w=document.createElement("span"); w.className="num"; const inp=document.createElement("input"); inp.type="number"; inp.min="0"; inp.placeholder="nº"; inp.value=u.n;
+    inp.onchange=()=>{ u.n=inp.value; renderDech(); }; w.appendChild(inp); o1.appendChild(w);
+    const h=document.createElement("span"); h.className="muted"; h.textContent="1: possível · 2 ou mais, ou perda glandular: provável (Mostafa 2020; procurar em grande aumento)"; o1.appendChild(h);
     const o=grp("Glândulas dilatadas com debris apoptóticos / perda glandular (presente: provável)"); bt(o,"ausente",!u.perda,set("perda",false)); bt(o,"presente",u.perda,set("perda",true));
   } else {
     const o1=grp("Corpos apoptóticos por 10 criptas contíguas");
@@ -1154,7 +1166,7 @@ function renderDech(){
     renderDech(); }));
   const go=document.createElement("button"); go.type="button"; go.className="primary"; go.textContent="Inserir linhas e ajustar título";
   go.onclick=()=>{ if(!cat){ toast("Digite o nº de corpos apoptóticos"); return; }
-    const linhas = tipo==="eso" ? dechLinesEso(u.apo,u.disq,u.liq,u.viral) : tipo==="gas" ? dechLinesGas(u.apo,u.perda,u.viral) : dechLines(n,u.cripta,u.viral);
+    const linhas = tipo==="eso" ? dechLinesEso(u.apo,u.disq,u.liq,u.viral,u.ulc) : tipo==="gas" ? dechLinesGas(n,u.perda,u.viral) : dechLines(n,u.cripta,u.viral);
     linhas.forEach(appendLine);
     draft.dech={ viral:u.viral, sug, manual:u.manual };
     toast(editTitle(t=>titleSetDech(t,cat)) ? "Título ajustado: DECH "+cat.toLowerCase() : "Sem título no editor: só as linhas foram inseridas"); };
@@ -1408,7 +1420,6 @@ $("btnCopiar").onclick=async()=>{
   }
 };
 $("btnImprimir").onclick=()=>{ renderLaudo(); window.print(); };
-$("btnRegenerar").onclick=()=>{ renderLaudo(); toast("Regenerado"); };
 $("btnLimparTudo").onclick=()=>{
   if(!confirm("Limpar o laudo inteiro (todas as amostras, notas e referências)? Não desfaz.")) return;
   WORK=emptyWork();

@@ -179,10 +179,13 @@ eq(t.dechCat(0, "sem", false), "NÃO IDENTIFICADA", "DECH 0"); eq(t.dechCat(4, "
 eq(t.dechCat(2, "isolada", false), "PROVÁVEL", "destruição de cripta"); eq(t.dechCat(9, "contigua", true), "POSSÍVEL", "viral segura em possível");
 eq(t.dechCatEso("aus", false, false), "NÃO IDENTIFICADA", "esôfago sem achado"); eq(t.dechCatEso("foc", false, false), "POSSÍVEL", "esôfago só apoptose");
 eq(t.dechCatEso("foc", true, false), "PROVÁVEL", "esôfago com disqueratóticas"); eq(t.dechCatEso("freq", true, true), "POSSÍVEL", "esôfago com ação viral");
-eq(t.dechCatGas("aus", false, false), "NÃO IDENTIFICADA", "estômago sem achado"); eq(t.dechCatGas("foc", false, false), "POSSÍVEL", "estômago focal");
-eq(t.dechCatGas("freq", false, false), "PROVÁVEL", "estômago frequente"); eq(t.dechCatGas("foc", true, false), "PROVÁVEL", "estômago com perda glandular");
+eq(t.dechCatEso("aus", false, false, true), "POSSÍVEL", "esôfago só com úlcera");
+eq(t.dechCatGas(0, false, false), "NÃO IDENTIFICADA", "estômago sem achado"); eq(t.dechCatGas(1, false, false), "POSSÍVEL", "estômago abaixo do limiar");
+eq(t.dechCatGas(2, false, false), "PROVÁVEL", "estômago no limiar"); eq(t.dechCatGas(1, true, false), "PROVÁVEL", "estômago com perda glandular"); eq(t.dechCatGas(5, false, true), "POSSÍVEL", "estômago com ação viral");
 ok(t.dechLinesEso("foc", true, false, false).some(x => x.includes("células disqueratóticas")), "linhas do esôfago");
-ok(t.dechLinesGas("freq", true, false)[0].includes("colo glandular, frequentes"), "linhas do estômago");
+ok(t.dechLinesGas(3, true, false)[0].includes("3 por 10 fovéolas contíguas; limiar: 2 ou mais [@mostafa]"), "linhas do estômago");
+ok(t.dechLinesEso("aus", false, false, false, true).includes("- Presença de área de ulceração."), "úlcera no esôfago");
+ok(!html.includes("btnRegenerar"), "botão Regenerar removido");
 eq(t.titleSetDech("- MUCOSA DE ÍLEO INATIVA:", "POSSÍVEL"), "- MUCOSA DE ÍLEO INATIVA (DECH POSSÍVEL – NIH/2014):", "sufixo DECH");
 eq(t.titleSetDech("- MUCOSA DE ÍLEO INATIVA (DECH POSSÍVEL – NIH/2014):", "PROVÁVEL"), "- MUCOSA DE ÍLEO INATIVA (DECH PROVÁVEL – NIH/2014):", "troca categoria");
 eq(t.lineKind("- MUCOSA DE ÍLEO INATIVA (DECH POSSÍVEL – NIH/2014):"), "b", "título com DECH em negrito");
@@ -200,7 +203,8 @@ eq(t.alertas().length, 2, "alerta de título INATIVA com criptite");
 for (const [k, base] of [["esofago", "ESOFAGITE CRÔNICA"], ["gastrica", "GASTRITE CRÔNICA"], ["duodeno", "DUODENITE CRÔNICA"], ["ileo", "ILEÍTE CRÔNICA"], ["colon", "COLITE CRÔNICA"], ["reto", "RETITE CRÔNICA"]])
   for (const g of ["INATIVA", "EM ATIVIDADE LEVE", "EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA"])
     ok(t.SEED_SITES[k].presets.some(p => p.titulo.startsWith(base) && p.titulo.includes(g)), k + ": " + base + " " + g);
-ok(!t.SEED_SITES.reto.presets.some(p => /COLITE|COLÔNICA|COLOPATIA/.test(p.titulo)), "reto sem títulos de cólon");
+ok(!t.SEED_SITES.reto.presets.some(p => /COLITE|COLÔNICA|COLOPATIA|RETOPATIA/.test(p.titulo)), "reto sem títulos de cólon");
+ok(t.SEED_SITES.reto.presets.some(p => p.titulo.startsWith("RETITE DE PADRÃO LINFOCITÁRIO")), "retite de padrão linfocitário");
 eq(t.SEED_SITES.reto.presets.length, t.SEED_SITES.colon.presets.length + 1, "reto tem todas as opções do cólon");
 ok(t.SEED_SITES.gastrica.segmentos.includes("Cárdia"), "cárdia nos segmentos do estômago");
 ok(t.SEED_SITES.polipo.presets.length >= 7, "pólipos presentes");
