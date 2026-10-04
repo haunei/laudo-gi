@@ -301,7 +301,7 @@ const SEED_SITES = {
         "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
-      P("ESOFAGITE CRÔNICA MODERADA, INATIVA",[
+      P("ESOFAGITE CRÔNICA INATIVA",[
         "Hiperplasia da camada basal.",
         "Espongiose moderada.",
         "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
@@ -660,7 +660,7 @@ function variantesAtiv(siteId, base, modelo, tipo, graus){
   (graus||GRAUS_ATIV).forEach((g,k)=>{ const t=base+" "+g;
     if(!site.presets.some(p=>p.titulo===t)) site.presets.push(P(t, src.bullets.map((b,j)=> j===i ? linhas[k] : b))); });
 }
-variantesAtiv("esofago","ESOFAGITE CRÔNICA","ESOFAGITE CRÔNICA MODERADA, INATIVA","esofago",["INATIVA","EM ATIVIDADE","EM ATIVIDADE, EROSIVA"]);
+variantesAtiv("esofago","ESOFAGITE CRÔNICA","ESOFAGITE CRÔNICA INATIVA","esofago",["INATIVA","EM ATIVIDADE","EM ATIVIDADE, EROSIVA"]);
 variantesAtiv("gastrica","GASTRITE CRÔNICA","GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO","gastrica");
 variantesAtiv("duodeno","DUODENITE CRÔNICA","DUODENITE CRÔNICA INESPECÍFICA, INATIVA","cripta");
 variantesAtiv("ileo","ILEÍTE CRÔNICA","ILEÍTE CRÔNICA EM ATIVIDADE MODERADA","cripta");
