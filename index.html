@@ -4,114 +4,129 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Máscara de Laudo — Biópsias endoscópicas/colonoscópicas pediátricas</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#22303f; --bg2:#1b2733; --card:#ffffff; --ink:#1c2430; --muted:#5b6675;
-  --accent:#1f6f8b; --accent-d:#175566; --accent-soft:#e3eef2; --line:#d7dde3;
-  --ok:#0e7c5a; --warn:#b4690e; --danger:#b3261e; --chip:#f1f4f7;
+  --bg:#141B24; --bg2:#141B24; --card:#1B2430; --well:#141B24; --ink:#EEF3F8; --muted:#C3CEDA;
+  --accent:#6CB0FF; --accent-d:#9CCBFF; --accent-soft:#1E3550; --line:#2E3A48; --line2:#46566A;
+  --ok:#5FD4A0; --warn:#F2C94C; --danger:#FF8A80; --chip:#223040; --dark:#0B1622;
   /* acentos por seção */
-  --c-id:#2563eb; --c-dx:#7c3aed; --c-crit:#059669; --c-notas:#d97706; --c-refs:#dc2626;
+  --c-id:#6CB0FF; --c-dx:#B79CFF; --c-crit:#5FD4A0; --c-notas:#F2C94C; --c-refs:#FF8A80;
 }
 *{box-sizing:border-box;}
-body{margin:0;font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;
-  background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%) fixed;color:var(--ink);line-height:1.4;padding:18px 14px 70px;font-size:14px;}
-.wrap{max-width:1280px;margin:0 auto;}
-header.top h1{font-size:1.5rem;margin:0 0 4px;letter-spacing:-.3px;color:#eef4f9;font-weight:800;}
-header.top p{margin:0;color:#a9b7c6;font-size:.88rem;}
-.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px 20px;margin:16px 0;
-  box-shadow:0 6px 20px rgba(8,15,25,.28);}
-.card>h2{font-size:1.18rem;margin:0 0 16px;color:var(--accent-d);border-bottom:2px solid var(--accent-soft);
-  padding-bottom:9px;font-weight:800;letter-spacing:-.2px;}
+body{margin:0;font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
+  background:var(--bg);color:var(--ink);line-height:1.45;padding:18px 16px 70px;font-size:15px;}
+.wrap{max-width:1500px;margin:0 auto;}
+.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start;}
+.cols>.card{margin:0;}
+header.top h1{font-size:1.45rem;margin:0 0 4px;color:var(--ink);font-weight:700;}
+header.top p{margin:0 0 14px;color:var(--muted);font-size:.9rem;max-width:75ch;}
+.card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:16px 0;}
+.card>h2{font-size:1.15rem;margin:0 0 16px;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:10px;}
+.tile{flex:0 0 auto;width:30px;height:30px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);}
+.tile svg{width:18px;height:18px;fill:none;stroke:var(--dark);stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round;}
+.tile.t-dx{background:var(--c-dx);}.tile.t-crit{background:var(--c-crit);}.tile.t-notas{background:var(--c-notas);}.tile.t-refs{background:var(--c-refs);}.tile.t-neutro{background:var(--muted);}
 /* blocos com acento colorido por seção */
-.acc{border-left:4px solid var(--line);border-radius:10px;padding-left:12px;}
-.acc-id{border-left-color:var(--c-id);}
-.acc-dx{border-left-color:var(--c-dx);}
+.acc{border-radius:8px;}
 .acc-dx h3{color:var(--c-dx)!important;}
-.acc-crit{border-left-color:var(--c-crit);}
 .acc-crit h3{color:var(--c-crit)!important;}
-.acc-notas{border-left:4px solid var(--c-notas);padding-left:12px;border-radius:10px;}
+.acc-notas{border-top:1px solid var(--line);}
 .acc-notas>.fld{color:var(--c-notas);}
-.acc-refs{border-left:4px solid var(--c-refs);padding-left:12px;border-radius:10px;}
+.acc-refs{border-top:1px solid var(--line);}
+.acc-refs>.fld{color:var(--c-refs);}
 .grid2{display:grid;grid-template-columns:1.05fr 1fr;gap:16px;}
 .grid-id{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px 14px;align-items:end;}
-label.fld{display:flex;flex-direction:column;gap:4px;font-size:.78rem;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.3px;}
-input[type=text],input[type=number],select,textarea{font:inherit;border:1px solid var(--line);border-radius:8px;
-  padding:8px 10px;background:#fff;color:var(--ink);outline:none;width:100%;}
+label.fld{display:flex;flex-direction:column;gap:4px;font-size:.9rem;font-weight:600;color:var(--muted);}
+input[type=text],input[type=number],select,textarea{font:inherit;border:1px solid var(--line2);border-radius:6px;
+  padding:9px 10px;background:var(--well);color:var(--ink);outline:none;width:100%;}
+input::placeholder,textarea::placeholder{color:#AEBBC9;}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
 textarea{resize:vertical;line-height:1.45;font-size:.92rem;}
 .seg-row{display:flex;gap:6px;}
 .seg-row select{flex:1;}
-button{font:inherit;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink);
-  border-radius:8px;padding:7px 12px;font-weight:600;transition:.12s;}
+button{font:inherit;cursor:pointer;border:1px solid var(--line2);background:var(--well);color:var(--ink);
+  border-radius:6px;padding:8px 12px;font-weight:600;transition:.12s;}
 button:hover{border-color:var(--accent);background:var(--accent-soft);}
-button.primary{background:var(--accent);color:#fff;border-color:var(--accent);}
+button.primary{background:var(--accent);color:var(--dark);border-color:var(--accent);}
 button.primary:hover{background:var(--accent-d);}
-button.ghost{background:#fff;}
+button.ghost{background:var(--well);}
 button.mini{padding:4px 9px;font-size:.8rem;border-radius:7px;}
-button.danger{color:var(--danger);}button.danger:hover{background:#fbe9e8;border-color:var(--danger);}
+button.danger{color:var(--danger);}button.danger:hover{background:#3A1F1D;border-color:var(--danger);}
 .muted{color:var(--muted);}
-.subpanel{border:1px solid var(--line);border-radius:10px;padding:10px 12px;max-height:560px;overflow:auto;background:#fbfcfd;}
-.subpanel h3{margin:0 0 8px;font-size:.82rem;text-transform:uppercase;letter-spacing:.4px;color:var(--accent);font-weight:800;}
-.preset{display:block;width:100%;text-align:left;margin:0 0 7px;padding:9px 11px;border-radius:9px;border:1px solid var(--line);
-  background:#fff;line-height:1.25;}
+.subpanel{border:1px solid var(--line);border-radius:8px;padding:12px;max-height:560px;overflow:auto;background:var(--card);}
+.subpanel h3{margin:0 0 10px;font-size:1rem;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:8px;}
+.subpanel h3 .tile{width:26px;height:26px;}.subpanel h3 .tile svg{width:15px;height:15px;}
+.preset{display:block;width:100%;text-align:left;margin:0 0 7px;padding:9px 11px;border-radius:6px;border:1px solid var(--line2);
+  background:var(--well);line-height:1.3;}
 .preset:hover{border-color:var(--accent);background:var(--accent-soft);}
-.preset b{display:block;font-size:.82rem;color:var(--accent-d);margin-bottom:2px;}
-.preset span{font-size:.72rem;color:var(--muted);}
-.crit{margin:0 0 11px;padding:0 0 9px;border-bottom:1px dashed #e4e9ee;}
+.preset b{display:block;font-size:.9rem;color:var(--ink);margin-bottom:2px;}
+.preset span{font-size:.8rem;color:var(--muted);}
+.crit{margin:0 0 11px;padding:0 0 10px;border-bottom:1px solid var(--line);}
 .crit:last-child{border-bottom:none;}
-.crit .glabel{display:block;font-size:.92rem;font-weight:800;color:var(--ink);margin-bottom:6px;}
+.crit .glabel{display:block;font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
 .crit .opts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
-.opts button{padding:5px 10px;font-size:.84rem;border-radius:20px;background:var(--chip);font-weight:600;}
-.opts .num{display:flex;gap:5px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:2px 4px 2px 10px;}
-.opts .num input{width:62px;border:none;padding:4px 2px;text-align:center;}
+.opts button{padding:6px 10px;font-size:.9rem;border-radius:6px;background:var(--well);font-weight:500;text-align:left;}
+.opts button.on{border:2px solid var(--c-crit);background:#173A2E;color:#fff;font-weight:600;}
+.opts button small{display:block;font-weight:400;color:var(--muted);font-size:.82rem;line-height:1.3;}
+.opts .num{display:flex;gap:5px;align-items:center;background:var(--well);border:1px solid var(--c-crit);border-radius:6px;padding:2px 4px 2px 8px;}
+.opts .num input{width:62px;border:none;padding:4px 2px;text-align:center;font-family:'IBM Plex Mono',Consolas,monospace;font-weight:600;}
 .opts .num input:focus{box-shadow:none;}
-.opts .num button{border-radius:16px;}
+.opts .num button{border-radius:5px;}
+.vr{display:inline-flex;align-items:center;gap:6px;font-size:.85rem;font-weight:600;border-radius:6px;padding:4px 9px;color:var(--dark);}
+.vr:empty{display:none;}.vr.desf{background:var(--c-crit);}.vr.duv{background:var(--c-notas);}.vr.compat{background:var(--c-refs);}
+.cchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--c-crit);border-radius:6px;padding:3px 4px 3px 9px;margin:4px 6px 0 0;font-size:.85rem;}
+.cchip button{padding:0 7px;border:none;background:transparent;color:var(--danger);}
+.alerta{display:flex;gap:10px;align-items:center;border:1px solid var(--c-notas);background:#3A3312;color:#F8E9B0;border-radius:8px;padding:10px 12px;margin:0 0 8px;}
+.alerta.conf{border-color:var(--c-refs);background:#3A1F1D;color:#FFD9D5;}
+.alerta .tile{background:var(--c-notas);}.alerta.conf .tile{background:var(--c-refs);}
+.alerta span{flex:1;}
 .editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
 .editor-actions .spacer{flex:1;}
 .sample-list{list-style:none;margin:0 0 12px;padding:0;}
-.sample-list li{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line);border-radius:9px;padding:8px 10px;margin-bottom:7px;background:#fbfcfd;}
+.sample-list li{display:flex;gap:8px;align-items:flex-start;border:1px solid var(--line2);border-radius:6px;padding:8px 10px;margin-bottom:7px;background:var(--well);}
 .sample-list .si-letter{font-weight:800;color:var(--accent-d);font-size:1rem;min-width:20px;}
 .sample-list .si-body{flex:1;min-width:0;}
-.sample-list .si-name{font-weight:700;font-size:.88rem;}
-.sample-list .si-prev{font-size:.76rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.sample-list .si-name{font-weight:600;font-size:.95rem;}
+.sample-list .si-prev{font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .sample-list .si-ctrl{display:flex;gap:4px;flex-shrink:0;}
 .notas-toggles{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px;}
-.notas-toggles button{font-size:.78rem;padding:5px 9px;border-radius:8px;text-align:left;max-width:100%;}
-.notas-toggles button.on{background:var(--ok);color:#fff;border-color:var(--ok);}
-.eospanel{border:1px solid var(--line);border-radius:10px;background:#fff;margin:14px 0;overflow:hidden;}
+.notas-toggles button{font-size:.85rem;padding:6px 9px;border-radius:6px;text-align:left;max-width:100%;}
+.notas-toggles button.on{background:var(--ok);color:var(--dark);border-color:var(--ok);}
+.eospanel{border:1px solid var(--line);border-radius:8px;background:var(--card);margin:14px 0;overflow:hidden;}
 .eospanel summary{cursor:pointer;padding:11px 16px;font-weight:800;color:var(--accent-d);list-style:none;}
 .eospanel summary::-webkit-details-marker{display:none;}
 .eospanel summary::before{content:"▸ ";color:var(--accent);}
 .eospanel[open] summary::before{content:"▾ ";}
 .eospanel .inner{padding:4px 16px 16px;}
-table.eos{width:100%;border-collapse:collapse;font-size:.82rem;}
+table.eos{width:100%;border-collapse:collapse;font-size:.88rem;}
 table.eos th,table.eos td{border:1px solid var(--line);padding:7px 9px;vertical-align:top;text-align:left;}
 table.eos th{background:var(--accent-soft);font-weight:800;}
 table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowrap;}
-.eos-refs{font-size:.74rem;color:var(--muted);margin-top:10px;line-height:1.5;}
+.eos-refs{font-size:.84rem;color:var(--muted);margin-top:10px;line-height:1.5;}
 .out{width:100%;min-height:340px;max-height:72vh;overflow:auto;border:1px solid var(--line);border-radius:10px;
-  padding:14px 18px;background:#fff;}
-.out .ll{font-family:Arial,Helvetica,sans-serif;font-size:8pt;line-height:1.15;color:#000;text-align:justify;white-space:pre-wrap;word-break:break-word;}
+  padding:14px 18px;background:#fff;border-radius:4px;}
+.out .ll{font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.3;color:#000;text-align:justify;white-space:pre-wrap;word-break:break-word;}
 .out .ll.b{font-weight:bold;}
 .out .ll.sp{height:.6em;}
 .out .empty{color:var(--muted);font-size:.85rem;font-style:italic;}
-.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--dark);
   padding:11px 20px;border-radius:9px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-.hint{font-size:.78rem;color:var(--muted);margin:0 0 9px;}
+.hint{font-size:.86rem;color:var(--muted);margin:0 0 9px;}
 .flagbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-bottom:10px;}
 .crit .glabel{display:flex;justify-content:space-between;align-items:center;gap:8px;}
 /* chips de notas/refs (tag + preview) */
 .chip-tog{display:block;width:100%;margin:0 0 6px;text-align:left;padding:7px 10px;border-radius:8px;line-height:1.25;}
-.chip-tog b{display:inline;color:var(--accent-d);font-size:.8rem;}
-.chip-tog span{color:var(--muted);font-size:.74rem;}
+.chip-tog b{display:inline;color:var(--ink);font-size:.88rem;}
+.chip-tog span{color:var(--muted);font-size:.84rem;}
 .chip-tog.on{background:var(--ok);border-color:var(--ok);}
-.chip-tog.on b,.chip-tog.on span{color:#fff;}
+.chip-tog.on b,.chip-tog.on span{color:var(--dark);}
 /* versão + aviso de legado v2 */
-header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e6;border-radius:20px;padding:2px 9px;margin-left:8px;vertical-align:middle;letter-spacing:0;}
-.banner{background:#fff7e6;border:1.5px solid var(--warn);border-radius:12px;padding:12px 16px;margin:14px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'IBM Plex Mono',Consolas,monospace;margin-left:10px;vertical-align:middle;}
+.banner{background:#3A3312;color:#F8E9B0;border:1px solid var(--warn);border-radius:8px;padding:12px 16px;margin:14px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .banner p{margin:0;flex:1;min-width:240px;font-size:.86rem;}
 .banner[hidden]{display:none;}
+@media(max-width:1100px){.cols{grid-template-columns:1fr;}}
 @media(max-width:880px){.grid2{grid-template-columns:1fr;}}
 @media print{
   body{background:#fff;padding:0;font-size:12px;}
@@ -128,7 +143,7 @@ header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e
 
 <header class="top noprint">
   <h1>Máscara de Laudo — Biópsias endoscópicas/colonoscópicas pediátricas<span class="ver" id="appVer"></span></h1>
-  <p>Monte cada amostra por cliques → edite o texto → <b>Salvar amostra</b> empilha no laudo. Copie tudo ao final. Só o laudo em montagem fica salvo neste navegador; diagnósticos, critérios, notas e referências vêm da versão publicada.</p>
+  <p>Monte cada amostra por cliques, edite o texto e clique em <b>Salvar amostra</b>. Só o laudo em montagem fica salvo neste navegador.</p>
 </header>
 
 <div class="banner noprint" id="legacyBanner" hidden>
@@ -160,13 +175,18 @@ header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e
 </details>
 
 <!-- ===================== 1. AMOSTRA ATUAL ===================== -->
+<div class="cols">
 <section class="card noprint">
-  <h2>1 · Montar amostra</h2>
+  <h2><span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 15h9"/></svg></span>Montar amostra</h2>
 
 
-  <div class="grid-id acc acc-id" style="margin-bottom:16px;padding:6px 0 6px 14px;">
-    <label class="fld">Letra do frasco
-      <input type="text" id="fLetra" maxlength="3" style="text-transform:uppercase;">
+  <label class="fld" style="margin-bottom:12px;">Materiais: início da frase (texto livre, completa ao digitar)
+    <input type="text" id="fPrefixo" list="prefixList">
+    <datalist id="prefixList"><option value="Biópsias endoscópicas/colonoscópicas de:"><option value="Biópsia endoscópica/colonoscópica de:"><option value="Biópsias endoscópicas de:"><option value="Biópsia endoscópica de:"><option value="Biópsias colonoscópicas de:"></datalist>
+  </label>
+  <div class="grid-id acc acc-id" style="margin-bottom:16px;">
+    <label class="fld">Letra (automática)
+      <input type="text" id="fLetra" maxlength="3" readonly style="text-transform:uppercase;">
     </label>
     <label class="fld">Sítio / órgão
       <select id="fSitio"></select>
@@ -175,22 +195,35 @@ header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e
       <select id="fSeg"></select>
     </label>
     <label class="fld" style="grid-column:span 2;">Nome da amostra (vai em “Materiais” e no cabeçalho do bloco)
-      <input type="text" id="fNome" placeholder="ex.: Mucosa esofágica">
+      <input type="text" id="fNome" list="matList" placeholder="ex.: Mucosa esofágica">
+      <datalist id="matList"></datalist>
     </label>
   </div>
 
   <div class="grid2">
     <div class="subpanel acc-dx">
-      <h3>Diagnósticos prontos (1 clique = bloco no editor)</h3>
+      <h3><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-5a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h5z"/></svg></span>Textos prontos (1 clique insere o bloco)</h3>
       <div id="presetBox"></div>
     </div>
     <div class="subpanel acc-crit">
-      <h3>Critérios histológicos (clique insere a linha)</h3>
+      <h3><span class="tile t-crit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Achados (clique insere a linha)</h3>
       <div id="critBox"></div>
     </div>
   </div>
 
-  <label class="fld" style="margin-top:14px;">Editor da amostra — texto livre/editável
+  <div class="grid2" style="margin-top:14px;">
+    <div class="subpanel">
+      <h3><span class="tile t-crit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9h16M4 15h16M10 3L8 21M16 3l-2 18"/></svg></span>Contagens com valor de referência</h3>
+      <div id="countBox"></div>
+      <div id="countChips"></div>
+    </div>
+    <div class="subpanel">
+      <h3><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 3v5M12 16v5M3 12h5M16 12h5"/></svg></span>Bloco DECH (NIH 2014)</h3>
+      <div id="dechBox"></div>
+    </div>
+  </div>
+
+  <label class="fld" style="margin-top:14px;">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
     <textarea id="corpo" rows="11" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
   </label>
   <div class="editor-actions">
@@ -203,30 +236,15 @@ header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e
 
 <!-- ===================== 2. LAUDO ACUMULADO ===================== -->
 <section class="card">
-  <h2>2 · Laudo acumulado</h2>
+  <h2 class="noprint"><span class="tile t-neutro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg></span>Laudo</h2>
 
   <div class="noprint">
     <ul class="sample-list" id="sampleList"></ul>
     <p class="hint" id="emptyHint">Nenhuma amostra salva ainda. Monte a amostra acima e clique <b>Salvar amostra</b>.</p>
 
-    <div class="acc-notas" style="margin-top:10px;padding-top:8px;padding-bottom:8px;">
-      <label class="fld">NOTAS — clique nas tags p/ incluir/remover; busque por tag ou texto</label>
-      <input type="text" id="notaSearch" placeholder="🔎 buscar nota (tag ou texto)…" style="margin-bottom:8px;">
-      <div class="notas-toggles" id="notasToggles"></div>
-      <label class="fld" style="margin-top:8px;">Notas livres (texto extra)</label>
-      <textarea id="notas" rows="3" placeholder="Notas adicionais (texto livre)."></textarea>
-    </div>
-
-    <div class="acc-refs" style="margin-top:12px;padding-top:8px;padding-bottom:8px;">
-      <label class="fld">REFERÊNCIAS — clique nas tags p/ incluir/remover; busque por tag ou texto</label>
-      <input type="text" id="refSearch" placeholder="🔎 buscar referência…" style="margin-bottom:8px;">
-      <div class="notas-toggles" id="refsToggles"></div>
-      <label class="fld" style="margin-top:8px;">Referências livres (uma por linha)</label>
-      <textarea id="refsFree" rows="2" placeholder="Referências adicionais (texto livre, 1 por linha)."></textarea>
-    </div>
   </div>
 
-  <label class="fld noprint">Laudo montado (pré-visualização rich — Arial 8pt; títulos em negrito; copiável formatado)</label>
+  <div id="alertBox" class="noprint"></div>
   <div class="out" id="laudoMontado"></div>
 
   <div class="editor-actions noprint">
@@ -236,7 +254,26 @@ header.top .ver{font-size:.72rem;font-weight:700;color:#0b1520;background:#9fd3e
     <span class="spacer"></span>
     <button class="danger" id="btnLimparTudo">Limpar laudo</button>
   </div>
+
+  <div class="noprint">
+    <div class="acc-notas" style="margin-top:10px;padding-top:12px;padding-bottom:8px;">
+      <label class="fld">Notas: clique para incluir ou remover. As notas de contagem e de DECH entram sozinhas</label>
+      <input type="text" id="notaSearch" placeholder="🔎 buscar nota (tag ou texto)…" style="margin-bottom:8px;">
+      <div class="notas-toggles" id="notasToggles"></div>
+      <label class="fld" style="margin-top:8px;">Notas livres (texto extra)</label>
+      <textarea id="notas" rows="3" placeholder="Notas adicionais (texto livre)."></textarea>
+    </div>
+
+    <div class="acc-refs" style="margin-top:12px;padding-top:12px;padding-bottom:8px;">
+      <label class="fld">Referências: as citadas no texto entram numeradas sozinhas; clique para acrescentar outras</label>
+      <input type="text" id="refSearch" placeholder="🔎 buscar referência…" style="margin-bottom:8px;">
+      <div class="notas-toggles" id="refsToggles"></div>
+      <label class="fld" style="margin-top:8px;">Referências livres (uma por linha)</label>
+      <textarea id="refsFree" rows="2" placeholder="Referências adicionais (texto livre, 1 por linha)."></textarea>
+    </div>
+  </div>
 </section>
+</div>
 
 </div>
 
@@ -613,6 +650,48 @@ const NOTAS_PADRAO = [
   {tag:"Linfocitário", texto:"O achado histopatológico de gastropatia/colopatia de padrão linfocitário pode ser encontrado em diversas condições clínicas, sendo imprescindível a correlação com dados clínicos, de imagem, endoscópicos/colonoscópicos e demais dados laboratoriais para melhor definição diagnóstica (DII? OUTRA?)."}
 ];
 
+/* ============================ REFERÊNCIAS CITÁVEIS (marca [@chave] no texto vira [n]) ============================ */
+const CITE = {
+  pap:"Papadopoulou A, Amil-Dias J, Auth MK, Chehade M, Collins MH, Gupta SK, et al. Joint ESPGHAN/NASPGHAN Guidelines on Childhood Eosinophilic Gastrointestinal Disorders Beyond Eosinophilic Esophagitis. J Pediatr Gastroenterol Nutr. 2024;78(1):122-152. doi:10.1097/MPG.0000000000003877.",
+  deb:"DeBrosse CW, Case JW, Putnam PE, Collins MH, Rothenberg ME. Quantity and distribution of eosinophils in the gastrointestinal tract of children. Pediatr Dev Pathol. 2006;9(3):210-8. doi:10.2350/11-05-0130.1.",
+  iwa:"Iwaya M, Kobayashi S, Nakayama Y, Kato S, Kurasawa S, Sado T, et al. Number and distribution of eosinophils and lymphocytes in the Japanese pediatric gastrointestinal tract: in search of a definition for \"abnormally increased eosinophils\". World J Pediatr. 2023;19(3):251-260. doi:10.1007/s12519-022-00646-x.",
+  agree:"Dellon ES, Liacouras CA, Molina-Infante J, Furuta GT, Spergel JM, Zevit N, et al. Updated International Consensus Diagnostic Criteria for Eosinophilic Esophagitis: Proceedings of the AGREE Conference. Gastroenterology. 2018;155(4):1022-1033.e10. doi:10.1053/j.gastro.2018.07.009.",
+  gio:"Giordano C, Angerilli V, Masci M, D'Armiento M, Parente P, Pilozzi E, et al. Standardisation of histologic reporting in eosinophilic oesophagitis: Expert recommendations. Pathologica. 2026;118(1):4-14. doi:10.32074/1591-951X-1842.",
+  hayat:"Hayat M, Cairns A, Dixon MF, O'Mahony S. Quantitation of intraepithelial lymphocytes in human duodenum: what is normal? J Clin Pathol. 2002;55(5):393-4. doi:10.1136/jcp.55.5.393.",
+  putra:"Putra J, Muller KE, Hussain ZH, Parker S, Gabbard S, Brickley EB, et al. Lymphocytic Esophagitis in Nonachalasia Primary Esophageal Motility Disorders: Improved Criteria, Prevalence, Strength of Association, and Natural History. Am J Surg Pathol. 2016;40(12):1679-1685. doi:10.1097/PAS.0000000000000712.",
+  habbal:"Habbal M, Scaffidi MA, Rumman A, Khan R, Ramaj M, Al-Mazroui A, et al. Clinical, endoscopic, and histologic characteristics of lymphocytic esophagitis: a systematic review. Esophagus. 2019;16(2):123-132. doi:10.1007/s10388-018-0649-1.",
+  shulman:"Shulman HM, Cardona DM, Greenson JK, Hingorani S, Horn T, Huber E, et al. NIH Consensus development project on criteria for clinical trials in chronic graft-versus-host disease: II. The 2014 Pathology Working Group Report. Biol Blood Marrow Transplant. 2015;21(4):589-603. doi:10.1016/j.bbmt.2014.12.031.",
+  lerner:"Lerner KG, Kao GF, Storb R, Buckner CD, Clift RA, Thomas ED. Histopathology of graft-vs.-host reaction (GvHR) in human recipients of marrow from HL-A-matched sibling donors. Transplant Proc. 1974;6(4):367-71.",
+  rowan:"Rowan DJ, Hartley CP, Carrillo-Polanco LF, Oshima K, Hagen CE. Diagnostic phrasing is independently correlated with the decision to treat for graft-versus-host disease: retrospective review of colon biopsies with rare apoptosis. Histopathology. 2016;69(5):802-811. doi:10.1111/his.13003."
+};
+const CITE_RE=/\[@([a-z0-9]+(?:,[a-z0-9]+)*)\]/g;
+
+/* ============================ CONTAGENS: valores de referência ============================ */
+// Campo de 40x com ocular FN 22 = 0,237 mm². "campo" = limiar da Tabela 6 (ESPGHAN/NASPGHAN 2024) convertido para esse campo.
+// "teto" = máximo normal em crianças dos EUA (DeBrosse 2006; máximo relatado ou média + 2 DP).
+const FIELD_MM2=0.237;
+const EOS_VR = {
+  estomago:{rot:"o estômago", campo:26, mm2:110, teto:7, normal:"1,9 ± 1,3 no antro e 2,1 ± 2,4 no fundo [@deb]; menos de 10 [@iwa]"},
+  duodeno:{rot:"o duodeno", campo:44, mm2:185, teto:26, normal:"9,6 ± 5,3 [@deb] e 30,0 ± 15,8 [@iwa]"},
+  ileo:{rot:"o íleo terminal", campo:52, mm2:220, teto:28, normal:"12,4 ± 5,4 [@deb] e 38,3 ± 22,7 [@iwa]"},
+  cecoasc:{rot:"o ceco/cólon ascendente", campo:88, mm2:370, teto:50, normal:"20,3 ± 8,2 [@deb] e 49,5 ± 22,4 [@iwa]"},
+  transdesc:{rot:"o cólon transverso/descendente", campo:71, mm2:300, teto:28, normal:"16,3 ± 5,6 [@deb] e 29,4 ± 17,0 [@iwa]"},
+  sigreto:{rot:"o sigmoide/reto", campo:52, mm2:220, teto:20, normal:"8,3 ± 5,9 [@deb]; menos de 10 no reto [@iwa]"}
+};
+const ESO_EOS_CAMPO=12;            // 15 por 0,3 mm² no campo FN 22
+const ESO_LINF = {"Transição esôfago-gástrica":62, "Terço distal":46, "Terço médio":41, "Terço proximal":41}; // Putra 2016
+const MATS_PADRAO = ["Esôfago","Mucosa esofágica","Lesão de esôfago","Mucosa gástrica","Estômago","Duodeno","Mucosa duodenal","Íleo","Íleo terminal","Mucosa de íleo terminal","Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Reto","Anastomose íleo-retal"];
+const PREFIXO_PADRAO = "Biópsias endoscópicas/colonoscópicas de:";
+const DECH_CRIPTAS = [
+  ["sem","sem destruição","apoptose isolada, criptas íntegras (grau 1 de Lerner)"],
+  ["isolada","destruição isolada","perda de uma cripta ou microabscesso apoptótico (grau 2)"],
+  ["contigua","perda contígua","perda de 2 ou mais criptas vizinhas (grau 3)"],
+  ["desnud","desnudação","perda extensa de criptas, com desnudação da mucosa (grau 4)"]
+];
+const NOTA_VIRAL="As alterações citopáticas descritas são sugestivas de ação viral; é necessária pesquisa imuno-histoquímica para confirmação e definição do agente.";
+const NOTA_DECH="Imprescindível correlação com dados clínicos e laboratoriais para melhor investigação de possibilidade de DECH (diagnóstico diferencial: alterações decorrentes de medicações em uso?). Categorias conforme o consenso NIH 2014 [@shulman].";
+const NOTA_EOS_CONSENSO="Não há consenso sobre o número normal de eosinófilos na mucosa do íleo e do cólon; os valores variam com o segmento, a população e a área do campo microscópico [@pap,deb,iwa].";
+
 const REFS_HEADER = "REFERÊNCIAS BIBLIOGRÁFICAS:";
 // REFS do SEED (tag eosinofílica; tags/CRUD chegam na Etapa 3)
 const SEED_REFS = [
@@ -622,14 +701,17 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.0.2";
+const APP_VERSION="3.1.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
 const LS_DRAFT="laudoGI_draft_v3";
 const LS_DB_V2="laudoGI_db_v2";                  // legado v2: só leitura (exportar customizações / importar rascunho)
 const LS_LEGACY_DISMISS="laudoGI_v2_banner_off";
+const LS_MATS="laudoGI_mats_v3";               // nomes de material mais usados (autocompletar)
 let editIndex = -1; // -1 = nova amostra; >=0 = editando
+let draft = { counts:[], dech:null }; // contagens e DECH da amostra em edição
+let dechUI = { n:"", cripta:"sem", viral:false, manual:null };
 
 function load(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){return null;} }
 function store(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
@@ -735,6 +817,239 @@ function appendBlock(block){
   ta.focus(); ta.scrollTop = ta.scrollHeight;
 }
 
+/* ============================ CONTAGENS / DECH / ATIVIDADE (regras) ============================ */
+const fmtPt=n=>String(n).replace(".",",");
+function eosKey(siteId, seg){
+  if(siteId==="esofago") return "esofago";
+  if(siteId==="gastrica") return "estomago";
+  if(siteId==="duodeno") return "duodeno";
+  if(siteId==="ileo") return "ileo";
+  if(siteId==="reto") return "sigreto";
+  if(siteId==="colon"){
+    if(/Ceco|ascendente/i.test(seg)) return "cecoasc";
+    if(/transverso|descendente/i.test(seg)) return "transdesc";
+    if(/sigmoide/i.test(seg)) return "sigreto";
+  }
+  return null;
+}
+// compat = no limiar ou acima; desf = dentro do normal publicado; duv = entre os dois
+function eosEval(key, n){
+  if(key==="esofago") return n>=ESO_EOS_CAMPO ? "compat" : "desf";
+  const v=EOS_VR[key];
+  return n>=v.campo ? "compat" : (n>v.teto ? "duv" : "desf");
+}
+function eosLine(key, n){
+  if(key==="esofago") return "- Exocitose de eosinófilos: até "+n+" por campo de grande aumento ("+Math.round(n*1.27)+" por 0,3 mm²; valor de referência: a partir de 15 por 0,3 mm² [@agree,gio]).";
+  const v=EOS_VR[key];
+  return "- Eosinófilos em lâmina própria: até "+n+" por campo de grande aumento ("+Math.round(n/FIELD_MM2)+"/mm²; valor de referência: limiar a partir de "+v.mm2+"/mm² [@pap]; normal "+v.normal+" por campo).";
+}
+function eosNote(letra, key, n){
+  const a="Amostra "+letra+": a contagem de eosinófilos ", st=eosEval(key,n);
+  if(key==="esofago") return st==="compat"
+    ? a+"atinge o critério histológico de 15 por 0,3 mm² [@agree]: achado compatível com esofagite de padrão eosinofílico, na dependência de correlação clínica."
+    : a+"está abaixo do critério histológico de 15 por 0,3 mm² [@agree]: o achado desfavorece esofagite eosinofílica.";
+  const v=EOS_VR[key];
+  if(st==="compat") return a+"atinge o limiar de consenso para "+v.rot+" [@pap]: achado compatível com doença gastrointestinal eosinofílica, na dependência de quadro clínico compatível e da exclusão de causas secundárias [@pap].";
+  if(st==="duv") return a+"está acima da faixa descrita em crianças sem doença [@deb], porém abaixo do limiar de consenso para "+v.rot+" [@pap]: não é possível afirmar, apenas pela histologia, se o valor é patológico.";
+  return a+"está abaixo do limiar de consenso para "+v.rot+" [@pap] e dentro da faixa descrita em crianças sem doença [@deb,iwa]: o achado desfavorece doença gastrointestinal eosinofílica neste sítio.";
+}
+function lieEval(n){ return n>=30 ? "compat" : (n>=25 ? "duv" : "desf"); }
+function lieLine(n){ return "- Linfócitos intraepiteliais: aproximadamente "+n+" por 100 enterócitos (valor de referência: normal até 25 [@hayat]; aumentado a partir de 30)."; }
+function lieNote(letra, n){
+  const a="Amostra "+letra+": a contagem de linfócitos intraepiteliais ", st=lieEval(n);
+  if(st==="compat") return a+"está aumentada (a partir de 30 por 100 enterócitos): achado compatível com enteropatia com linfocitose intraepitelial, na dependência de correlação clínica e sorológica.";
+  if(st==="duv") return a+"está em faixa limítrofe (25 a 29 por 100 enterócitos; limite superior normal de 25 [@hayat]): não é possível afirmar, apenas pela histologia, se o valor é patológico.";
+  return a+"está dentro do limite normal (até 25 por 100 enterócitos [@hayat]): o achado desfavorece enteropatia com linfocitose intraepitelial.";
+}
+function linfEval(lim, n){ return n>lim ? "compat" : "desf"; }
+function linfLine(lim, n){ return "- Exocitose de linfócitos: até "+n+" por campo de grande aumento (valor de referência: limite normal de "+lim+" por campo neste nível [@putra])."; }
+function linfNote(letra, lim, n){
+  const a="Amostra "+letra+": a contagem de linfócitos intraepiteliais ";
+  return (linfEval(lim,n)==="compat"
+    ? a+"está acima do limite normal descrito para o nível biopsiado [@putra]: achado compatível com esofagite de padrão linfocítico, se a distribuição for peripapilar e os granulócitos forem raros ou ausentes."
+    : a+"está dentro do limite normal descrito para o nível biopsiado [@putra]: o achado desfavorece esofagite de padrão linfocítico.")
+    +" Não há consenso sobre o ponto de corte [@habbal].";
+}
+// atividade pela fração de criptas com criptite/abscesso (escala Lewin/Geboes adotada)
+function ativGrade(a, b){
+  if(!(b>0) || a<0 || a>b) return null;
+  if(a===0) return "INATIVA";
+  const p=100*a/b;
+  return p<=5 ? "EM ATIVIDADE LEVE" : (p<=50 ? "EM ATIVIDADE MODERADA" : "EM ATIVIDADE ACENTUADA");
+}
+function ativLine(a, b){ return "- Presença de criptite neutrofílica ("+a+" de "+b+" criptas avaliadas; "+fmtPt(Math.round(1000*a/b)/10)+"%)."; }
+const ATIV_RE=/EM ATIVIDADE (?:LEVE|MODERADA|ACENTUADA)|INATIVA|EM ATIVIDADE/;
+const DECH_SUF_RE=/ \(DECH [^)]*\)/;
+function titleSetAtiv(title, grau){
+  const m=title.match(/^(.*?)( \(DECH [^)]*\))?:$/); if(!m) return title;
+  const base = ATIV_RE.test(m[1]) ? m[1].replace(ATIV_RE, grau) : m[1]+", "+grau;
+  return base+(m[2]||"")+":";
+}
+function dechCat(n, cripta, viral){
+  if(n===0 && cripta==="sem") return "NÃO IDENTIFICADA";
+  if(viral) return "POSSÍVEL";
+  if(n>=7 || cripta!=="sem") return "PROVÁVEL";
+  return "POSSÍVEL";
+}
+function titleSetDech(title, cat){
+  const m=title.match(/^(.*?)( \(DECH [^)]*\))?:$/); if(!m) return title;
+  return m[1]+" (DECH "+cat+" – NIH/2014):";
+}
+function dechLines(n, cripta, viral){
+  const out=[];
+  const g1="(apoptose isolada, criptas íntegras; grau 1 de Lerner [@lerner])";
+  if(n===0) out.push("- Não foram identificados corpos apoptóticos na camada basal do epitélio glandular.");
+  else out.push("- Presença de corpos apoptóticos na camada basal do epitélio glandular ("+n+" por 10 criptas contíguas; apoptose mínima: até 6 [@rowan])"
+    +(cripta==="sem" ? ", sem destruição de glândulas ou desnudação da mucosa "+g1+" (VIDE NOTA)." : " (VIDE NOTA)."));
+  if(cripta==="isolada") out.push("- Presença de destruição de criptas isoladas (perda de uma cripta ou microabscesso apoptótico; grau 2 de Lerner [@lerner]).");
+  if(cripta==="contigua") out.push("- Presença de destruição de criptas contíguas (perda de 2 ou mais criptas vizinhas; grau 3 de Lerner [@lerner]).");
+  if(cripta==="desnud") out.push("- Presença de desnudação da mucosa (perda extensa de criptas; grau 4 de Lerner [@lerner]).");
+  out.push(viral ? "- Presença de alterações citopáticas sugestivas de ação viral (VIDE NOTA)." : "- Não foram identificados achados sugestivos de ação viral.");
+  return out;
+}
+// último título (linha em negrito) do editor
+function editTitle(fn){
+  const ta=$("corpo"), ls=ta.value.split("\n");
+  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ ls[i]=fn(ls[i].trim()); ta.value=ls.join("\n"); return true; }
+  return false;
+}
+// notas automáticas (contagens e DECH) de todas as amostras salvas
+function autoNotas(){
+  const out=[]; let consenso=false;
+  WORK.samples.forEach((s,i)=>{
+    const L_=letterOf(i);
+    (s.counts||[]).forEach(c=>{
+      if(c.t==="eos"){ out.push(eosNote(L_,c.key,c.n)); if(c.key!=="esofago") consenso=true; }
+      if(c.t==="lie") out.push(lieNote(L_,c.n));
+      if(c.t==="linf") out.push(linfNote(L_,c.lim,c.n));
+    });
+    if(s.dech){ if(s.dech.viral && !out.includes(NOTA_VIRAL)) out.push(NOTA_VIRAL); if(!out.includes(NOTA_DECH)) out.push(NOTA_DECH); }
+  });
+  if(consenso) out.push(NOTA_EOS_CONSENSO);
+  return out;
+}
+// [@a,b] -> [n,m] na ordem de aparecimento; devolve o texto e a lista de chaves citadas
+function fmtNums(ns){
+  ns=[...new Set(ns)].sort((a,b)=>a-b); const out=[];
+  for(let i=0;i<ns.length;){ let j=i; while(j+1<ns.length && ns[j+1]===ns[j]+1) j++;
+    out.push(j-i>=2 ? ns[i]+"-"+ns[j] : ns.slice(i,j+1).join(",")); i=j+1; }
+  return out.join(",");
+}
+function resolveCites(txt){
+  const order=[];
+  const out=txt.replace(CITE_RE,(m,keys)=>{
+    const ns=keys.split(",").filter(k=>CITE[k]).map(k=>{ let i=order.indexOf(k); if(i<0){ order.push(k); i=order.length-1; } return i+1; });
+    return ns.length ? "["+fmtNums(ns)+"]" : m;
+  });
+  return { txt:out, order };
+}
+// inconsistências (avisam, não bloqueiam)
+function alertas(){
+  const out=[];
+  const check=(rot, corpo, dech)=>{
+    const ls=(corpo||"").split("\n"), tit=ls.filter(l=>lineKind(l)==="b").join(" ");
+    if(/INATIVA/.test(tit) && ls.some(l=>/^- Presença de (criptite|infiltrado inflamatório neutrofílico)/.test(l.trim())))
+      out.push({conf:true, msg:rot+": o título diz INATIVA, mas há atividade neutrofílica descrita."});
+    if(dech && dech.manual && dech.manual!==dech.sug)
+      out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
+  };
+  WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
+  return out;
+}
+function renderAlertas(){
+  const ic='<span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7.5v6M12 16.5v.5"/></svg></span>';
+  $("alertBox").innerHTML = alertas().map(a=>'<div class="alerta'+(a.conf?" conf":"")+'" role="status">'+ic+'<span>'+esc(a.msg)+'</span></div>').join("");
+}
+
+/* ============================ PAINEL DE CONTAGENS ============================ */
+const ROT_ST={compat:"no limiar ou acima", duv:"entre o normal e o limiar", desf:"dentro do normal"};
+function numField(id, btnId, btnTxt){ return '<span class="num"><input type="number" min="0" id="'+id+'" placeholder="nº"><button type="button" id="'+btnId+'">'+btnTxt+'</button></span>'; }
+function setBadge(id, st, txt){ const b=$(id); b.className="vr"+(st?" "+st:""); b.textContent=txt||""; }
+function renderCounts(){
+  const site=currentSite(); let h="";
+  h+='<div class="crit"><span class="glabel">Eosinófilos: pico por campo de 40×</span><div class="opts">'+numField("eosN","eosGo","inserir com valor de referência")+'<span class="vr" id="eosBadge"></span></div><p class="hint" id="eosHint" style="margin:6px 0 0"></p></div>';
+  if(site.id==="duodeno") h+='<div class="crit"><span class="glabel">Linfócitos intraepiteliais por 100 enterócitos</span><div class="opts">'+numField("lieN","lieGo","inserir com valor de referência")+'<span class="vr" id="lieBadge"></span></div><p class="hint" style="margin:6px 0 0">Normal até 25 · 25 a 29 limítrofe · aumentado a partir de 30.</p></div>';
+  if(site.id==="esofago") h+='<div class="crit"><span class="glabel">Linfócitos intraepiteliais: pico por campo de 40×</span><div class="opts">'+numField("linN","linGo","inserir com valor de referência")+'<span class="vr" id="linBadge"></span></div><p class="hint" style="margin:6px 0 0">Limite normal por nível: 62 na transição, 46 no distal, 41 no médio. Escolha o segmento.</p></div>';
+  if(["ileo","colon","reto"].includes(site.id)) h+='<div class="crit"><span class="glabel">Atividade: criptas com criptite ou abscesso</span><div class="opts"><span class="num"><input type="number" min="0" id="criA" placeholder="nº"></span><span class="muted">de</span>'+numField("criB","criGo","inserir e ajustar título")+'<span class="vr" id="criBadge"></span></div><p class="hint" style="margin:6px 0 0">Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada.</p></div>';
+  $("countBox").innerHTML=h;
+  const key=()=>eosKey(site.id, $("fSeg").value);
+  const hint=()=>{ const k=key(); $("eosHint").textContent = !k ? "Escolha o segmento do cólon: o valor de referência depende do sítio."
+    : k==="esofago" ? "Critério: a partir de 15 por 0,3 mm² (12 neste campo)."
+    : "Limiar para "+EOS_VR[k].rot+": a partir de "+EOS_VR[k].campo+" por campo ("+EOS_VR[k].mm2+"/mm²). Máximo normal (EUA): "+EOS_VR[k].teto+"."; };
+  hint();
+  $("eosN").oninput=()=>{ hint(); const k=key(), n=parseFloat($("eosN").value); if(!k||isNaN(n)){ setBadge("eosBadge"); return; } const st=eosEval(k,n); setBadge("eosBadge", st, ROT_ST[st]); };
+  $("eosGo").onclick=()=>{ const k=key(), n=parseFloat($("eosN").value);
+    if(isNaN(n)){ toast("Digite o nº"); return; } if(!k){ toast("Escolha o segmento"); return; }
+    appendLine(eosLine(k,n)); draft.counts.push({t:"eos", key:k, n}); renderCountChips(); toast("Linha e nota de eosinófilos incluídas"); };
+  if(site.id==="duodeno"){
+    $("lieN").oninput=()=>{ const n=parseFloat($("lieN").value); if(isNaN(n)){ setBadge("lieBadge"); return; } const st=lieEval(n); setBadge("lieBadge", st, st==="compat"?"aumentado":st==="duv"?"limítrofe":"normal"); };
+    $("lieGo").onclick=()=>{ const n=parseFloat($("lieN").value); if(isNaN(n)){ toast("Digite o nº"); return; }
+      appendLine(lieLine(n)); draft.counts.push({t:"lie", n}); renderCountChips(); toast("Linha e nota de linfócitos incluídas"); };
+  }
+  if(site.id==="esofago"){
+    const lim=()=>ESO_LINF[$("fSeg").value];
+    $("linN").oninput=()=>{ const n=parseFloat($("linN").value), l=lim(); if(isNaN(n)||!l){ setBadge("linBadge"); return; } const st=linfEval(l,n); setBadge("linBadge", st, st==="compat"?"acima do limite":"dentro do limite"); };
+    $("linGo").onclick=()=>{ const n=parseFloat($("linN").value), l=lim(); if(isNaN(n)){ toast("Digite o nº"); return; } if(!l){ toast("Escolha o segmento"); return; }
+      appendLine(linfLine(l,n)); draft.counts.push({t:"linf", lim:l, n}); renderCountChips(); toast("Linha e nota de linfócitos incluídas"); };
+  }
+  if(["ileo","colon","reto"].includes(site.id)){
+    const g=()=>ativGrade(parseFloat($("criA").value), parseFloat($("criB").value));
+    const upd=()=>{ const x=g(); setBadge("criBadge", x?(x==="INATIVA"?"desf":"duv"):"", x?x.toLowerCase():""); };
+    $("criA").oninput=upd; $("criB").oninput=upd;
+    $("criGo").onclick=()=>{ const x=g(); if(!x){ toast("Preencha os dois números"); return; }
+      const a=parseFloat($("criA").value), b=parseFloat($("criB").value);
+      if(a>0) appendLine(ativLine(a,b));
+      toast(editTitle(t=>titleSetAtiv(t,x)) ? "Título ajustado: "+x.toLowerCase() : "Sem título no editor: só a linha foi inserida"); };
+  }
+}
+function renderCountChips(){
+  const box=$("countChips"); box.innerHTML="";
+  draft.counts.forEach((c,i)=>{
+    const sp=document.createElement("span"); sp.className="cchip";
+    sp.textContent = c.t==="eos" ? "eosinófilos "+c.n : c.t==="lie" ? "linfócitos "+c.n+"/100" : "linfócitos "+c.n;
+    const x=document.createElement("button"); x.type="button"; x.textContent="×"; x.title="Remover a nota desta contagem (a linha do editor você apaga à mão)";
+    x.onclick=()=>{ draft.counts.splice(i,1); renderCountChips(); };
+    sp.appendChild(x); box.appendChild(sp);
+  });
+}
+
+/* ============================ PAINEL DECH ============================ */
+function renderDech(){
+  const box=$("dechBox"); box.innerHTML="";
+  const n=parseFloat(dechUI.n), sug=isNaN(n)?null:dechCat(n, dechUI.cripta, dechUI.viral), cat=dechUI.manual||sug;
+  const grp=(label)=>{ const d=document.createElement("div"); d.className="crit"; const l=document.createElement("span"); l.className="glabel"; l.textContent=label; d.appendChild(l);
+    const o=document.createElement("div"); o.className="opts"; d.appendChild(o); box.appendChild(d); return o; };
+  const bt=(par, txt, on, fn, sub)=>{ const b=document.createElement("button"); b.type="button"; b.innerHTML=esc(txt)+(sub?"<small>"+esc(sub)+"</small>":""); if(on) b.className="on"; b.onclick=fn; par.appendChild(b); return b; };
+  const o1=grp("Corpos apoptóticos por 10 criptas contíguas");
+  const w=document.createElement("span"); w.className="num"; const inp=document.createElement("input"); inp.type="number"; inp.min="0"; inp.placeholder="nº"; inp.value=dechUI.n;
+  inp.onchange=()=>{ dechUI.n=inp.value; renderDech(); }; w.appendChild(inp); o1.appendChild(w);
+  const h=document.createElement("span"); h.className="muted"; h.textContent="até 6: possível · 7 ou mais, ou destruição de criptas sem outra causa: provável"; o1.appendChild(h);
+  const o2=grp("Criptas (o critério também vai escrito no laudo)");
+  DECH_CRIPTAS.forEach(([k,rot,crit])=>bt(o2, rot, dechUI.cripta===k, ()=>{ dechUI.cripta=k; renderDech(); }, crit));
+  const o3=grp("Ação viral");
+  bt(o3, "Não identificada", !dechUI.viral, ()=>{ dechUI.viral=false; renderDech(); });
+  bt(o3, "Alterações citopáticas sugestivas de ação viral", dechUI.viral, ()=>{ dechUI.viral=true; renderDech(); }, "entra a nota pedindo imuno-histoquímica");
+  const o4=grp("Categoria no título"+(sug?" (sugerida pelos achados: "+sug.toLowerCase()+")":""));
+  ["NÃO IDENTIFICADA","POSSÍVEL","PROVÁVEL"].forEach(c=>bt(o4, "DECH "+c, cat===c, ()=>{
+    dechUI.manual = (c===sug) ? null : c;
+    if(c==="NÃO IDENTIFICADA"){ dechUI.n="0"; dechUI.cripta="sem"; dechUI.viral=false; dechUI.manual=null; }
+    renderDech(); }));
+  const go=document.createElement("button"); go.type="button"; go.className="primary"; go.textContent="Inserir linhas e ajustar título";
+  go.onclick=()=>{ if(isNaN(n)){ toast("Digite o nº de corpos apoptóticos"); return; }
+    dechLines(n, dechUI.cripta, dechUI.viral).forEach(appendLine);
+    draft.dech={ viral:dechUI.viral, sug, manual:dechUI.manual };
+    toast(editTitle(t=>titleSetDech(t,cat)) ? "Título ajustado: DECH "+cat.toLowerCase() : "Sem título no editor: só as linhas foram inseridas"); };
+  box.appendChild(go);
+}
+
+/* ============================ MATERIAIS (autocompletar com memória) ============================ */
+function renderMatList(){
+  const uso=load(LS_MATS)||{};
+  const nomes=[...new Set(Object.keys(uso).sort((a,b)=>uso[b]-uso[a]).concat(MATS_PADRAO))];
+  $("matList").innerHTML=nomes.map(n=>'<option value="'+esc(n).replace(/"/g,"&quot;")+'">').join("");
+}
+function contaMaterial(nome){ const uso=load(LS_MATS)||{}; uso[nome]=(uso[nome]||0)+1; store(LS_MATS, uso); }
+
 /* ============================ RENDER SÍTIO ============================ */
 function currentSite(){ return siteById($("fSitio").value); }
 
@@ -789,15 +1104,16 @@ function applyDefaultName(){
   if(seg){ base = (site.nome==="Cólon"||site.nome==="Reto") ? seg : base+" ("+seg.toLowerCase()+")"; }
   $("fNome").value=base;
 }
-function onSiteChange(){ renderSeg(); renderPresets(); renderCrit(); applyDefaultName(); }
+function onSiteChange(){ renderSeg(); renderPresets(); renderCrit(); renderCounts(); applyDefaultName(); }
 
 /* ============================ SALVAR AMOSTRA ============================ */
 function nextLetter(){ return letterOf(WORK.samples.length); }
 function resetEditor(){
   editIndex=-1;
+  draft={ counts:[], dech:null }; dechUI={ n:"", cripta:"sem", viral:false, manual:null };
   $("corpo").value="";
   $("fLetra").value = nextLetter();
-  $("fSitio").selectedIndex=0; onSiteChange();
+  $("fSitio").selectedIndex=0; onSiteChange(); renderCountChips(); renderDech();
   $("btnSalvar").textContent="✓ Salvar amostra (empilhar)";
   $("btnCancelEdit").style.display="none";
 }
@@ -806,6 +1122,9 @@ $("btnSalvar").onclick=()=>{
   if(!nome){ toast("Falta o nome da amostra"); $("fNome").focus(); return; }
   if(!corpo){ toast("Editor vazio"); $("corpo").focus(); return; }
   const obj={nome, corpo};
+  if(draft.counts.length) obj.counts=draft.counts;
+  if(draft.dech) obj.dech=draft.dech;
+  contaMaterial(nome); renderMatList();
   if(editIndex>=0){ WORK.samples[editIndex]=obj; toast("Amostra atualizada"); }
   else { WORK.samples.push(obj); toast("Amostra salva"); }
   saveNow(); resetEditor(); renderAll();
@@ -836,6 +1155,7 @@ function esc(s){ return (s||"").replace(/&/g,"&amp;").replace(/</g,"&lt;").repla
 function move(i,d){ const j=i+d; if(j<0||j>=WORK.samples.length)return; const t=WORK.samples[i]; WORK.samples[i]=WORK.samples[j]; WORK.samples[j]=t; saveNow(); renderAll(); }
 function editSample(i){
   editIndex=i; const s=WORK.samples[i];
+  draft={ counts:(s.counts||[]).slice(), dech:s.dech||null }; renderCountChips();
   $("fNome").value=s.nome; $("corpo").value=s.corpo; $("fLetra").value=letterOf(i);
   $("btnSalvar").textContent="✓ Atualizar amostra "+letterOf(i);
   $("btnCancelEdit").style.display="inline-block";
@@ -843,7 +1163,7 @@ function editSample(i){
 }
 
 /* ============================ SAÍDA (regras da máscara EDA) ============================ */
-// Arial 8pt preto justificado; negrito só em "A) …:" e "- TÍTULO CAIXA ALTA:"; itens "- " normais;
+// Arial 8pt preto justificado; negrito só em "- TÍTULO CAIXA ALTA:"; cabeçalho "A) …:" e itens "- " normais;
 // separador "-----" entre amostras; gênero/espécie em itálico.
 const SEP_LINE="-".repeat(100);
 const SPECIES_RE=/(H\. pylori|Helicobacter pylori|Candida(?: albicans| sp\.)?|Giardia(?: lamblia| intestinalis| duodenalis)?|Cryptosporidium(?: sp\.)?|Strongyloides stercoralis|Enterobius vermicularis|Clostridioides difficile|Schistosoma(?: mansoni)?)(?![A-Za-z])/g;
@@ -851,29 +1171,30 @@ const SPECIES_RE=/(H\. pylori|Helicobacter pylori|Candida(?: albicans| sp\.)?|Gi
 function buildLaudo(){
   const samples=WORK.samples;
   if(!samples.length) return "";
-  const mats = "Materiais: Biópsias endoscópicas/colonoscópicas de: " +
+  const mats = "Materiais: " + ((WORK.prefixo||"").trim()||PREFIXO_PADRAO) + " " +
     samples.map((s,i)=>letterOf(i)+") "+s.nome).join(", ") + ".";
   const blocks = samples.map((s,i)=> letterOf(i)+") "+s.nome+":"+L+s.corpo).join(L+" "+L+SEP_LINE+L+" "+L);
   let out = mats + L+" "+L + blocks;
-  // NOTAS: notas selecionadas + campo livre
-  const selNotas = WORK.notasSel.map(notaById).filter(Boolean).map(n=>"- "+n.texto);
+  // NOTAS: automáticas (contagens, DECH) + selecionadas + campo livre
+  const selNotas = autoNotas().concat(WORK.notasSel.map(notaById).filter(Boolean).map(n=>n.texto)).map(t=>"- "+t);
   const free = (WORK.notasFree||"").trim();
   let notasBlock = selNotas.join(L);
   if(free) notasBlock = notasBlock ? notasBlock+L+free : free;
   if(notasBlock) out += L+" "+L+"NOTAS:"+L+notasBlock;
-  // REFERÊNCIAS: refs selecionadas + campo livre (uma por linha)
-  const selRefs = WORK.refsSel.map(refById).filter(Boolean).map(r=>"- "+r.texto);
-  const freeRefs = (WORK.refsFree||"").split("\n").map(s=>s.trim()).filter(Boolean).map(s=> s.startsWith("-")? s : "- "+s);
-  const refsBlock = selRefs.concat(freeRefs).join(L);
-  if(refsBlock) out += L+" "+L+REFS_HEADER+L+refsBlock;
+  // REFERÊNCIAS: citadas no texto (numeradas na ordem de aparecimento) + selecionadas + campo livre
+  const res = resolveCites(out); out = res.txt;
+  const selRefs = WORK.refsSel.map(refById).filter(Boolean).map(r=>r.texto);
+  const freeRefs = (WORK.refsFree||"").split("\n").map(s=>s.trim().replace(/^(-|\d+\.)\s*/,"")).filter(Boolean);
+  const refs = res.order.map(k=>CITE[k]);
+  selRefs.concat(freeRefs).forEach(r=>{ if(!refs.includes(r)) refs.push(r); });
+  if(refs.length) out += L+" "+L+REFS_HEADER+L+refs.map((r,i)=>(i+1)+". "+r).join(L);
   return out;
 }
-// "sp" = linha vazia; "b" = negrito (cabeçalho da amostra ou título do diagnóstico); "" = normal
+// "sp" = linha vazia; "b" = negrito (só o título do diagnóstico); "" = normal
 function lineKind(line){
   const t=line.trim();
   if(!t) return "sp";
   if(/^-{5,}$/.test(t)) return "";
-  if(/^[A-Z]{1,3}\) .*:$/.test(t)) return "b";
   if(/^- .*:$/.test(t) && !/[a-zà-ÿ]/.test(t.replace(SPECIES_RE,""))) return "b";
   return "";
 }
@@ -895,7 +1216,7 @@ function laudoToRichHTML(txt){
   }).join("");
   return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;">'+body+'</div>';
 }
-function renderLaudo(){ $("laudoMontado").innerHTML = laudoToPreviewHTML(buildLaudo()); }
+function renderLaudo(){ $("laudoMontado").innerHTML = laudoToPreviewHTML(buildLaudo()); renderAlertas(); }
 
 /* ============================ NOTAS / REFS (tags + busca) ============================ */
 function renderChipList(boxId, list, selArr, rerender){
@@ -952,7 +1273,8 @@ $("btnLimparTudo").onclick=()=>{
 
 /* ============================ EVENTOS ============================ */
 $("fSitio").onchange=onSiteChange;
-$("fSeg").onchange=applyDefaultName;
+$("fSeg").onchange=()=>{ applyDefaultName(); renderCounts(); };
+$("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
 $("notas").oninput=()=>{ WORK.notasFree=$("notas").value; save(); renderLaudo(); };
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
 $("notaSearch").oninput=renderNotasToggles;
@@ -965,6 +1287,8 @@ function init(){
   renderSitioSelect();
   onSiteChange();
   $("fLetra").value=nextLetter();
+  $("fPrefixo").value=WORK.prefixo||PREFIXO_PADRAO;
+  renderMatList(); renderCountChips(); renderDech();
   $("notas").value=WORK.notasFree||"";
   $("refsFree").value=WORK.refsFree||"";
   renderLegacyBanner();

@@ -1,5 +1,14 @@
 # Changelog
 
+## v3.1.0 — em validação (ramo compositor-v3.1, não publicado)
+- Saída: negrito só no título do diagnóstico (cabeçalho "A) …:" sem negrito); referências numeradas, com o número entre colchetes no texto e a lista completa em "REFERÊNCIAS BIBLIOGRÁFICAS:".
+- Contagens com valor de referência na mesma linha (eosinófilos em todos os sítios; linfócitos no duodeno e no esôfago) e nota de conclusão automática: compatível, desfavorece ou duvidoso.
+- Atividade no íleo, cólon e reto pela fração de criptas com criptite; ajusta o título.
+- Bloco DECH: corpos apoptóticos por 10 criptas, critério das criptas escrito no laudo, ação viral com duas opções e nota de imuno-histoquímica, categoria NIH 2014 no título.
+- Materiais: início da frase em texto livre com sugestões; nomes de material com sugestões e memória dos mais usados.
+- Alertas de inconsistência (título inativo com atividade descrita; categoria de DECH diferente da sugerida).
+- Visual novo (tema escuro, ícones por área); prévia do laudo ampliada para leitura, cópia continua em Arial 8.
+
 ## v3.0.2 — 2026-10-03
 - Painel "Limiares de eosinófilos por sítio": limiares trocados pelos da Tabela 6 do guideline ESPGHAN/NASPGHAN 2024 (estômago ≥30, duodeno ≥50, íleo terminal ≥60, ceco/ascendente ≥100, transverso/descendente ≥80, sigmoide/reto ≥60 por 0,27 mm²), com o equivalente por mm² e no campo de 40× com ocular FN 22. Esôfago: ≥15 por 0,3 mm².
 
