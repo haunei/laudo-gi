@@ -643,23 +643,24 @@ SEED_SITES.reto.presets = SEED_SITES.reto.presets.filter(p=>/^RETITE/.test(p.tit
 // Variantes de atividade: toda "crônica" tem inativa, leve, moderada e acentuada
 const GRAUS_ATIV = ["INATIVA","EM ATIVIDADE LEVE","EM ATIVIDADE MODERADA","EM ATIVIDADE ACENTUADA"];
 const LINHA_ATIV = {
+  // esôfago: não há graduação publicada da atividade; neutrófilos intraepiteliais e erosão são achados de presença/ausência (Mastracci 2020)
   esofago:["Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
-    "Presença de exocitose leve de neutrófilos, sem erosão ou ulceração.",
-    "Presença de exocitose moderada de neutrófilos, sem erosão ou ulceração.",
-    "Presença de exocitose acentuada de neutrófilos, com erosão/ulceração."],
-  gastrica:[NEUTRO.ausente, NEUTRO.leve, NEUTRO.moderado, NEUTRO.acentuado].map(x=>x.slice(2)),
+    "Presença de exocitose de neutrófilos, sem erosão ou ulceração.",
+    "Presença de exocitose de neutrófilos e de erosão (necrose com tecido de granulação e/ou fibrina com neutrófilos [@mast])."],
+  // estômago: leve, moderada e acentuada pela escala visual do Sistema Sydney atualizado
+  gastrica:[NEUTRO.ausente, NEUTRO.leve, NEUTRO.moderado, NEUTRO.acentuado].map((x,i)=>x.slice(2).replace(/\.$/, i ? " (graduação pelo Sistema Sydney atualizado [@sydney])." : ".")),
   cripta:[NEUTRO.ausente.slice(2),
     "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, com criptite ocasional (até 5% das criptas), não sendo identificados microabscessos, erosão ou ulceração.",
     "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite (mais de 5% até 50% das criptas), sem erosão ou ulceração.",
     "Presença de infiltrado inflamatório neutrofílico acentuado em lâmina própria, com criptite em mais de 50% das criptas, microabscessos de cripta e erosões."]
 };
-function variantesAtiv(siteId, base, modelo, tipo){
+function variantesAtiv(siteId, base, modelo, tipo, graus){
   const site=SEED_SITES[siteId], src=site.presets.find(p=>p.titulo===modelo), linhas=LINHA_ATIV[tipo];
   const i=src.bullets.findIndex(b=>/neutr/i.test(b));
-  GRAUS_ATIV.forEach((g,k)=>{ const t=base+" "+g;
+  (graus||GRAUS_ATIV).forEach((g,k)=>{ const t=base+" "+g;
     if(!site.presets.some(p=>p.titulo===t)) site.presets.push(P(t, src.bullets.map((b,j)=> j===i ? linhas[k] : b))); });
 }
-variantesAtiv("esofago","ESOFAGITE CRÔNICA","ESOFAGITE CRÔNICA MODERADA, INATIVA","esofago");
+variantesAtiv("esofago","ESOFAGITE CRÔNICA","ESOFAGITE CRÔNICA MODERADA, INATIVA","esofago",["INATIVA","EM ATIVIDADE","EM ATIVIDADE, EROSIVA"]);
 variantesAtiv("gastrica","GASTRITE CRÔNICA","GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO","gastrica");
 variantesAtiv("duodeno","DUODENITE CRÔNICA","DUODENITE CRÔNICA INESPECÍFICA, INATIVA","cripta");
 variantesAtiv("ileo","ILEÍTE CRÔNICA","ILEÍTE CRÔNICA EM ATIVIDADE MODERADA","cripta");
@@ -1113,7 +1114,7 @@ function alertas(){
   const out=[];
   const check=(rot, corpo, dech)=>{
     const ls=(corpo||"").split("\n"), tit=ls.filter(l=>lineKind(l)==="b").join(" ");
-    if(/INATIVA/.test(tit) && ls.some(l=>/^- Presença de (criptite|infiltrado inflamatório neutrofílico|exocitose (leve|moderada|acentuada) de neutrófilos)/.test(l.trim())))
+    if(/INATIVA/.test(tit) && ls.some(l=>/^- Presença de (criptite|infiltrado inflamatório neutrofílico|exocitose de neutrófilos)/.test(l.trim())))
       out.push({conf:true, msg:rot+": o título diz INATIVA, mas há atividade neutrofílica descrita."});
     if(dech && dech.manual && dech.manual!==dech.sug)
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});

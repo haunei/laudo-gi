@@ -201,8 +201,11 @@ eq(t.alertas().length, 1, "alerta de categoria DECH divergente");
 t.WORK.samples.push({ nome: "Reto", corpo: "- RETITE CRÔNICA INATIVA:\n- Presença de criptite neutrofílica (3 de 60 criptas avaliadas; 5%)." });
 eq(t.alertas().length, 2, "alerta de título INATIVA com criptite");
 for (const [k, base] of [["esofago", "ESOFAGITE CRÔNICA"], ["gastrica", "GASTRITE CRÔNICA"], ["duodeno", "DUODENITE CRÔNICA"], ["ileo", "ILEÍTE CRÔNICA"], ["colon", "COLITE CRÔNICA"], ["reto", "RETITE CRÔNICA"]])
-  for (const g of ["INATIVA", "EM ATIVIDADE LEVE", "EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA"])
+  for (const g of (k === "esofago" ? ["INATIVA", "EM ATIVIDADE", "EM ATIVIDADE, EROSIVA"] : ["INATIVA", "EM ATIVIDADE LEVE", "EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA"]))
     ok(t.SEED_SITES[k].presets.some(p => p.titulo.startsWith(base) && p.titulo.includes(g)), k + ": " + base + " " + g);
+ok(!t.SEED_SITES.esofago.presets.some(p => /EM ATIVIDADE (LEVE|MODERADA|ACENTUADA)/.test(p.titulo)), "esôfago sem graus de atividade");
+ok(t.SEED_SITES.gastrica.presets.find(p => p.titulo === "GASTRITE CRÔNICA EM ATIVIDADE MODERADA").bullets.some(b => b.includes("[@sydney]")), "atividade gástrica cita o Sydney");
+ok(!t.SEED_SITES.gastrica.presets.find(p => p.titulo === "GASTRITE CRÔNICA INATIVA").bullets.some(b => b.includes("[@sydney]")), "inativa não cita");
 ok(!t.SEED_SITES.reto.presets.some(p => /COLITE|COLÔNICA|COLOPATIA|RETOPATIA/.test(p.titulo)), "reto sem títulos de cólon");
 ok(t.SEED_SITES.reto.presets.some(p => p.titulo.startsWith("RETITE DE PADRÃO LINFOCITÁRIO")), "retite de padrão linfocitário");
 eq(t.SEED_SITES.reto.presets.length, t.SEED_SITES.colon.presets.length + 1, "reto tem todas as opções do cólon");
