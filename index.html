@@ -303,7 +303,7 @@ const SEED_SITES = {
         "Não foi identificada metaplasia intestinal."]),
       P("ESOFAGITE CRÔNICA INATIVA",[
         "Hiperplasia da camada basal.",
-        "Espongiose moderada.",
+        "Espongiose.",
         "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
         "Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento).",
         "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
@@ -334,8 +334,10 @@ const SEED_SITES = {
         opt:[["Ausente","- Ausência de hiperplasia da camada basal."]],
         combo:{grupos:[[["leve","leve (15% a menos de 30% da espessura do epitélio; normal: menos de 15% [@mast])"],["acentuada","acentuada (30% ou mais da espessura do epitélio; normal: menos de 15% [@mast])"]],[["papilar","papilar"]]],
           monta:x=>"- Hiperplasia "+(x[1]?"papilar ":"")+"da camada basal"+(x[0]?" "+x[0]:"")+"."}},
-      {g:"Espongiose", opt:[
-        ["Leve","- Espongiose leve."],["Moderada","- Espongiose moderada."],["Acentuada","- Espongiose acentuada."]]},
+      {g:"Espongiose (espaços intercelulares dilatados)", dica:"Pequenos ou grandes em relação ao diâmetro de um linfócito pequeno (Mastracci 2020).",
+        opt:[["Ausente","- Ausência de espongiose."],
+        ["Espaços pequenos","- Espongiose, com espaços intercelulares dilatados pequenos (menores que o diâmetro de um linfócito pequeno [@mast])."],
+        ["Espaços grandes","- Espongiose, com espaços intercelulares dilatados grandes (maiores que o diâmetro de um linfócito pequeno [@mast])."]]},
       {g:"Ascensão vascular", opt:[
         ["Ausente","- Ausência de ascensão vascular capilar intraepitelial."],
         ["Terço inferior","- Ascensão vascular até o terço inferior da espessura do epitélio mucoso."],
@@ -465,14 +467,14 @@ const SEED_SITES = {
         "Classificação de Marsh-Oberhuber (1999): 0."]),
       P("DUODENITE CRÔNICA INESPECÍFICA, INATIVA",[
         "Arquitetura alterada: Mucosa entérica com vilosidades focalmente hipotróficas, não sendo identificadas criptas hipertróficas.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Linfocitose intraepitelial: Não identificada (exocitose de até 15 linfócitos/100 enterócitos nas pontas das vilosidades).",
         "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
         "Classificação de Marsh-Oberhuber (1999): 0."]),
       P("DUODENITE CRÔNICA, DE PADRÃO LINFOCÍTICO, EM ATIVIDADE LEVE, COM VILOSIDADES ATRÓFICAS (APLAINAMENTO SEVERO) E CRIPTAS HIPERTRÓFICAS (VIDE NOTAS)",[
         "Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
         "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, sem criptite, microabscessos, erosões ou ulcerações.",
         "Linfocitose intraepitelial: Presente (exocitose de aproximadamente 40 linfócitos/100 enterócitos nas pontas das vilosidades).",
         "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
@@ -486,7 +488,7 @@ const SEED_SITES = {
       {g:"Glândulas de Brünner", opt:[["Presentes","- Presença de glândulas de Brünner."]]},
       {g:"Celularidade mononuclear", opt:[
         ["Preservada","- Celularidade preservada de leucócitos mononucleares em lâmina própria."],
-        ["Levemente aumentada","- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria."]]},
+        ["Aumentada","- Celularidade aumentada de leucócitos mononucleares em lâmina própria."]]},
       {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
       {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve]]},
       {g:"Linfocitose intraepitelial (n/100 enter.)", num:{tpl:"- Linfocitose intraepitelial: Presente (exocitose de aproximadamente {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"Presente (n)",
@@ -512,12 +514,12 @@ const SEED_SITES = {
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("ILEÍTE ATIVA MODERADA",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
         "Presença de infiltrado inflamatório neutrofílico em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("ILEÍTE CRÔNICA EM ATIVIDADE MODERADA",[
         "Arquitetura alterada: Encurtamento focal de vilosidades, focalmente associado a leve linfocitose intraepitelial das mesmas.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
         "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite, sem formar microabscessos.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."])
     ],
@@ -528,7 +530,7 @@ const SEED_SITES = {
         ["Atrofia global/severa","- Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas."]]},
       {g:"Celularidade mononuclear", opt:[
         ["Preservada","- Celularidade preservada de leucócitos mononucleares em lâmina própria."],
-        ["Levemente aumentada","- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve."]]},
+        ["Aumentada","- Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário."]]},
       {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
       {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve],["Moderado c/ criptite",NEUTRO.moderado],["Acentuado",NEUTRO.acentuado]]},
       {g:"Hiperplasia folicular linfoide", opt:[["Presente","- Hiperplasia folicular linfoide: Presente."],["Ausente","- Hiperplasia folicular linfoide: Não identificada."]]},
@@ -903,7 +905,7 @@ function vr(text){
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
-  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- Espongiose/];
+  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/];
 function setLinha(line){
   const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [];
   let start=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
