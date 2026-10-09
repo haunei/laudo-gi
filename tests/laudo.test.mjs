@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -370,5 +370,36 @@ for (const k of Object.keys(t.SEED_SITES)) for (const p of t.SEED_SITES[k].prese
     const h = t.laudoToRichHTML(t.presetText(p));
     eq((h.match(/<i>H\. ?pylori<\/i>/gi) || []).length, (t.presetText(p).match(/H\. ?pylori/gi) || []).length, "todo H. pylori do texto pronto em itálico: " + p.titulo);
   }
+
+// 13. Concordância de número e gênero
+({ t, els } = boot({}));
+for (const [antes, depois] of [
+  ["- Agregado linfoides: Presente.", "- Agregado linfoide: Presente."],
+  ["- Agregados linfoide: Presente.", "- Agregados linfoides: Presentes."],
+  ["- Não foi identificados granulomas.", "- Não foram identificados granulomas."],
+  ["- Não foram evidenciado displasia.", "- Não foi evidenciada displasia."],
+  ["- Presença de corpo apoptóticos.", "- Presença de corpo apoptótico."],
+  ["- Criptas hipertrófico e glândulas dilatado.", "- Criptas hipertróficas e glândulas dilatadas."],
+  ["- Linfangiectasias: Não identificado.", "- Linfangiectasias: Não identificadas."],
+  ["- Não sendo identificados eosinofilia.", "- Não sendo identificada eosinofilia."],
+  ["- Exocitose de eosinófilos (até 1 eosinófilos/campo de grande aumento).", "- Exocitose de eosinófilos (até 1 eosinófilo/campo de grande aumento)."],
+  ["- Presença de eosinófilos (até 2 eosinófilo/campo de grande aumento).", "- Presença de eosinófilos (até 2 eosinófilos/campo de grande aumento)."],
+  ["- AGREGADOS LINFOIDE, EM MUCOSA RETAL:", "- AGREGADOS LINFOIDES, EM MUCOSA RETAL:"],
+  ["- Alterações citopático sugestivas de ação viral.", "- Alterações citopáticas sugestivas de ação viral."],
+]) eq(t.concorda(antes).text, depois, "concordância: " + antes);
+eq(t.concorda("- Hiperplasia de células caliciformes focal.").trocas.length, 0, "adjetivo distante não é tocado");
+eq(t.concorda("- Texto livre com palavras fora do vocabulário: mucosas edemaciado.").trocas.length, 0, "fora do vocabulário não mexe");
+const libCG = new Set();
+for (const k of Object.keys(t.SEED_SITES)) { const st3 = t.SEED_SITES[k];
+  st3.presets.forEach(p => t.presetText(p).split("\n").forEach(l => libCG.add(l)));
+  (st3.criterios || []).forEach(c => { (c.opt || []).forEach(o => libCG.add(o[1])); if (c.num) libCG.add(c.num.tpl.replace("{n}", "5")); }); }
+t.NOTAS_PADRAO.forEach(x => libCG.add("- " + x.texto));
+for (const l of libCG) eq(t.concorda(l).trocas.join(), "", "biblioteca já concorda: " + l.slice(0, 60));
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco";
+els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Agregado linfoides: Presente.";
+els.corpo.onfocus(); els.corpo.onchange();
+ok(els.corpo.value.endsWith("- Agregado linfoide: Presente."), "editor corrige a concordância ao sair do campo");
+ok(/Concordância: Agregado linfoides → Agregado linfoide/.test(els.toast.textContent), "aviso mostra o que foi trocado");
+ok(html.includes('id="corpo" rows="10" spellcheck="true" lang="pt-BR"'), "ortografia do navegador ligada no editor");
 
 console.log(`OK — ${n} asserts`);

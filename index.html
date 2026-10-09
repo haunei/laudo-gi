@@ -260,7 +260,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 <section class="card col" id="colC">
   <div class="noprint">
     <label class="fld">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
-      <textarea id="corpo" rows="10" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
+      <textarea id="corpo" rows="10" spellcheck="true" lang="pt-BR" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
     </label>
     <div class="editor-actions">
       <button class="primary" id="btnSalvar">✓ Salvar amostra (empilhar)</button>
@@ -287,7 +287,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
       <input type="text" id="notaSearch" placeholder="🔎 buscar nota (tag ou texto)…" style="margin-bottom:8px;">
       <div class="notas-toggles" id="notasToggles"></div>
       <label class="fld" style="margin-top:8px;">Notas livres (texto extra)</label>
-      <textarea id="notas" rows="3" placeholder="Notas adicionais (texto livre)."></textarea>
+      <textarea id="notas" rows="3" spellcheck="true" lang="pt-BR" placeholder="Notas adicionais (texto livre)."></textarea>
     </div>
 
     <div class="acc-refs" style="margin-top:12px;padding-top:12px;padding-bottom:8px;">
@@ -1004,6 +1004,66 @@ function appendBlock(block){
   ta.focus(); ta.scrollTop = ta.scrollHeight;
 }
 
+/* ============================ CONCORDÂNCIA (número e gênero) ============================ */
+// Corretor por regras, restrito ao vocabulário do laudo: (1) substantivo + adjetivo vizinho; (2) "foi/foram/sendo + particípio + substantivo";
+// (3) "Rótulo: Presente/Ausente/(Não) identificado"; (4) "1 eosinófilo" x "2 eosinófilos". Fora do vocabulário, não mexe.
+const CG_NOMES = {
+  m:"agregado folículo microabscesso abscesso corpo eosinófilo linfócito neutrófilo leucócito plasmócito fragmento granuloma pólipo espaço parasito achado infiltrado material",
+  f:"cripta glândula vilosidade célula erosão ulceração fovéola papila linfangiectasia alteração amostra área metaplasia atrofia displasia hiperplasia eosinofilia criptite linfocitose plasmocitose celularidade lâmina"
+};
+const CG_ADJ_INV="linfoide intraepitelial glandular focal exuberante grande mononuclear caliciforme superficial intercelular folicular";
+const CG_ADJ_VAR="eosinofílico neutrofílico apoptótico inflamatório hipertrófico atrófico hipotrófico dilatado contíguo isolado reativo disqueratótico citopático significativo examinado preservado pequeno mononucleado linfoplasmocitário entremeado degranulado identificado evidenciado detectado representado observado";
+function cgPlural(w){
+  if(/ão$/.test(w)) return w.slice(0,-2)+"ões";
+  if(/al$/.test(w)) return w.slice(0,-1)+"is";
+  if(/[rz]$/.test(w)) return w+"es";
+  return w+"s";
+}
+const CG = (()=>{
+  const nome={}, adj={};
+  Object.keys(CG_NOMES).forEach(g=>CG_NOMES[g].split(" ").forEach(w=>{ nome[w]={g, n:"s"}; nome[cgPlural(w)]={g, n:"p"}; }));
+  CG_ADJ_INV.split(" ").forEach(w=>{ adj[w]={b:w, inv:true}; adj[cgPlural(w)]={b:w, inv:true}; });
+  CG_ADJ_VAR.split(" ").forEach(w=>{ const r=w.slice(0,-1); [r+"o", r+"a", r+"os", r+"as"].forEach(f=>{ adj[f]={b:w, inv:false}; }); });
+  return {nome, adj};
+})();
+function cgForma(a, n){ return a.inv ? (n.n==="p" ? cgPlural(a.b) : a.b) : a.b.slice(0,-1)+(n.g==="m"?"o":"a")+(n.n==="p"?"s":""); }
+function cgCaixa(novo, antigo){ return antigo===antigo.toUpperCase() && antigo.length>1 ? novo.toUpperCase() : antigo[0]===antigo[0].toUpperCase() ? novo[0].toUpperCase()+novo.slice(1) : novo; }
+function concorda(text){
+  const trocas=[];
+  const reg=(antes, depois)=>{ if(antes!==depois) trocas.push(antes+" → "+depois); return depois; };
+  const out=(text||"").split("\n").map(line=>{
+    // (4) numeral
+    line=line.replace(/\b(\d+) (eosinófilo|linfócito)(s?)(?=\/)/g, (x,n,w,pl)=>reg(x, n+" "+w+(+n===1?"":"s")));
+    // (2) verbo + particípio + substantivo
+    line=line.replace(/\b(foi|foram|sendo) (identificad|evidenciad|detectad|representad|observad)(os|as|o|a) ([A-Za-zÀ-ÿ]+)/gi, (x,aux,part,fim,subst)=>{
+      const n=CG.nome[subst.toLowerCase()]; if(!n) return x;
+      const a=/^sendo$/i.test(aux) ? aux : cgCaixa(n.n==="p"?"foram":"foi", aux);
+      return reg(x, a+" "+part+(n.g==="m"?"o":"a")+(n.n==="p"?"s":"")+" "+subst); });
+    // (3) rótulo: valor
+    line=line.replace(/^(- )([A-Za-zÀ-ÿ]+)([^:]*: )(Não identificad|Identificad|Presente|Ausente)(os|as|o|a|s)?(?![A-Za-zÀ-ÿ])/, (x,p,subst,meio,val,fim)=>{
+      const n=CG.nome[subst.toLowerCase()]; if(!n) return x;
+      const f=/ad$/.test(val) ? (n.g==="m"?"o":"a")+(n.n==="p"?"s":"") : (n.n==="p"?"s":"");
+      return reg(x, p+subst+meio+val+f); });
+    // (1) substantivo + adjetivo vizinho (o substantivo manda)
+    line=line.replace(/([A-Za-zÀ-ÿ]+) ([A-Za-zÀ-ÿ]+)/g, (x,w1,w2,pos,str)=>{
+      const n=CG.nome[w1.toLowerCase()], a=CG.adj[w2.toLowerCase()];
+      if(!n || !a) return x;
+      return reg(x, w1+" "+cgCaixa(cgForma(a,n), w2)); });
+    // o passo (1) consome pares; repete uma vez para pegar pares que começam na segunda palavra de um par já visto
+    line=line.replace(/(?<=[A-Za-zÀ-ÿ]+ )([A-Za-zÀ-ÿ]+) ([A-Za-zÀ-ÿ]+)/g, (x,w1,w2)=>{
+      const n=CG.nome[w1.toLowerCase()], a=CG.adj[w2.toLowerCase()];
+      if(!n || !a) return x;
+      return reg(x, w1+" "+cgCaixa(cgForma(a,n), w2)); });
+    return line;
+  }).join("\n");
+  return { text:out, trocas };
+}
+function corrigeCampo(id){
+  const el=$(id), r=concorda(el.value);
+  if(r.trocas.length){ el.value=r.text; toast("Concordância: "+r.trocas.slice(0,2).join("; ")+(r.trocas.length>2?" (+"+(r.trocas.length-2)+")":"")); }
+  return r.trocas.length;
+}
+
 /* ============================ SINCRONIZAÇÃO: número/grau/critério -> frase e título ============================ */
 // frase dos eosinófilos pela faixa da contagem (mesmos cortes da nota: máximo normal e limiar do sítio)
 const EOS_FRASE = { desf:["não sendo identificada eosinofilia","Não foi identificada eosinofilia"],
@@ -1102,6 +1162,7 @@ function tituloParaLinha(site){
 function ressincEditor(){
   const ta=$("corpo"), site=$("fSitio").value, seg=$("fSeg").value;
   ta.value=ta.value.split("\n").map(l=>fraseLie(fraseEos(l, site, seg), site)).join("\n");
+  corrigeCampo("corpo");
   const tit=ultimoTitulo(ta.value);
   if(tit && tit!==prevTit) tituloParaLinha(site);
   else { const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
@@ -1628,6 +1689,7 @@ $("fSitio").onchange=onSiteChange;
 $("fSeg").onchange=applyDefaultName;
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
 $("notas").oninput=()=>{ WORK.notasFree=$("notas").value; save(); renderLaudo(); };
+$("notas").onchange=()=>{ if(corrigeCampo("notas")){ WORK.notasFree=$("notas").value; save(); renderLaudo(); } };
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
 $("notaSearch").oninput=renderNotasToggles;
 $("corpo").onchange=ressincEditor;

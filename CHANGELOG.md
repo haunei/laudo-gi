@@ -10,6 +10,7 @@
 - Estômago: mucosa de transição corpo-antro (segmento e amostragem).
 - Alertas novos: Marsh-Oberhuber × linfócitos; OLGIM × metaplasia; OLGA × atrofia.
 - Notas novas: granulomas e displasia em linhas separadas.
+- Corretor de concordância (número e gênero) no editor e nas notas livres, por regras e com o vocabulário do laudo: substantivo + adjetivo vizinho, "foi/foram/sendo + particípio", "Rótulo: Presente/Ausente/Identificado" e "1 eosinófilo × 2 eosinófilos"; avisa o que trocou. Ortografia pelo corretor do navegador.
 - *H. pylori* sempre em itálico, em títulos e itens, em qualquer grafia (H. PYLORI, H.pylori, Helicobacter pylori), na prévia, na cópia e na interface.
 
 ## v3.1.0 — 2026-10-04
