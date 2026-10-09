@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.2.0 — em validação (ramo melhorias-v3.2, não publicado)
+## v3.2.0 — 2026-10-09
 - Layout: três colunas no desktop (amostra e textos prontos · achados · editor e laudo), cada uma rolando por dentro; editor ao lado dos achados; lista de amostras salvas no fim; bloco DECH recolhível (estado lembrado).
 - Tema: seletor Escuro/Claro com escolha gravada no navegador (não segue o sistema); tema claro em azul-claro.
 - Eosinófilos: a frase ("não sendo identificada eosinofilia" / "com presença de eosinófilos" / "com presença de eosinofilia") segue a contagem pelas faixas do sítio, ao inserir e ao editar o número; novo grupo de achados associados (degranulação, microabscessos eosinofílicos).
