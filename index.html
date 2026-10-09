@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Máscara de Laudo — Biópsias endoscópicas/colonoscópicas pediátricas</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script data-tema>try{document.documentElement.setAttribute("data-tema",JSON.parse(localStorage.getItem("laudoGI_tema"))==="claro"?"claro":"escuro");}catch(e){}</script>
 <style>
 :root{
   --bg:#141B24; --bg2:#141B24; --card:#1B2430; --well:#141B24; --ink:#EEF3F8; --muted:#C3CEDA;
@@ -12,15 +13,51 @@
   --ok:#5FD4A0; --warn:#F2C94C; --danger:#FF8A80; --chip:#223040; --dark:#0B1622;
   /* acentos por seção */
   --c-id:#6CB0FF; --c-dx:#B79CFF; --c-crit:#5FD4A0; --c-notas:#F2C94C; --c-refs:#FF8A80;
+  --on-bg:#173A2E; --on-ink:#FFFFFF; --al-bg:#3A3312; --al-ink:#F8E9B0; --alc-bg:#3A1F1D; --alc-ink:#FFD9D5; --ph:#AEBBC9;
 }
+/* tema claro: azul-claro e tons correlatos; a folha do laudo continua branca */
+:root[data-tema="claro"]{
+  --bg:#D6E8FA; --bg2:#D6E8FA; --card:#EAF3FD; --well:#FFFFFF; --ink:#0F2438; --muted:#3A5068;
+  --accent:#1B63B0; --accent-d:#154E8C; --accent-soft:#CFE3F8; --line:#B4CDE8; --line2:#86A9CF;
+  --ok:#136F50; --warn:#7A5D00; --danger:#B3261E; --chip:#DCEAF8; --dark:#FFFFFF;
+  --c-id:#1B63B0; --c-dx:#5B3FB8; --c-crit:#136F50; --c-notas:#7A5D00; --c-refs:#B3261E;
+  --on-bg:#D3EFE3; --on-ink:#0B3D2B; --al-bg:#FFF4CC; --al-ink:#4D3B00; --alc-bg:#FDE3E0; --alc-ink:#6E1610; --ph:#5F7890;
+}
+:root[data-tema="claro"] button.primary:hover{color:#FFFFFF;}
 *{box-sizing:border-box;}
 body{margin:0;font-family:'IBM Plex Sans','Segoe UI',system-ui,sans-serif;
   background:var(--bg);color:var(--ink);line-height:1.45;padding:18px 16px 70px;font-size:15px;}
 .wrap{max-width:1500px;margin:0 auto;}
-.cols{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:16px;align-items:start;}
-.cols>.card{margin:0;}
-header.top h1{font-size:1.45rem;margin:0 0 4px;color:var(--ink);font-weight:700;}
-header.top p{margin:0 0 14px;color:var(--muted);font-size:.9rem;max-width:75ch;}
+.cols{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr) minmax(0,1.35fr);gap:12px;align-items:stretch;}
+.cols>.card{margin:0;padding:14px;}
+.col{display:flex;flex-direction:column;gap:10px;min-height:0;}
+.col .grow{flex:1 1 auto;min-height:0;max-height:none;overflow:auto;}
+.col>h2{margin:0;}
+#colC>*{flex:0 0 auto;}
+#colC .out{overflow:visible;}
+#colA .grid-id{grid-template-columns:64px minmax(0,1fr) minmax(0,1fr);gap:8px 10px;}
+details.dech{flex:0 0 auto;max-height:60%;overflow:auto;}
+details.dech>summary{cursor:pointer;list-style:none;font-size:1rem;font-weight:600;display:flex;align-items:center;gap:8px;}
+details.dech>summary::-webkit-details-marker{display:none;}
+details.dech>summary::after{content:"▸";margin-left:auto;color:var(--muted);}
+details.dech[open]>summary::after{content:"▾";}
+details.dech[open]>summary{margin-bottom:10px;}
+details.dech .tile{width:26px;height:26px;}details.dech .tile svg{width:15px;height:15px;}
+.pilha{border-top:1px solid var(--line);padding-top:12px;}
+header.top{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;margin-bottom:8px;}
+header.top .tema{margin-left:auto;display:flex;align-items:center;gap:8px;font-size:.9rem;color:var(--muted);font-weight:600;}
+header.top .tema select{width:auto;padding:5px 8px;}
+@media(min-width:1101px){
+  html,body{height:100%;}
+  body{overflow:hidden;padding:10px 14px;display:flex;flex-direction:column;}
+  .wrap{flex:1;min-height:0;display:flex;flex-direction:column;width:100%;}
+  .cols{flex:1;min-height:0;}
+  .col{overflow:auto;}
+  #colA,#colB{overflow:hidden;}
+  .eospanel{margin:0 0 8px;}
+}
+header.top h1{font-size:1.15rem;margin:0;color:var(--ink);font-weight:700;}
+header.top p{margin:0;color:var(--muted);font-size:.86rem;}
 .card{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:18px 20px;margin:16px 0;}
 .card>h2{font-size:1.15rem;margin:0 0 16px;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:10px;}
 .tile{flex:0 0 auto;width:30px;height:30px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;background:var(--accent);}
@@ -39,7 +76,7 @@ header.top p{margin:0 0 14px;color:var(--muted);font-size:.9rem;max-width:75ch;}
 label.fld{display:flex;flex-direction:column;gap:4px;font-size:.9rem;font-weight:600;color:var(--muted);}
 input[type=text],input[type=number],select,textarea{font:inherit;border:1px solid var(--line2);border-radius:6px;
   padding:9px 10px;background:var(--well);color:var(--ink);outline:none;width:100%;}
-input::placeholder,textarea::placeholder{color:#AEBBC9;}
+input::placeholder,textarea::placeholder{color:var(--ph);}
 input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft);}
 textarea{resize:vertical;line-height:1.45;font-size:.92rem;}
 .seg-row{display:flex;gap:6px;}
@@ -51,7 +88,7 @@ button.primary{background:var(--accent);color:var(--dark);border-color:var(--acc
 button.primary:hover{background:var(--accent-d);}
 button.ghost{background:var(--well);}
 button.mini{padding:4px 9px;font-size:.8rem;border-radius:7px;}
-button.danger{color:var(--danger);}button.danger:hover{background:#3A1F1D;border-color:var(--danger);}
+button.danger{color:var(--danger);}button.danger:hover{background:var(--alc-bg);border-color:var(--danger);}
 .muted{color:var(--muted);}
 .subpanel{border:1px solid var(--line);border-radius:8px;padding:12px;max-height:560px;overflow:auto;background:var(--card);}
 .subpanel h3{margin:0 0 10px;font-size:1rem;color:var(--ink);font-weight:600;display:flex;align-items:center;gap:8px;}
@@ -66,7 +103,7 @@ button.danger{color:var(--danger);}button.danger:hover{background:#3A1F1D;border
 .crit .glabel{display:block;font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
 .crit .opts{display:flex;flex-wrap:wrap;gap:6px;align-items:center;}
 .opts button{padding:6px 10px;font-size:.9rem;border-radius:6px;background:var(--well);font-weight:500;text-align:left;}
-.opts button.on{border:2px solid var(--c-crit);background:#173A2E;color:#fff;font-weight:600;}
+.opts button.on{border:2px solid var(--c-crit);background:var(--on-bg);color:var(--on-ink);font-weight:600;}
 .opts button.go{border-color:var(--c-crit);color:var(--c-crit);font-weight:600;}
 .opts .sep{flex-basis:100%;height:0;}
 .opts button small{display:block;font-weight:400;color:var(--muted);font-size:.82rem;line-height:1.3;}
@@ -78,8 +115,8 @@ button.danger{color:var(--danger);}button.danger:hover{background:#3A1F1D;border
 .vr:empty{display:none;}.vr.desf{background:var(--c-crit);}.vr.duv{background:var(--c-notas);}.vr.compat{background:var(--c-refs);}
 .cchip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--c-crit);border-radius:6px;padding:3px 4px 3px 9px;margin:4px 6px 0 0;font-size:.85rem;}
 .cchip button{padding:0 7px;border:none;background:transparent;color:var(--danger);}
-.alerta{display:flex;gap:10px;align-items:center;border:1px solid var(--c-notas);background:#3A3312;color:#F8E9B0;border-radius:8px;padding:10px 12px;margin:0 0 8px;}
-.alerta.conf{border-color:var(--c-refs);background:#3A1F1D;color:#FFD9D5;}
+.alerta{display:flex;gap:10px;align-items:center;border:1px solid var(--c-notas);background:var(--al-bg);color:var(--al-ink);border-radius:8px;padding:10px 12px;margin:0 0 8px;}
+.alerta.conf{border-color:var(--c-refs);background:var(--alc-bg);color:var(--alc-ink);}
 .alerta .tile{background:var(--c-notas);}.alerta.conf .tile{background:var(--c-refs);}
 .alerta span{flex:1;}
 .editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
@@ -105,7 +142,7 @@ table.eos th,table.eos td{border:1px solid var(--line);padding:7px 9px;vertical-
 table.eos th{background:var(--accent-soft);font-weight:800;}
 table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowrap;}
 .eos-refs{font-size:.84rem;color:var(--muted);margin-top:10px;line-height:1.5;}
-.out{width:100%;min-height:340px;max-height:72vh;overflow:auto;border:1px solid var(--line);border-radius:10px;
+.out{width:100%;min-height:200px;overflow:auto;border:1px solid var(--line);border-radius:10px;
   padding:14px 18px;background:#fff;border-radius:4px;}
 .out .ll{font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.3;color:#000;text-align:justify;white-space:pre-wrap;word-break:break-word;}
 .out .ll.b{font-weight:bold;}
@@ -125,13 +162,15 @@ table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowra
 .chip-tog.on b,.chip-tog.on span{color:var(--dark);}
 /* versão + aviso de legado v2 */
 header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'IBM Plex Mono',Consolas,monospace;margin-left:10px;vertical-align:middle;}
-.banner{background:#3A3312;color:#F8E9B0;border:1px solid var(--warn);border-radius:8px;padding:12px 16px;margin:14px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.banner{background:var(--al-bg);color:var(--al-ink);border:1px solid var(--warn);border-radius:8px;padding:12px 16px;margin:14px 0;display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
 .banner p{margin:0;flex:1;min-width:240px;font-size:.86rem;}
 .banner[hidden]{display:none;}
 @media(max-width:1100px){.cols{grid-template-columns:1fr;}}
 @media(max-width:880px){.grid2{grid-template-columns:1fr;}}
 @media print{
-  body{background:#fff;padding:0;font-size:12px;}
+  html,body{height:auto;}
+  body{background:#fff;padding:0;font-size:12px;display:block;overflow:visible;}
+  .cols,.col,.wrap{display:block;overflow:visible;}
   .noprint{display:none !important;}
   .card{border:none;padding:0;margin:0;box-shadow:none;}
   #laudoMontado{border:none;padding:0;max-height:none;overflow:visible;min-height:auto;}
@@ -145,7 +184,9 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 
 <header class="top noprint">
   <h1>Máscara de Laudo — Biópsias endoscópicas/colonoscópicas pediátricas<span class="ver" id="appVer"></span></h1>
-  <p>Monte cada amostra por cliques, edite o texto e clique em <b>Salvar amostra</b>. Só o laudo em montagem fica salvo neste navegador.</p>
+  <label class="tema">Tema
+    <select id="temaSel"><option value="escuro">Escuro</option><option value="claro">Claro</option></select>
+  </label>
 </header>
 
 <div class="banner noprint" id="legacyBanner" hidden>
@@ -178,67 +219,58 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 
 <!-- ===================== 1. AMOSTRA ATUAL ===================== -->
 <div class="cols">
-<section class="card noprint">
-  <h2><span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 15h9"/></svg></span>Montar amostra</h2>
-
-
-  <label class="fld" style="margin-bottom:12px;">Materiais: início da frase (texto livre, completa ao digitar)
+<section class="card col noprint" id="colA">
+  <h2><span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 15h9"/></svg></span>Amostra</h2>
+  <label class="fld">Materiais: início da frase
     <input type="text" id="fPrefixo" list="prefixList">
     <datalist id="prefixList"><option value="Biópsias endoscópicas/colonoscópicas de:"><option value="Biópsia endoscópica/colonoscópica de:"><option value="Biópsias endoscópicas de:"><option value="Biópsia endoscópica de:"><option value="Biópsias colonoscópicas de:"></datalist>
   </label>
-  <div class="grid-id acc acc-id" style="margin-bottom:16px;">
-    <label class="fld">Letra (automática)
+  <div class="grid-id acc acc-id">
+    <label class="fld">Letra
       <input type="text" id="fLetra" maxlength="3" readonly style="text-transform:uppercase;">
     </label>
     <label class="fld">Sítio / órgão
       <select id="fSitio"></select>
     </label>
-    <label class="fld">Segmento (grupo)
+    <label class="fld">Segmento
       <select id="fSeg"></select>
     </label>
-    <label class="fld" style="grid-column:span 2;">Nome da amostra (vai em “Materiais” e no cabeçalho do bloco)
+    <label class="fld" style="grid-column:1/-1;">Nome da amostra (vai em “Materiais” e no cabeçalho)
       <input type="text" id="fNome" list="matList" placeholder="ex.: Mucosa esofágica">
       <datalist id="matList"></datalist>
     </label>
   </div>
-
-  <div class="grid2">
-    <div class="subpanel acc-dx">
-      <h3><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-5a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h5z"/></svg></span>Textos prontos (1 clique insere o bloco)</h3>
-      <div id="presetBox"></div>
-    </div>
-    <div class="subpanel acc-crit">
-      <h3><span class="tile t-crit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Achados (clique insere a linha)</h3>
-      <div id="critBox"></div>
-    </div>
-  </div>
-
-  <div class="subpanel" style="margin-top:14px;max-height:none;">
-      <h3><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 3v5M12 16v5M3 12h5M16 12h5"/></svg></span>Bloco DECH (NIH 2014): muda conforme o sítio</h3>
-      <div id="dechBox"></div>
-  </div>
-
-  <label class="fld" style="margin-top:14px;">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
-    <textarea id="corpo" rows="11" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
-  </label>
-  <div class="editor-actions">
-    <button class="primary" id="btnSalvar">✓ Salvar amostra (empilhar)</button>
-    <button class="ghost" id="btnCancelEdit" style="display:none;">Cancelar edição</button>
-    <span class="spacer"></span>
-    <button class="ghost" id="btnLimparEditor">Limpar editor</button>
+  <div class="subpanel acc-dx grow">
+    <h3><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-5a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h5z"/></svg></span>Textos prontos (1 clique insere o bloco)</h3>
+    <div id="presetBox"></div>
   </div>
 </section>
 
-<!-- ===================== 2. LAUDO ACUMULADO ===================== -->
-<section class="card">
-  <h2 class="noprint"><span class="tile t-neutro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg></span>Laudo</h2>
+<section class="card col noprint" id="colB">
+  <div class="subpanel acc-crit grow">
+    <h3><span class="tile t-crit"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.5 1.5L8 5M4 12l1.5 1.5L8 11M4 18l1.5 1.5L8 17"/></svg></span>Achados (clique insere a linha)</h3>
+    <div id="critBox"></div>
+  </div>
+  <details class="subpanel dech" id="dechDet">
+    <summary><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM12 3v5M12 16v5M3 12h5M16 12h5"/></svg></span>Bloco DECH (NIH 2014): muda conforme o sítio</summary>
+    <div id="dechBox"></div>
+  </details>
+</section>
 
+<section class="card col" id="colC">
   <div class="noprint">
-    <ul class="sample-list" id="sampleList"></ul>
-    <p class="hint" id="emptyHint">Nenhuma amostra salva ainda. Monte a amostra acima e clique <b>Salvar amostra</b>.</p>
-
+    <label class="fld">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
+      <textarea id="corpo" rows="10" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
+    </label>
+    <div class="editor-actions">
+      <button class="primary" id="btnSalvar">✓ Salvar amostra (empilhar)</button>
+      <button class="ghost" id="btnCancelEdit" style="display:none;">Cancelar edição</button>
+      <span class="spacer"></span>
+      <button class="ghost" id="btnLimparEditor">Limpar editor</button>
+    </div>
   </div>
 
+  <h2 class="noprint"><span class="tile t-neutro"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7zM14 3v5h5M10 13h6M10 17h6"/></svg></span>Laudo</h2>
   <div id="alertBox" class="noprint"></div>
   <div class="out" id="laudoMontado"></div>
 
@@ -250,7 +282,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
   </div>
 
   <div class="noprint">
-    <div class="acc-notas" style="margin-top:10px;padding-top:12px;padding-bottom:8px;">
+    <div class="acc-notas" style="padding-top:12px;padding-bottom:8px;">
       <label class="fld">Notas: clique para incluir ou remover. As notas de contagem e de DECH entram sozinhas</label>
       <input type="text" id="notaSearch" placeholder="🔎 buscar nota (tag ou texto)…" style="margin-bottom:8px;">
       <div class="notas-toggles" id="notasToggles"></div>
@@ -264,6 +296,12 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
       <div class="notas-toggles" id="refsToggles"></div>
       <label class="fld" style="margin-top:8px;">Referências livres (uma por linha)</label>
       <textarea id="refsFree" rows="2" placeholder="Referências adicionais (texto livre, 1 por linha)."></textarea>
+    </div>
+
+    <div class="pilha" style="margin-top:12px;">
+      <label class="fld" style="margin-bottom:8px;">Amostras salvas (ordem do laudo: A, B, C…)</label>
+      <ul class="sample-list" id="sampleList"></ul>
+      <p class="hint" id="emptyHint">Nenhuma amostra salva ainda. Monte a amostra e clique <b>Salvar amostra</b>.</p>
     </div>
   </div>
 </section>
@@ -353,7 +391,11 @@ const SEED_SITES = {
       {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
           monta:x=>"- Metaplasia intestinal: Presente"+(x[0]?", "+x[0]:"")+(x[1]?", "+x[1]:"")+"."}},
-      {g:"Lâmina própria", opt:[
+      {g:"Lâmina própria superficial", opt:[
+        ["Representada","- Lâmina própria superficial: Representada."],["Não representada","- Lâmina própria superficial: Não representada."]]},
+      {g:"Infiltrado inflamatório na lâmina própria", opt:[
+        ["Presente","- Infiltrado inflamatório em lâmina própria: Presente."],["Ausente","- Infiltrado inflamatório em lâmina própria: Ausente."]]},
+      {g:"Lâmina própria (frase única)", opt:[
         ["Não representada","- Não foi representada lâmina própria."],
         ["Superficial c/ infiltrado","- Lâmina própria superficialmente representada, apresentando infiltrado inflamatório mononuclear leve."]]}
     ]
@@ -361,7 +403,7 @@ const SEED_SITES = {
 
   gastrica:{
     nome:"Mucosa gástrica", nomeAmostra:"Mucosa gástrica", eos:"EoG",
-    segmentos:["Cárdia","Antro","Corpo/fundo (oxíntico)","Misto oxíntico/mucinoso","Incisura","Transição esôfago-gástrica"],
+    segmentos:["Cárdia","Antro","Corpo/fundo (oxíntico)","Transição corpo-antro","Misto oxíntico/mucinoso","Incisura","Transição esôfago-gástrica"],
     presets:[
       P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
         "Amostragem: Mucosa gástrica de padrão antral.",
@@ -419,7 +461,8 @@ const SEED_SITES = {
       {g:"Amostragem (padrão)", opt:[
         ["Antral","- Amostragem: Mucosa gástrica de padrão antral."],
         ["Oxíntico (corpo/fundo)","- Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo)."],
-        ["Misto oxínt./mucinoso","- Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso."]]},
+        ["Misto oxínt./mucinoso","- Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso."],
+        ["Transição corpo-antro","- Amostragem: Mucosa gástrica de transição corpo-antro."]]},
       {g:"Celularidade mononuclear (lâmina própria)", opt:[
         ["Habitual","- Celularidade habitual de leucócitos mononucleares em lâmina própria."],
         ["Levemente aumentada","- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria."],
@@ -491,8 +534,8 @@ const SEED_SITES = {
         ["Aumentada","- Celularidade aumentada de leucócitos mononucleares em lâmina própria."]]},
       {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
       {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve]]},
-      {g:"Linfocitose intraepitelial (n/100 enter.)", num:{tpl:"- Linfocitose intraepitelial: Presente (exocitose de aproximadamente {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"Presente (n)",
-         alt:{tpl:"- Linfocitose intraepitelial: Não identificada (exocitose de até {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"Não ident. (até n)"}}},
+      {g:"Linfocitose intraepitelial (n/100 enter.)", dica:"A frase sai sozinha pelo número: menos de 25 não identificada · 25 a 29 limítrofe · 30 ou mais presente.",
+        num:{tpl:"- Linfocitose intraepitelial: Presente (exocitose de aproximadamente {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"inserir (n)"}},
       {g:"Agregados linfoides", opt:[["Presentes","- Agregados linfoides: Presentes."],["Ausentes","- Agregados linfoides: Não identificados."]]},
       {g:"Parasitos", opt:[["Não identificados","- Parasitos: Não identificados."],["Identificados","- Parasitos: Identificados."]]},
       {g:"Linfangiectasias", opt:[["Não identificadas","- Linfangiectasias: Não identificadas."],["Identificadas","- Linfangiectasias: Identificadas."]]},
@@ -638,6 +681,13 @@ const CRIT_COLON = [
 SEED_SITES.colon.criterios = CRIT_COLON;
 SEED_SITES.reto.criterios = CRIT_COLON;
 
+// Achados associados aos eosinófilos (pilha), logo depois do grupo de contagem de cada sítio
+const ACHADOS_EOS = {g:"Eosinófilos: achados associados", dica:"Marque os presentes e clique em inserir: sai uma linha só.",
+  opt:[["Ausentes","- Achados eosinofílicos associados: Não identificados (sem degranulação ou microabscessos eosinofílicos)."]],
+  stack:{pre:"- Achados eosinofílicos associados: ", itens:[["degranulação","degranulação de eosinófilos"],["microabscessos eosinofílicos","microabscessos eosinofílicos"]]}};
+[SEED_SITES.esofago.criterios, SEED_SITES.gastrica.criterios, SEED_SITES.duodeno.criterios, SEED_SITES.ileo.criterios, CRIT_COLON].forEach(cr=>{
+  const i=cr.findIndex(c=>/^(Eosinófilos|Exocitose de eosinófilos)/.test(c.g)); cr.splice(i+1, 0, ACHADOS_EOS); });
+
 // Reto: mesmos textos do cólon, com a nomenclatura de reto
 SEED_SITES.reto.presets = SEED_SITES.reto.presets.filter(p=>/^RETITE/.test(p.titulo)).concat(SEED_SITES.colon.presets.map(p=>
   P(p.titulo.replace("MUCOSA COLÔNICA","MUCOSA RETAL").replace("COLITE","RETITE").replace("COLOPATIA","RETITE"), p.bullets)));
@@ -670,6 +720,7 @@ const OPT_NEUTRO_CRIPTA = [["Ausente","- "+LINHA_ATIV.cripta[0]],["Leve (até 5%
   ["Moderado (mais de 5% até 50%)","- "+LINHA_ATIV.cripta[2]],["Acentuado (mais de 50%, erosão ou úlcera)","- "+LINHA_ATIV.cripta[3]]];
 [CRIT_COLON, SEED_SITES.ileo.criterios].forEach(cr=>{ cr.find(c=>c.g==="Infiltrado neutrofílico").opt=OPT_NEUTRO_CRIPTA; });
 SEED_SITES.duodeno.criterios.find(c=>c.g==="Infiltrado neutrofílico").opt=[["Ausente","- "+LINHA_ATIV.duodeno[0]],["Presente","- "+LINHA_ATIV.duodeno[1]]];
+SEED_SITES.gastrica.criterios.find(c=>c.g==="Infiltrado neutrofílico").opt=["Ausente","Leve","Moderado c/ criptite","Acentuado"].map((r,i)=>[r,"- "+LINHA_ATIV.gastrica[i]]);
 SEED_SITES.duodeno.presets.forEach(p=>{ if(/EM ATIVIDADE LEVE/.test(p.titulo)){ p.titulo=p.titulo.replace("EM ATIVIDADE LEVE","EM ATIVIDADE");
   const i=p.bullets.findIndex(b=>/infiltrado inflamatório neutrofílico/.test(b)); if(i>=0) p.bullets[i]=LINHA_ATIV.duodeno[1]; } });
 function variantesAtiv(siteId, base, modelo, tipo, graus){
@@ -736,7 +787,9 @@ const NOTAS_PADRAO = [
   {tag:"Linfocitário", texto:"O achado histopatológico de gastropatia/colopatia de padrão linfocitário pode ser encontrado em diversas condições clínicas, sendo imprescindível a correlação com dados clínicos, de imagem, endoscópicos/colonoscópicos e demais dados laboratoriais para melhor definição diagnóstica (DII? OUTRA?)."},
   {tag:"Polipose (adenoma)", texto:"Adenoma em criança ou adolescente é incomum; recomenda-se avaliação clínica e genética para síndromes de polipose."},
   {tag:"Pólipo fúndico", texto:"Pólipo de glândulas fúndicas em criança sem uso de inibidor de bomba de prótons: recomenda-se avaliação para polipose adenomatosa familiar."},
-  {tag:"Pólipo hamartomatoso", texto:"Pólipo hamartomatoso: recomenda-se correlação com o número e a localização dos pólipos e com a história familiar, para avaliação de síndrome de polipose."}
+  {tag:"Pólipo hamartomatoso", texto:"Pólipo hamartomatoso: recomenda-se correlação com o número e a localização dos pólipos e com a história familiar, para avaliação de síndrome de polipose."},
+  {tag:"Granulomas", texto:"Não foram identificados granulomas em nenhuma das amostras examinadas."},
+  {tag:"Displasia", texto:"Não foi identificada displasia em nenhuma das amostras examinadas."}
 ];
 
 /* ============================ REFERÊNCIAS CITÁVEIS (marca [@chave] no texto vira [n]) ============================ */
@@ -812,13 +865,15 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.1.0";
+const APP_VERSION="3.2.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
 const LS_DRAFT="laudoGI_draft_v3";
 const LS_DB_V2="laudoGI_db_v2";                  // legado v2: só leitura (exportar customizações / importar rascunho)
 const LS_LEGACY_DISMISS="laudoGI_v2_banner_off";
+const LS_TEMA="laudoGI_tema";                   // "escuro" | "claro" (escolha fixa do usuário)
+const LS_DECH_ABERTO="laudoGI_dech_aberto";
 const LS_MATS="laudoGI_mats_v3";               // nomes de material mais usados (autocompletar)
 let editIndex = -1; // -1 = nova amostra; >=0 = editando
 let draft = { dech:null }; // DECH da amostra em edição
@@ -921,7 +976,7 @@ function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("sho
 function vr(text){
   const site=$("fSitio").value, seg=$("fSeg").value;
   if(site==="colon" && !eosKey(site,seg) && /\d+ eosinófilos?\/campo/.test(text)) toast("Escolha o segmento do cólon para sair o valor de referência");
-  return text.split("\n").map(l=>comVR(l, site, seg)).join("\n");
+  return text.split("\n").map(l=>comVR(fraseLie(fraseEos(l, site, seg), site), site, seg)).join("\n");
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
@@ -938,12 +993,119 @@ function appendLine(line){
   line=vr(line);
   const ta=$("corpo");
   if(!setLinha(line)){ let v=ta.value; if(v && !v.endsWith("\n")) v+="\n"; ta.value = v + line; }
+  sincAposLinha(line);
+  prevTit=ultimoTitulo(ta.value);
   ta.focus(); ta.scrollTop = ta.scrollHeight;
 }
 function appendBlock(block){
   const ta=$("corpo"); let v=ta.value.trim();
   ta.value = v ? v+"\n \n"+vr(block) : vr(block);
+  prevTit=ultimoTitulo(ta.value);
   ta.focus(); ta.scrollTop = ta.scrollHeight;
+}
+
+/* ============================ SINCRONIZAÇÃO: número/grau/critério -> frase e título ============================ */
+// frase dos eosinófilos pela faixa da contagem (mesmos cortes da nota: máximo normal e limiar do sítio)
+const EOS_FRASE = { desf:["não sendo identificada eosinofilia","Não foi identificada eosinofilia"],
+  duv:["com presença de eosinófilos","Presença de eosinófilos"], compat:["com presença de eosinofilia","Presença de eosinofilia"] };
+function fraseEos(line, siteId, seg){
+  const m=/(\d+) eosinófilos?\/campo de grande aumento/.exec(line), k=eosKey(siteId, seg);
+  if(!m || !k || k==="esofago") return line;
+  const f=EOS_FRASE[eosEval(k, +m[1])];
+  return line
+    .replace(/^- (?:Não sendo identificada eosinofilia(?: franca)?|Não foi identificada eosinofilia|Presença de eosin(?:ófilos|ofilia))(?= \()/, "- "+f[1])
+    .replace(/,? (?:não sendo identificada eosinofilia(?: franca)?|(?:e|com) presença de eosin(?:ófilos|ofilia))(?= \()/, ", "+f[0])
+    .replace(/(\d+)( eosinófilos?\/campo de grande aumento; )\d+(\/mm²)/, (x,n,a,b)=>n+a+Math.round(n/FIELD_MM2)+b);
+}
+// frase dos linfócitos intraepiteliais do duodeno pela faixa da contagem
+function fraseLie(line, siteId){
+  if(siteId!=="duodeno") return line;
+  return line.replace(/^- Linfocitose intraepitelial: (?:Presente|Não identificada|Limítrofe) \(exocitose de (?:até|aproximadamente) (\d+)/, (x,n)=>{
+    const st=lieEval(+n);
+    return "- Linfocitose intraepitelial: "+(st==="compat" ? "Presente (exocitose de aproximadamente " : st==="duv" ? "Limítrofe (exocitose de aproximadamente " : "Não identificada (exocitose de até ")+n; });
+}
+// grau de atividade lido do título e da linha de neutrófilos
+const RE_NEUTRO=/infiltrado inflamatório neutrofílico|exocitose de neutrófilos/;
+function grauDoTitulo(t){
+  const m=t.match(/(?:EM ATIVIDADE|ATIVA) (LEVE|MODERADA|ACENTUADA)/);
+  return m ? "EM ATIVIDADE "+m[1] : /INATIVA/.test(t) ? "INATIVA" : /EM ATIVIDADE/.test(t) ? "EM ATIVIDADE" : null;
+}
+function grauDaLinha(l){
+  if(/^- (Ausência|Não foi evidenciada)/.test(l)) return "INATIVA";
+  const m=l.match(/neutrofílico (leve|moderado|acentuado)/);
+  return m ? "EM ATIVIDADE "+{leve:"LEVE", moderado:"MODERADA", acentuado:"ACENTUADA"}[m[1]] : "EM ATIVIDADE";
+}
+// linha de neutrófilos que corresponde a um grau, no sítio (null = o sítio não tem linha para esse grau)
+function linhaAtiv(siteId, grau, titulo){
+  const k=GRAUS_ATIV.indexOf(grau);
+  if(siteId==="gastrica") return k>=0 ? LINHA_ATIV.gastrica[k] : null;
+  if(["ileo","colon","reto"].includes(siteId)) return k>=0 ? LINHA_ATIV.cripta[k] : null;
+  if(siteId==="esofago") return grau==="INATIVA" ? LINHA_ATIV.esofago[0] : LINHA_ATIV.esofago[/EROSIVA/.test(titulo||"") ? 2 : 1];
+  if(siteId==="duodeno") return LINHA_ATIV.duodeno[grau==="INATIVA" ? 0 : 1];
+  return null;
+}
+// título com o grau de atividade ajustado (só em títulos de processo inflamatório)
+function tituloComAtiv(t, grau){
+  if(/ATIVA (LEVE|MODERADA|ACENTUADA)/.test(t) && !/EM ATIVIDADE/.test(t)){
+    const w=grau.match(/LEVE|MODERADA|ACENTUADA/); return w ? t.replace(/ATIVA (LEVE|MODERADA|ACENTUADA)/, "ATIVA "+w[0]) : t; }
+  if(ATIV_RE.test(t)) return titleSetAtiv(t, grau);
+  return (grau!=="INATIVA" && /GASTRITE|ESOFAGITE|DUODENITE|ILEÍTE|COLITE|RETITE/.test(t)) ? titleSetAtiv(t, grau) : t;
+}
+// troca, acrescenta ou retira um trecho do título, antes dos parênteses finais
+function titleSetTrecho(title, re, novo, acrescenta){
+  const m=title.match(/^(.*?)((?: \([^)]*\))*):$/); if(!m) return title;
+  let base=m[1];
+  if(re.test(base)) base = novo ? base.replace(re, (x,pre)=>(pre||"")+novo) : base.replace(re, "");
+  else if(novo && acrescenta) base += ", "+novo;
+  return base+m[2]+":";
+}
+const RE_T_HP=/(,? )(?:ASSOCIADA A H\. pylori|COM PESQUISA PARA H\. pylori POSITIVA(?: \([^)]*\))?)/;
+function titleSetHp(title, positiva){ return titleSetTrecho(title, RE_T_HP, positiva ? "ASSOCIADA A H. pylori" : "", /GASTRITE/.test(title)); }
+const RE_T_MI=/(,? )COM METAPLASIA INTESTINAL(?: (?:IN)?COMPLETA)?(?: E)?(?: (?:LEVE|MODERADA|ACENTUADA))?/;
+function titleSetMetaplasia(title, linha){
+  const m=linha.match(/^- Metaplasia intestinal: Presente(?:, (completa|incompleta))?(?:, (leve|moderada|acentuada))?\./);
+  const novo = m ? "COM METAPLASIA INTESTINAL"+(m[1]?" "+m[1].toUpperCase():"")+(m[2]?(m[1]?" E ":" ")+m[2].toUpperCase():"") : "";
+  return titleSetTrecho(title, RE_T_MI, novo, /GASTRITE|ESOFAGITE/.test(title));
+}
+const RE_T_DISP=/(,? )(?:SEM DISPLASIA|COM DISPLASIA DE (?:BAIXO|ALTO) GRAU)/;
+function titleSetDisplasia(title, linha){
+  const m=linha.match(/^- Displasia: (Não identificada|Presente, de (baixo|alto) grau)/); if(!m) return title;
+  return titleSetTrecho(title, RE_T_DISP, m[2] ? "COM DISPLASIA DE "+m[2].toUpperCase()+" GRAU" : "SEM DISPLASIA", false);
+}
+let prevTit="";
+function ultimoTitulo(txt){ const ls=(txt||"").split("\n"); for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b") return ls[i].trim(); return ""; }
+function linhaNeutroDoBloco(){
+  const ls=$("corpo").value.split("\n"); let start=-1;
+  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
+  return ls.find((l,i)=>i>start && RE_NEUTRO.test(l)) || null;
+}
+// critério clicado -> título (e, no H. pylori, linha de atividade coerente com o título)
+function sincAposLinha(line){
+  const site=$("fSitio").value;
+  if(RE_NEUTRO.test(line)) editTitle(t=>tituloComAtiv(t, grauDaLinha(line)));
+  else if(/^- Pesquisa para H\. pylori: /.test(line)){
+    const pos=/Positiva/.test(line);
+    editTitle(t=>titleSetHp(t, pos));
+    if(pos) tituloParaLinha(site);
+  }
+  else if(/^- Metaplasia intestinal: /.test(line)) editTitle(t=>titleSetMetaplasia(t, line));
+  else if(/^- Displasia: /.test(line)) editTitle(t=>titleSetDisplasia(t, line));
+}
+// título -> linha de neutrófilos do bloco
+function tituloParaLinha(site){
+  const tit=ultimoTitulo($("corpo").value), g=grauDoTitulo(tit), atual=linhaNeutroDoBloco();
+  if(!g || !atual || grauDaLinha(atual)===g) return;
+  const nova=linhaAtiv(site, g, tit);
+  if(nova) setLinha("- "+nova);
+}
+// roda quando o texto do editor é alterado à mão: frases pelas contagens e vínculo título <-> atividade
+function ressincEditor(){
+  const ta=$("corpo"), site=$("fSitio").value, seg=$("fSeg").value;
+  ta.value=ta.value.split("\n").map(l=>fraseLie(fraseEos(l, site, seg), site)).join("\n");
+  const tit=ultimoTitulo(ta.value);
+  if(tit && tit!==prevTit) tituloParaLinha(site);
+  else { const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
+  prevTit=ultimoTitulo(ta.value);
 }
 
 /* ============================ CONTAGENS / DECH / ATIVIDADE (regras) ============================ */
@@ -1141,6 +1303,13 @@ function alertas(){
     const gt=tit.match(/ATIVIDADE (LEVE|MODERADA|ACENTUADA)/), gl=(corpo||"").match(/neutrofílico (leve|moderado|acentuado) em/);
     if(gt && gl && gt[1].slice(0,3).toLowerCase()!==gl[1].slice(0,3))
       out.push({conf:true, msg:rot+": o título diz atividade "+gt[1].toLowerCase()+", mas a linha de neutrófilos diz "+gl[1]+"."});
+    const lie=(corpo||"").match(/(\d+) linfócitos\/100 enterócitos/), marsh=(corpo||"").match(/Marsh-Oberhuber \(1999\): (\d)/);
+    if(lie && marsh && ((+marsh[1]>=1 && +lie[1]<25) || (+marsh[1]===0 && +lie[1]>=30)))
+      out.push({conf:true, msg:rot+": Marsh-Oberhuber "+marsh[1]+" não combina com "+lie[1]+" linfócitos por 100 enterócitos."});
+    if(/OLGIM: Estágio 0/.test(corpo||"") && /Metaplasia intestinal: Presente/.test(corpo||""))
+      out.push({conf:true, msg:rot+": OLGIM estágio 0 com metaplasia intestinal presente."});
+    if(/OLGA: Estágio 0/.test(corpo||"") && /Atrofia: Presente/.test(corpo||""))
+      out.push({conf:true, msg:rot+": OLGA estágio 0 com atrofia presente."});
     if(dech && dech.manual && dech.manual!==dech.sug)
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
@@ -1459,12 +1628,19 @@ $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaud
 $("notas").oninput=()=>{ WORK.notasFree=$("notas").value; save(); renderLaudo(); };
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
 $("notaSearch").oninput=renderNotasToggles;
+$("corpo").onchange=ressincEditor;
+$("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); };
+function aplicaTema(t){ t = t==="claro" ? "claro" : "escuro"; if(document.documentElement) document.documentElement.setAttribute("data-tema", t); $("temaSel").value=t; return t; }
+$("temaSel").onchange=()=>{ store(LS_TEMA, aplicaTema($("temaSel").value)); };
+$("dechDet").ontoggle=()=>{ store(LS_DECH_ABERTO, !!$("dechDet").open); };
 $("refSearch").oninput=renderRefsToggles;
 
 /* ============================ INIT ============================ */
 function renderAll(){ renderSampleList(); renderNotasToggles(); renderRefsToggles(); renderLaudo(); }
 function init(){
   $("appVer").textContent="v"+APP_VERSION;
+  aplicaTema(load(LS_TEMA));
+  $("dechDet").open=!!load(LS_DECH_ABERTO);
   renderSitioSelect();
   onSiteChange();
   $("fLetra").value=nextLetter();

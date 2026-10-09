@@ -1,5 +1,16 @@
 # Changelog
 
+## v3.2.0 — em validação (ramo melhorias-v3.2, não publicado)
+- Layout: três colunas no desktop (amostra e textos prontos · achados · editor e laudo), cada uma rolando por dentro; editor ao lado dos achados; lista de amostras salvas no fim; bloco DECH recolhível (estado lembrado).
+- Tema: seletor Escuro/Claro com escolha gravada no navegador (não segue o sistema); tema claro em azul-claro.
+- Eosinófilos: a frase ("não sendo identificada eosinofilia" / "com presença de eosinófilos" / "com presença de eosinofilia") segue a contagem pelas faixas do sítio, ao inserir e ao editar o número; novo grupo de achados associados (degranulação, microabscessos eosinofílicos).
+- Duodeno: linfocitose intraepitelial com um campo só; a frase (não identificada, limítrofe, presente) segue o número.
+- Vínculo título ↔ atividade nos dois sentidos em todos os sítios; H. pylori positiva entra no título e alinha a linha de atividade ao grau; metaplasia intestinal e displasia atualizam o trecho correspondente do título.
+- Esôfago: lâmina própria superficial (representada / não representada) e infiltrado inflamatório (presente / ausente) em campos independentes.
+- Estômago: mucosa de transição corpo-antro (segmento e amostragem).
+- Alertas novos: Marsh-Oberhuber × linfócitos; OLGIM × metaplasia; OLGA × atrofia.
+- Notas novas: granulomas e displasia em linhas separadas.
+
 ## v3.1.0 — 2026-10-04
 - Saída: negrito só no título do diagnóstico (cabeçalho "A) …:" sem negrito); referências numeradas, com o número entre colchetes no texto e a lista completa em "REFERÊNCIAS BIBLIOGRÁFICAS:".
 - Contagens: toda linha com contagem de eosinófilos ou de linfócitos (texto pronto ou achado) entra com o valor de referência do sítio e a referência; a nota de conclusão (compatível, desfavorece ou duvidoso) é gerada a partir do texto da amostra.

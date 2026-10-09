@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -240,5 +240,117 @@ ok(hb.combo.monta(["leve (x)", "papilar"]).startsWith("- Hiperplasia papilar da 
 // 10. Materiais: início da frase livre
 t.WORK.prefixo = "Biópsia endoscópica de:";
 ok(t.buildLaudo().startsWith("Materiais: Biópsia endoscópica de: A) Ceco, B) Cólon ascendente, C) Íleo, D) Reto."), "prefixo livre e letras em ordem");
+
+// 11. v3.2: sincronização número/grau/critério -> frase e título
+({ t, els } = boot({}));
+const E = (n) => "- Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até " + n + " eosinófilos/campo de grande aumento).";
+for (const [site, seg, k] of [["gastrica", "", "estomago"], ["duodeno", "", "duodeno"], ["ileo", "", "ileo"], ["colon", "Ceco", "cecoasc"], ["colon", "Cólon transverso", "transdesc"], ["reto", "", "sigreto"]]) {
+  const v = t.EOS_VR[k];
+  ok(t.fraseEos(E(v.teto), site, seg).includes(", não sendo identificada eosinofilia (até " + v.teto), k + ": até o máximo normal");
+  ok(t.fraseEos(E(v.teto + 1), site, seg).includes(", com presença de eosinófilos (até " + (v.teto + 1)), k + ": acima do normal");
+  ok(t.fraseEos(E(v.campo), site, seg).includes(", com presença de eosinofilia (até " + v.campo), k + ": no limiar");
+}
+eq(t.fraseEos("- Não sendo identificada eosinofilia (até 60 eosinófilos/campo de grande aumento).", "duodeno", ""), "- Presença de eosinofilia (até 60 eosinófilos/campo de grande aumento).", "linha isolada do duodeno");
+eq(t.fraseEos("- Presença de eosinófilos (até 3 eosinófilos/campo de grande aumento).", "colon", "Ceco"), "- Não foi identificada eosinofilia (até 3 eosinófilos/campo de grande aumento).", "linha isolada do cólon");
+eq(t.fraseEos(E(90), "colon", ""), E(90), "cólon sem segmento não muda");
+eq(t.fraseEos("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).", "esofago", ""), "- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).", "esôfago não usa essas frases");
+ok(t.fraseEos(", e presença de eosinófilos (até 95 eosinófilos/campo de grande aumento; 84/mm²; valor de referência: x)", "colon", "Ceco").includes(", com presença de eosinofilia (até 95 eosinófilos/campo de grande aumento; 401/mm²;"), "frase e mm² acompanham o número editado");
+for (const k of Object.keys(t.SEED_SITES)) for (const p of t.SEED_SITES[k].presets) for (const b of p.bullets) {
+  const m = /(\d+) eosinófilos?\/campo/.exec(b), key = t.eosKey(k, k === "colon" ? "Ceco" : "");
+  if (m && key && key !== "esofago" && /eosinofilia|presença de eosinófilos/i.test(b)) {
+    const st = t.eosEval(key, +m[1]), r = t.fraseEos("- " + b, k, k === "colon" ? "Ceco" : "");
+    ok({ desf: /identificada eosinofilia/, duv: /presença de eosinófilos/i, compat: /presença de eosinofilia/i }[st].test(r), "texto pronto coerente com a contagem: " + k + " / " + p.titulo);
+  }
+}
+const L = (w, n) => "- Linfocitose intraepitelial: " + w + n + " linfócitos/100 enterócitos nas pontas das vilosidades).";
+ok(t.fraseLie(L("Presente (exocitose de aproximadamente ", 12), "duodeno").startsWith("- Linfocitose intraepitelial: Não identificada (exocitose de até 12"), "LIE 12");
+ok(t.fraseLie(L("Presente (exocitose de aproximadamente ", 27), "duodeno").startsWith("- Linfocitose intraepitelial: Limítrofe (exocitose de aproximadamente 27"), "LIE 27");
+ok(t.fraseLie(L("Não identificada (exocitose de até ", 40), "duodeno").startsWith("- Linfocitose intraepitelial: Presente (exocitose de aproximadamente 40"), "LIE 40");
+eq(t.fraseLie(L("Presente (exocitose de aproximadamente ", 12), "ileo"), L("Presente (exocitose de aproximadamente ", 12), "LIE só no duodeno");
+ok(!t.SEED_SITES.duodeno.criterios.find(c => /Linfocitose intraepitelial/.test(c.g)).num.alt, "LIE com um campo só");
+eq(t.grauDoTitulo("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA:"), "EM ATIVIDADE MODERADA", "grau do título");
+eq(t.grauDoTitulo("- RETITE ATIVA LEVE:"), "EM ATIVIDADE LEVE", "grau em 'ativa leve'");
+eq(t.grauDoTitulo("- ESOFAGITE CRÔNICA EM ATIVIDADE, EROSIVA:"), "EM ATIVIDADE", "atividade sem grau");
+eq(t.grauDoTitulo("- MUCOSA GÁSTRICA SEM ALTERAÇÕES:"), null, "título sem atividade");
+const gNeutro = t.SEED_SITES.gastrica.criterios.find(c => c.g === "Infiltrado neutrofílico").opt;
+eq(t.grauDaLinha(gNeutro[0][1]), "INATIVA", "linha ausente"); eq(t.grauDaLinha(gNeutro[2][1]), "EM ATIVIDADE MODERADA", "linha moderada");
+eq(t.tituloComAtiv("- GASTRITE CRÔNICA INATIVA:", "EM ATIVIDADE MODERADA"), "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA:", "critério -> título");
+eq(t.tituloComAtiv("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:", "INATIVA"), "- GASTRITE CRÔNICA INATIVA, ASSOCIADA A H. pylori:", "critério ausente -> título");
+eq(t.tituloComAtiv("- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "INATIVA"), "- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "título não inflamatório não muda");
+eq(t.tituloComAtiv("- RETITE ATIVA LEVE:", "EM ATIVIDADE ACENTUADA"), "- RETITE ATIVA ACENTUADA:", "convenção 'ativa' preservada");
+eq(t.linhaAtiv("gastrica", "EM ATIVIDADE MODERADA"), gNeutro[2][1].slice(2), "título -> linha (estômago)");
+ok(t.linhaAtiv("colon", "EM ATIVIDADE LEVE").includes("criptite ocasional"), "título -> linha (cólon)");
+ok(t.linhaAtiv("esofago", "EM ATIVIDADE", "- ESOFAGITE CRÔNICA EM ATIVIDADE, EROSIVA:").includes("erosão (necrose"), "título -> linha (esôfago erosiva)");
+eq(t.linhaAtiv("duodeno", "EM ATIVIDADE"), t.SEED_SITES.duodeno.criterios.find(c => c.g === "Infiltrado neutrofílico").opt[1][1].slice(2), "título -> linha (duodeno)");
+eq(t.titleSetHp("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA:", true), "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:", "H. pylori no título");
+eq(t.titleSetHp("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori (DECH POSSÍVEL – NIH/2014):", false), "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA (DECH POSSÍVEL – NIH/2014):", "H. pylori negativa tira o trecho e preserva DECH");
+eq(t.titleSetHp("- GASTRITE CRÔNICA INATIVA, ASSOCIADA A H. pylori:", true), "- GASTRITE CRÔNICA INATIVA, ASSOCIADA A H. pylori:", "não duplica");
+eq(t.titleSetHp("- MUCOSA GÁSTRICA SEM ALTERAÇÕES:", true), "- MUCOSA GÁSTRICA SEM ALTERAÇÕES:", "só em gastrite");
+eq(t.lineKind("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:"), "b", "título com H. pylori segue em negrito");
+eq(t.titleSetMetaplasia("- GASTRITE CRÔNICA INATIVA:", "- Metaplasia intestinal: Presente, incompleta, moderada."), "- GASTRITE CRÔNICA INATIVA, COM METAPLASIA INTESTINAL INCOMPLETA E MODERADA:", "metaplasia entra no título");
+eq(t.titleSetMetaplasia("- GASTRITE CRÔNICA COM METAPLASIA INTESTINAL COMPLETA E ACENTUADA, SEM DISPLASIA, INATIVA (VIDE NOTAS):", "- Metaplasia intestinal: Presente, incompleta, leve."), "- GASTRITE CRÔNICA COM METAPLASIA INTESTINAL INCOMPLETA E LEVE, SEM DISPLASIA, INATIVA (VIDE NOTAS):", "metaplasia troca no título");
+eq(t.titleSetMetaplasia("- GASTRITE CRÔNICA COM METAPLASIA INTESTINAL COMPLETA E ACENTUADA, SEM DISPLASIA, INATIVA (VIDE NOTAS):", "- Metaplasia intestinal: Não identificada."), "- GASTRITE CRÔNICA, SEM DISPLASIA, INATIVA (VIDE NOTAS):", "metaplasia sai do título");
+eq(t.titleSetDisplasia("- PÓLIPO JUVENIL, SEM DISPLASIA:", "- Displasia: Presente, de baixo grau."), "- PÓLIPO JUVENIL, COM DISPLASIA DE BAIXO GRAU:", "displasia troca no título");
+eq(t.titleSetDisplasia("- ADENOMA TUBULAR COM DISPLASIA DE BAIXO GRAU:", "- Displasia: Presente, de alto grau."), "- ADENOMA TUBULAR COM DISPLASIA DE ALTO GRAU:", "displasia de alto grau");
+eq(t.titleSetDisplasia("- GASTRITE CRÔNICA INATIVA:", "- Displasia: Não identificada."), "- GASTRITE CRÔNICA INATIVA:", "displasia só troca trecho existente");
+// editor: critério -> título, H. pylori, e título -> critério
+els.fSitio.value = "gastrica"; els.fSeg.value = "";
+els.corpo.value = "- GASTRITE CRÔNICA INATIVA:\n" + gNeutro[0][1];
+t.appendLine(gNeutro[2][1]);
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA:"), "editor: marcar atividade moderada muda o título");
+eq(els.corpo.value.split("\n").filter(l => /neutrof/.test(l)).length, 1, "editor: uma linha de neutrófilos só");
+t.appendLine("- Pesquisa para H. pylori: Positiva (+2/+3).");
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:"), "editor: H. pylori positiva entra no título com o grau");
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace("EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA");
+els.corpo.onchange();
+ok(els.corpo.value.includes(gNeutro[3][1]) && !els.corpo.value.includes(gNeutro[2][1]), "editor: mudar o título muda a linha de neutrófilos");
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace(gNeutro[3][1], gNeutro[1][1]);
+els.corpo.onchange();
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, ASSOCIADA A H. pylori:"), "editor: mudar a linha à mão muda o título");
+t.appendLine("- Pesquisa para H. pylori: Negativa.");
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE:"), "editor: H. pylori negativa tira o trecho");
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco";
+els.corpo.value = "- COLITE CRÔNICA INATIVA:";
+t.appendLine("- Presença de eosinófilos (até 7 eosinófilos/campo de grande aumento).");
+ok(els.corpo.value.includes("- Não foi identificada eosinofilia (até 7 eosinófilos/campo de grande aumento; 30/mm²;"), "editor: frase pela contagem ao inserir");
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace("até 7 eos", "até 95 eos");
+els.corpo.onchange();
+ok(els.corpo.value.includes("- Presença de eosinofilia (até 95 eosinófilos/campo de grande aumento; 401/mm²;"), "editor: mudar a contagem muda o descritivo e o mm²");
+els.corpo.value = "";
+// dados novos
+ok(t.SEED_SITES.gastrica.segmentos.includes("Transição corpo-antro"), "segmento de transição corpo-antro");
+ok(t.SEED_SITES.gastrica.criterios.find(c => /Amostragem/.test(c.g)).opt.some(o => o[1] === "- Amostragem: Mucosa gástrica de transição corpo-antro."), "amostragem de transição corpo-antro");
+for (const k of ["esofago", "gastrica", "duodeno", "ileo", "colon", "reto"]) {
+  const a = t.SEED_SITES[k].criterios.find(c => c.g === "Eosinófilos: achados associados");
+  ok(a && a.stack.itens.some(i => /degranulação/.test(i[1])) && a.stack.itens.some(i => /microabscessos eosinofílicos/.test(i[1])), k + ": degranulação e microabscessos eosinofílicos");
+}
+ok(!t.SEED_SITES.polipo.criterios.some(c => /achados associados/.test(c.g)), "pólipo sem grupo de eosinófilos");
+const lp = t.SEED_SITES.esofago.criterios.filter(c => /^Lâmina própria superficial$|^Infiltrado inflamatório na lâmina própria$/.test(c.g));
+eq(lp.length, 2, "esôfago: dois campos independentes de lâmina própria");
+eq(lp[0].opt.length + lp[1].opt.length, 4, "representada/não representada e presente/ausente");
+ok(!t.SEED_SITES.gastrica.criterios.some(c => /^Lâmina própria superficial$/.test(c.g)), "só no esôfago");
+const nG = t.LIB.notas.find(x => x.texto === "Não foram identificados granulomas em nenhuma das amostras examinadas."), nD = t.LIB.notas.find(x => x.texto === "Não foi identificada displasia em nenhuma das amostras examinadas.");
+ok(nG && nD, "notas novas de granulomas e de displasia");
+t.WORK.samples.push({ nome: "Ceco", corpo: "- COLITE CRÔNICA INATIVA:" }); t.WORK.notasSel.push(nG.id, nD.id);
+ok(t.buildLaudo().includes("NOTAS:\n- " + nG.texto + "\n- " + nD.texto), "notas em linhas separadas com '- '");
+t.WORK.samples.push({ nome: "Duodeno", corpo: "- DUODENITE:\n- Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos).\n- Classificação de Marsh-Oberhuber (1999): 3A." },
+  { nome: "Antro", corpo: "- GASTRITE:\n- Metaplasia intestinal: Presente, completa, leve.\n- Atrofia: Presente, leve.\n- Classificação OLGIM: Estágio 0.\n- Classificação OLGA: Estágio 0." });
+eq(t.alertas().length, 3, "alertas de Marsh, OLGIM e OLGA incoerentes");
+// tema e DECH recolhível
+ok(!/prefers-color-scheme/.test(html), "tema não segue o sistema");
+ok(html.includes(':root[data-tema="claro"]') && html.includes('id="temaSel"'), "tema claro e seletor");
+const st2 = {}; ({ t, els } = boot(st2));
+eq(els.temaSel.value, "escuro", "tema padrão escuro");
+els.temaSel.value = "claro"; els.temaSel.onchange();
+eq(st2.laudoGI_tema, '"claro"', "escolha do tema gravada");
+els.dechDet.open = true; els.dechDet.ontoggle();
+({ t, els } = boot(st2));
+eq(els.temaSel.value, "claro", "tema persiste ao recarregar");
+eq(els.dechDet.open, true, "DECH aberto é lembrado");
+ok(html.indexOf('id="sampleList"') > html.indexOf('id="refsFree"'), "pilha de amostras no fim, depois das referências");
+ok(html.indexOf('id="critBox"') < html.indexOf('id="corpo"') && html.includes('<details class="subpanel dech" id="dechDet">'), "achados antes do editor; DECH recolhível");
 
 console.log(`OK — ${n} asserts`);
