@@ -10,6 +10,7 @@
 - Estômago: mucosa de transição corpo-antro (segmento e amostragem).
 - Alertas novos: Marsh-Oberhuber × linfócitos; OLGIM × metaplasia; OLGA × atrofia.
 - Notas novas: granulomas e displasia em linhas separadas.
+- *H. pylori* sempre em itálico, em títulos e itens, em qualquer grafia (H. PYLORI, H.pylori, Helicobacter pylori), na prévia, na cópia e na interface.
 
 ## v3.1.0 — 2026-10-04
 - Saída: negrito só no título do diagnóstico (cabeçalho "A) …:" sem negrito); referências numeradas, com o número entre colchetes no texto e a lista completa em "REFERÊNCIAS BIBLIOGRÁFICAS:".

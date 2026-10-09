@@ -1318,7 +1318,7 @@ function alertas(){
 }
 function renderAlertas(){
   const ic='<span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18zM12 7.5v6M12 16.5v.5"/></svg></span>';
-  $("alertBox").innerHTML = alertas().map(a=>'<div class="alerta'+(a.conf?" conf":"")+'" role="status">'+ic+'<span>'+esc(a.msg)+'</span></div>').join("");
+  $("alertBox").innerHTML = alertas().map(a=>'<div class="alerta'+(a.conf?" conf":"")+'" role="status">'+ic+'<span>'+fmtInline(a.msg)+'</span></div>').join("");
 }
 
 /* ============================ PAINEL DECH (por sítio) ============================ */
@@ -1403,7 +1403,7 @@ function renderCrit(){
   const grupos=(site.criterios||[]).slice();
   if(["ileo","colon","reto"].includes(site.id)) grupos.unshift({g:"Atividade: criptas com criptite ou abscesso", ativ:true, dica:"Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada. Insere a linha e ajusta o título."});
   if(!grupos.length){ box.innerHTML='<p class="hint">Nenhum critério para este sítio.</p>'; return; }
-  const mkb=(par, label, fn, cls)=>{ const b=document.createElement("button"); b.type="button"; b.textContent=label; if(cls) b.className=cls; b.onclick=()=>fn(b); par.appendChild(b); return b; };
+  const mkb=(par, label, fn, cls)=>{ const b=document.createElement("button"); b.type="button"; b.innerHTML=fmtInline(label); if(cls) b.className=cls; b.onclick=()=>fn(b); par.appendChild(b); return b; };
   grupos.forEach(c=>{
     const div=document.createElement("div"); div.className="crit";
     const lab=document.createElement("span"); lab.className="glabel"; lab.innerHTML=fmtInline(c.g);
@@ -1491,7 +1491,7 @@ function renderSampleList(){
     const li=document.createElement("li");
     const prev=s.corpo.split("\n").find(x=>x.trim().startsWith("-"))||s.corpo.slice(0,60);
     li.innerHTML=`<span class="si-letter">${letterOf(i)})</span>
-      <span class="si-body"><span class="si-name">${esc(s.nome)}</span><br><span class="si-prev">${esc(prev.replace(/^[-.\s]+/,""))}</span></span>`;
+      <span class="si-body"><span class="si-name">${fmtInline(s.nome)}</span><br><span class="si-prev">${fmtInline(prev.replace(/^[-.\s]+/,""))}</span></span>`;
     const ctrl=document.createElement("span"); ctrl.className="si-ctrl";
     ctrl.appendChild(mkBtn("↑",()=>move(i,-1)));
     ctrl.appendChild(mkBtn("↓",()=>move(i,1)));
@@ -1551,7 +1551,9 @@ function lineKind(line){
   return "";
 }
 function laudoLines(txt){ return txt.split("\n").map(line=>({cls:lineKind(line), text:line})); }
-function fmtInline(s){ return esc(s).replace(SPECIES_RE,"<i>$1</i>"); }
+// H. pylori sai sempre em itálico, em qualquer grafia (H. PYLORI, H.pylori, Helicobacter pylori)
+const HP_RE=/(?<!<i>)(H\.\s?pylori|Helicobacter pylori)(?![A-Za-z])/gi;
+function fmtInline(s){ return esc(s).replace(SPECIES_RE,"<i>$1</i>").replace(HP_RE,"<i>$1</i>"); }
 function laudoToPreviewHTML(txt){
   if(!txt.trim()) return '<span class="empty">Nenhuma amostra salva ainda — monte acima e clique “Salvar amostra”.</span>';
   return laudoLines(txt).map(o=> o.cls==="sp"
@@ -1577,7 +1579,7 @@ function renderChipList(boxId, list, selArr, rerender){
   list.forEach(item=>{
     const b=document.createElement("button"); b.type="button"; b.className="chip-tog";
     if(selArr.includes(item.id)) b.classList.add("on");
-    b.innerHTML='<b>'+esc(item.tag||"—")+'</b><span>'+esc(item.texto)+'</span>';
+    b.innerHTML='<b>'+fmtInline(item.tag||"—")+'</b><span>'+fmtInline(item.texto)+'</span>';
     b.title=item.texto;
     b.onclick=()=>{ toggleIn(selArr,item.id); saveNow(); rerender(); renderLaudo(); };
     box.appendChild(b);

@@ -353,4 +353,22 @@ eq(els.dechDet.open, true, "DECH aberto é lembrado");
 ok(html.indexOf('id="sampleList"') > html.indexOf('id="refsFree"'), "pilha de amostras no fim, depois das referências");
 ok(html.indexOf('id="critBox"') < html.indexOf('id="corpo"') && html.includes('<details class="subpanel dech" id="dechDet">'), "achados antes do editor; DECH recolhível");
 
+// 12. H. pylori sempre em itálico (título e itens, qualquer grafia)
+({ t, els } = boot({}));
+const hpTxt = "Materiais: x.\n \nA) Antro:\n- GASTRITE CRÔNICA EM ATIVIDADE LEVE, ASSOCIADA A H. PYLORI:\n- Pesquisa para H. pylori: Positiva (+1).\n- Bacilos compatíveis com Helicobacter pylori.\n- Pesquisa para H.pylori: Negativa.";
+const hpRich = t.laudoToRichHTML(hpTxt), hpPrev = t.laudoToPreviewHTML(hpTxt);
+for (const h of [hpRich, hpPrev]) {
+  ok(h.includes("ASSOCIADA A <i>H. PYLORI</i>:"), "título em maiúsculas com itálico");
+  ok(h.includes("Pesquisa para <i>H. pylori</i>: Positiva"), "item com itálico");
+  ok(h.includes("<i>Helicobacter pylori</i>") && h.includes("<i>H.pylori</i>"), "outras grafias com itálico");
+  ok(!h.includes("<i><i>"), "sem itálico duplicado");
+  eq((h.match(/<i>/g) || []).length, 4, "as 4 ocorrências em itálico");
+}
+eq(t.lineKind("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, ASSOCIADA A H. PYLORI:"), "b", "título com H. PYLORI segue título");
+for (const k of Object.keys(t.SEED_SITES)) for (const p of t.SEED_SITES[k].presets)
+  if (/pylori/i.test(p.titulo + p.bullets.join(" "))) {
+    const h = t.laudoToRichHTML(t.presetText(p));
+    eq((h.match(/<i>H\. ?pylori<\/i>/gi) || []).length, (t.presetText(p).match(/H\. ?pylori/gi) || []).length, "todo H. pylori do texto pronto em itálico: " + p.titulo);
+  }
+
 console.log(`OK — ${n} asserts`);
