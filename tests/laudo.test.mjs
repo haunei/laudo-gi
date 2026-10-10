@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_T,HS_L,hsTitulo,hsAchados,hsTituloPeca,hsNotas,hsAlertas};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -428,5 +428,77 @@ t.WORK.notasSel.push(t.LIB.notas.find(x => /Vide referências bibliográficas/.t
 eq(t.alertas().length, 0, "com referências: sem alerta");
 els.btnRefs.onclick();
 eq(t.alertas().length, 1, "sem referências: alerta para nota que manda ver as referências");
+
+// 15. Hirschsprung: título pelos achados, notas, alertas
+({ t, els } = boot({}));
+const H = t.HS_T, A = (o) => t.hsTitulo(Object.assign({ adeq: "ok", gang: null, nerv: false, cal: null, ctrl: false }, o));
+eq(A({ adeq: "inad", gang: "nao" }), H.inad, "linha 1: inadequada");
+eq(A({ adeq: "inad", gang: "nao", cal: "pres" }), H.inad, "linha 1: inadequada com calretinina preservada");
+eq(A({ adeq: "inad", gang: "nao", cal: "aus" }), H.inadCal, "linha 2: inadequada com calretinina ausente");
+eq(A({ gang: "pres", cal: "pres" }), H.gang, "linha 3: gânglios presentes");
+eq(A({ gang: "pres" }), H.gang, "linha 3: gânglios presentes sem calretinina");
+eq(A({ gang: "pres", cal: "aus" }), H.gangCorr, "linha 4: gânglios + calretinina ausente");
+eq(A({ gang: "pres", cal: "esp" }), H.gangCorr, "linha 4: gânglios + calretinina esparsa");
+eq(A({ gang: "pres", cal: "pres", nerv: true }), H.gangCorr, "linha 4: gânglios + nervos hipertróficos");
+eq(A({ gang: "duv", cal: "aus", ctrl: true }), H.duv, "linha 5: gânglios duvidosos");
+eq(A({ gang: "nao", cal: "aus", ctrl: true }), H.agang, "linha 6: aganglionose");
+eq(A({ gang: "nao", cal: "aus", ctrl: true, nerv: true }), H.agang, "linha 6: aganglionose com nervos");
+eq(A({ gang: "nao", cal: "pres" }), H.inconc, "linha 7: calretinina preservada");
+eq(A({ gang: "nao", cal: "esp" }), H.inconc, "linha 7: calretinina esparsa");
+eq(A({ gang: "nao", cal: "sub" }), H.inconc, "linha 7: só em nervos submucosos");
+eq(A({ gang: "nao" }), H.pend, "linha 8: calretinina não realizada");
+eq(A({ gang: "nao", cal: "aus", ctrl: false }), H.pend, "linha 8: calretinina ausente sem controle interno");
+eq(A({}), null, "sem dado de células ganglionares não há título");
+for (const k of Object.keys(H)) eq(t.lineKind("- " + H[k] + ":"), "b", "título reconhecido: " + k);
+const hsSite = t.SEED_SITES.hirschsprung;
+eq(hsSite.segmentos.length, 5, "tipos de espécime");
+for (const p of hsSite.presets) {
+  const corpo = t.presetText(p), esp = t.hsTitulo(t.hsAchados(corpo)) || t.hsTituloPeca(corpo);
+  if (esp && /^(BIÓPSIA RETAL|CÉLULAS GANGLIONARES PRESENTES|AGANGLIONOSE EM BIÓPSIA RETAL|DOENÇA DE HIRSCHSPRUNG:)/.test(p.titulo)) eq(p.titulo, esp, "texto pronto coerente com a regra: " + p.titulo.slice(0, 40));
+  eq(t.lineKind("- " + p.titulo + ":"), "b", "título do texto pronto em negrito: " + p.titulo.slice(0, 40));
+}
+ok(hsSite.presets.filter(p => t.hsTitulo(t.hsAchados(t.presetText(p)))).length >= 6, "textos prontos da biópsia cobertos pela regra");
+const peca = "- X:\n- Segmento aganglionar: 8 cm.\n";
+eq(t.hsTituloPeca(peca + "- " + t.HS_L.margS), "DOENÇA DE HIRSCHSPRUNG: SEGMENTO AGANGLIONAR DE 8 CM; MARGEM PROXIMAL SEM ACHADOS DE ZONA DE TRANSIÇÃO", "peça com margem livre");
+eq(t.hsTituloPeca(peca + "- Margem proximal: Achados de zona de transição presentes: Hipoganglionose mioentérica (1/8 ou mais da circunferência)."), "DOENÇA DE HIRSCHSPRUNG: SEGMENTO AGANGLIONAR DE PELO MENOS 8 CM; MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO (VIDE NOTA)", "peça com zona de transição na margem");
+eq(t.hsTituloPeca(peca), null, "peça sem dado de margem: sem título automático");
+// editor: título nasce e acompanha os achados
+els.fSitio.value = "hirschsprung"; els.fSeg.value = "Biópsia retal por sucção"; els.corpo.value = "";
+const hc = (g, i) => hsSite.criterios.find(c => c.g === g).opt[i][1];
+t.appendLine(hc("Biópsia: adequação", 0));
+eq(els.corpo.value.split("\n").filter(l => t.lineKind(l) === "b").length, 0, "sem células ganglionares informadas ainda não há título");
+t.appendLine(hc("Células ganglionares submucosas", 2));
+ok(els.corpo.value.startsWith("- " + H.pend + ":"), "sem calretinina: estudo complementar pendente");
+t.appendLine(hc("Calretinina", 3));
+ok(els.corpo.value.startsWith("- " + H.pend + ":"), "calretinina ausente sem controle: continua pendente");
+t.appendLine(hc("Calretinina: controle interno positivo", 0));
+ok(els.corpo.value.startsWith("- " + H.agang + ":"), "com controle interno: aganglionose");
+t.appendLine(hc("Calretinina", 0));
+ok(els.corpo.value.startsWith("- " + H.inconc + ":"), "calretinina preservada: inconclusiva");
+eq(els.corpo.value.split("\n").filter(l => /^- Calretinina: /.test(l)).length, 1, "linha da calretinina é trocada, não duplicada");
+t.appendLine(hc("Células ganglionares submucosas", 0));
+ok(els.corpo.value.startsWith("- " + H.gang + ":"), "gânglios presentes");
+t.appendLine(hc("Nervos submucosos hipertróficos", 1));
+ok(els.corpo.value.startsWith("- " + H.gangCorr + ":"), "gânglios + nervos hipertróficos: a correlacionar");
+// notas, referências e alertas no laudo
+const agCorpo = t.presetText(hsSite.presets.find(p => p.titulo === H.agang));
+t.WORK.samples.push({ nome: "Biópsia retal", corpo: agCorpo, site: "hirschsprung", seg: "Biópsia retal por sucção" });
+const lh = t.buildLaudo();
+ok(lh.includes("- Amostra A: o diagnóstico de doença de Hirschsprung e a extensão do segmento aganglionar dependem"), "nota automática da aganglionose");
+ok(lh.includes(t.CITE.ernica) && lh.includes(t.CITE.veras) && !/\[@/.test(lh), "referências de Hirschsprung numeradas");
+eq(t.alertas().length, 0, "aganglionose com amostragem informada: sem alerta");
+t.WORK.samples[0].corpo = agCorpo.split("\n").filter(l => !/níveis de corte/.test(l)).join("\n") + "\n- Contexto informado: trissomia 21.\n- Contexto informado: idade maior que 1 ano.\n- Nível informado: 1 cm acima da linha pectínea.";
+eq(t.alertas().length, 4, "alertas: amostragem incompleta, trissomia 21, nervo após 1 ano, biópsia baixa");
+t.WORK.samples[0].corpo = agCorpo.replace(t.HS_L.calA, t.HS_L.calP);
+ok(t.alertas().some(a => /não corresponde aos achados/.test(a.msg)), "alerta quando o título salvo diverge dos achados");
+t.WORK.samples[0].corpo = t.presetText(hsSite.presets.find(p => p.titulo === H.inconc));
+ok(/calretinina: achados conflitantes/.test(t.buildLaudo()) && t.buildLaudo().includes(t.CITE.kapur14), "nota e referência da inconclusiva");
+t.WORK.samples[0] = { nome: "Retossigmoide", corpo: "- DOENÇA DE HIRSCHSPRUNG: SEGMENTO AGANGLIONAR DE PELO MENOS 8 CM; MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO (VIDE NOTA):\n- Segmento aganglionar: 8 cm.", site: "hirschsprung", seg: "Peça de abaixamento" };
+ok(/o comprimento informado do segmento aganglionar é um mínimo/.test(t.buildLaudo()) && t.buildLaudo().includes(t.CITE.kapur25), "nota da margem com zona de transição");
+ok(!JSON.stringify(hsSite).match(/Teitelbaum|grau [IV]+/), "enterocolite sem graus (artigo ainda não conferido)");
+els.fSitio.value = "hirschsprung"; els.fSeg.value = "Peça de abaixamento"; els.fSeg.onchange();
+eq(els.fNome.value, "Produto de abaixamento de retossigmoide", "nome padrão da peça");
+els.fSeg.value = "Biópsia retal por sucção"; els.fSeg.onchange();
+eq(els.fNome.value, "Biópsia retal", "nome padrão da biópsia");
 
 console.log(`OK — ${n} asserts`);
