@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_T,HS_L,hsTitulo,hsAchados,hsTituloPeca,hsNotas,hsAlertas};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_T,HS_L,hsTitulo,hsAchados,hsTituloPeca,hsNotas,hsAlertas,hsGrupos};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -500,5 +500,13 @@ els.fSitio.value = "hirschsprung"; els.fSeg.value = "Peça de abaixamento"; els.
 eq(els.fNome.value, "Produto de abaixamento de retossigmoide", "nome padrão da peça");
 els.fSeg.value = "Biópsia retal por sucção"; els.fSeg.onchange();
 eq(els.fNome.value, "Biópsia retal", "nome padrão da biópsia");
+const gr = (seg) => t.hsGrupos(hsSite, seg).map(c => c.g);
+ok(hsSite.criterios.every(c => Array.isArray(c.esp) && c.esp.length), "todo grupo tem tipo de espécime");
+eq(gr("").length, hsSite.criterios.length, "sem tipo escolhido: todos os grupos");
+ok(gr("Biópsia retal por sucção").every(g => !/^(Peça|Reoperação|Congelação|Biópsia incisional|Margem)/.test(g)) && gr("Biópsia retal por sucção").some(g => /^Calretinina$/.test(g)), "sucção: só grupos da biópsia");
+ok(gr("Biópsia retal incisional (espessura total)").some(g => /^Biópsia incisional: gânglios mioentéricos/.test(g)), "incisional: inclui plexo mioentérico");
+eq(gr("Congelação / nivelamento").join(" | "), hsSite.criterios.filter(c => /^(Congelação|Margem proximal)/.test(c.g)).map(c => c.g).join(" | "), "congelação: nivelamento e margem");
+ok(gr("Peça de abaixamento").every(g => /^(Peça|Margem proximal|Outras alterações)/.test(g)) && gr("Peça de abaixamento").some(g => /segmento aganglionar/.test(g)), "peça: grupos da peça");
+ok(gr("Rebiopsia / reoperação").some(g => /^Reoperação: técnica prévia/.test(g)) && gr("Rebiopsia / reoperação").some(g => /^Células ganglionares/.test(g)) && !gr("Rebiopsia / reoperação").some(g => /^Peça/.test(g)), "rebiopsia: grupos próprios");
 
 console.log(`OK — ${n} asserts`);

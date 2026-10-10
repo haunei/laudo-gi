@@ -878,6 +878,12 @@ SEED_SITES.hirschsprung = {
   ]
 };
 
+// Hirschsprung: cada grupo de achados aparece só nos tipos de espécime a que se aplica (índices de `segmentos`: 0 sucção, 1 incisional, 2 congelação, 3 peça, 4 rebiopsia)
+const HS_ESP = [[/^Biópsia: /,[0,1]], [/^Biópsia incisional: /,[1,4]], [/^(Células ganglionares submucosas|Nervos submucosos|Calretinina|Contexto clínico)/,[0,1,4]],
+  [/^Outras alterações/,[0,1,3,4]], [/^Congelação: /,[2]], [/^Margem proximal/,[2,3,4]], [/^Peça: /,[3]], [/^Reoperação: /,[4]]];
+SEED_SITES.hirschsprung.criterios.forEach(c=>{ const m=HS_ESP.filter(([re])=>re.test(c.g)).pop(); c.esp=m[1]; });
+function hsGrupos(site, seg){ const i=site.segmentos.indexOf(seg); return i<0 ? site.criterios : site.criterios.filter(c=>c.esp.includes(i)); }
+
 // NOTAS padrão do SEED (tag ≤20 char + texto)
 const NOTAS_PADRAO = [
   {tag:"Inespecífico", texto:"Os quadros histológicos descritos das amostras examinadas são discretos e inespecíficos."},
@@ -1656,7 +1662,7 @@ function juntar(a){ return a.length<2 ? a.join("") : a.slice(0,-1).join(", ")+" 
 function renderCrit(){
   const site=currentSite();
   const box=$("critBox"); box.innerHTML="";
-  const grupos=(site.criterios||[]).slice();
+  const grupos=(site.id==="hirschsprung" ? hsGrupos(site, $("fSeg").value) : (site.criterios||[])).slice();
   if(["ileo","colon","reto"].includes(site.id)) grupos.unshift({g:"Atividade: criptas com criptite ou abscesso", ativ:true, dica:"Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada. Insere a linha e ajusta o título."});
   if(!grupos.length){ box.innerHTML='<p class="hint">Nenhum critério para este sítio.</p>'; return; }
   const mkb=(par, label, fn, cls)=>{ const b=document.createElement("button"); b.type="button"; b.innerHTML=fmtInline(label); if(cls) b.className=cls; b.onclick=()=>fn(b); par.appendChild(b); return b; };
@@ -1889,7 +1895,7 @@ $("btnLimparTudo").onclick=()=>{
 
 /* ============================ EVENTOS ============================ */
 $("fSitio").onchange=onSiteChange;
-$("fSeg").onchange=applyDefaultName;
+$("fSeg").onchange=()=>{ applyDefaultName(); if($("fSitio").value==="hirschsprung") renderCrit(); };
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
 $("notas").oninput=()=>{ WORK.notasFree=$("notas").value; save(); renderLaudo(); };
 $("notas").onchange=()=>{ if(corrigeCampo("notas")){ WORK.notasFree=$("notas").value; save(); renderLaudo(); } };
