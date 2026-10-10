@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_T,HS_L,hsTitulo,hsAchados,hsTituloPeca,hsNotas,hsAlertas,hsGrupos};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_T,HS_L,hsTitulo,hsAchados,hsTituloPeca,hsNotas,hsAlertas,hsGrupos,hsTextos};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -500,6 +500,14 @@ els.fSitio.value = "hirschsprung"; els.fSeg.value = "Peça de abaixamento"; els.
 eq(els.fNome.value, "Produto de abaixamento de retossigmoide", "nome padrão da peça");
 els.fSeg.value = "Biópsia retal por sucção"; els.fSeg.onchange();
 eq(els.fNome.value, "Biópsia retal", "nome padrão da biópsia");
+const tx = (seg) => t.hsTextos(hsSite, seg).map(p => p.titulo);
+eq(tx("").length, hsSite.presets.length, "sem tipo escolhido: todos os textos prontos");
+eq(tx("Biópsia retal por sucção").length, 6, "sucção: 6 textos da biópsia"); eq(tx("Biópsia retal incisional (espessura total)").join(), tx("Biópsia retal por sucção").join(), "incisional: os mesmos da biópsia");
+ok(tx("Biópsia retal por sucção").every(x => /^(BIÓPSIA RETAL|CÉLULAS GANGLIONARES|AGANGLIONOSE)/.test(x)), "sucção: só títulos de biópsia");
+eq(tx("Congelação / nivelamento").join(), "EXAME INTRAOPERATÓRIO POR CONGELAÇÃO (NIVELAMENTO)", "congelação: 1 texto");
+ok(tx("Peça de abaixamento").length === 1 && /^DOENÇA DE HIRSCHSPRUNG:/.test(tx("Peça de abaixamento")[0]), "peça: 1 texto");
+ok(tx("Rebiopsia / reoperação").length === 1 && /^REBIOPSIA/.test(tx("Rebiopsia / reoperação")[0]), "rebiopsia: 1 texto");
+eq(hsSite.segmentos.reduce((n2, sg) => n2 + (sg === "Biópsia retal incisional (espessura total)" ? 0 : tx(sg).length), 0), hsSite.presets.length, "nenhum texto fica de fora");
 const gr = (seg) => t.hsGrupos(hsSite, seg).map(c => c.g);
 ok(hsSite.criterios.every(c => Array.isArray(c.esp) && c.esp.length), "todo grupo tem tipo de espécime");
 eq(gr("").length, hsSite.criterios.length, "sem tipo escolhido: todos os grupos");
