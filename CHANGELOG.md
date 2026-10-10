@@ -1,6 +1,6 @@
 # Changelog
 
-## v3.3.1 — em validação (ramo melhorias-v3.3.1, não publicado)
+## v3.3.1 — 2026-10-09
 - Hirschsprung: os textos prontos também aparecem só para o tipo de espécime escolhido.
 
 ## v3.3.0 — 2026-10-09
