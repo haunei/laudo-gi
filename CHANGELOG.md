@@ -1,7 +1,8 @@
 # Changelog
 
-## v3.3.0 — em validação (ramo melhorias-v3.3, não publicado)
+## v3.3.0 — 2026-10-09
 - Novo sítio "Hirschsprung", com quatro tipos de espécime (biópsia retal, congelação/nivelamento, peça de abaixamento, rebiopsia/reoperação): o título da biópsia e o da peça são calculados dos achados (células ganglionares, adequação, calretinina com controle interno, nervos, margem proximal); notas, referências numeradas e alertas próprios (amostragem, idade, trissomia 21, biópsia baixa, anastomose).
+- Em Hirschsprung, os achados aparecem só para o tipo de espécime escolhido. Enterocolite na peça: presente ou não identificada, sem grau (artigo de Teitelbaum 1989 não localizado).
 - Chave "Referências: com / sem" no laudo: em "sem", saem os números do texto e a lista de referências; valores de referência e notas continuam. A escolha fica gravada no rascunho e pode ser desfeita a qualquer momento.
 
 ## v3.2.0 — 2026-10-09
