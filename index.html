@@ -778,22 +778,24 @@ SEED_SITES.polipo = {
 
 // ============================ HIRSCHSPRUNG ============================
 // Fontes: Veras 2019 (laudo sinóptico APSA), ERNICA 2020, Kapur 2014/2016/2025, Guinard-Samuel 2009, Gonzalo 2013.
-// O "segmento" aqui é o tipo de espécime. O título da biópsia retal e o da peça são calculados dos achados (hsTitulo, hsTituloPeca).
-const HS_T = {
-  inad:"BIÓPSIA RETAL INADEQUADA PARA PESQUISA DE CÉLULAS GANGLIONARES",
-  inadCal:"BIÓPSIA RETAL INADEQUADA, COM AUSÊNCIA DE INERVAÇÃO MUCOSA À CALRETININA (VIDE NOTA)",
-  gang:"CÉLULAS GANGLIONARES PRESENTES: AUSÊNCIA DE AGANGLIONOSE NO NÍVEL BIOPSIADO",
-  gangCorr:"CÉLULAS GANGLIONARES PRESENTES, COM ACHADOS A CORRELACIONAR (VIDE NOTA)",
-  duv:"BIÓPSIA RETAL INCONCLUSIVA (VIDE NOTA)",
-  agang:"AGANGLIONOSE EM BIÓPSIA RETAL, COMPATÍVEL COM DOENÇA DE HIRSCHSPRUNG",
-  inconc:"BIÓPSIA RETAL INCONCLUSIVA PARA DOENÇA DE HIRSCHSPRUNG (VIDE NOTA)",
-  pend:"BIÓPSIA RETAL INCONCLUSIVA: ESTUDO COMPLEMENTAR PENDENTE (VIDE NOTA)"
-};
+// O "segmento" aqui é o tipo de espécime. O título é descritivo e tem dois itens, calculados das linhas do texto:
+// mucosa (hsTitMucosa) e pesquisa de células ganglionares por plexo (hsTitGang). A interpretação vai para a nota (hsNotas).
+const HS_CONG="Congelação / nivelamento";
+const HS_GANG = {pres:"Células ganglionares presentes", aus:"Células ganglionares ausentes", duv:"Células ganglionares duvidosas (células isoladas, de identificação incerta)"};
+const HS_SEM="Sem particularidades histológicas significativas.";
 const HS_L = {
+  muc:"Mucosa retal: "+HS_SEM,
   adeq:"Amostra adequada: mucosa colunar, com submucosa representada (critério: 3 mm ou mais, com submucosa em pelo menos 1/3 da amostra, a 2 cm ou mais da linha pectínea [@ernica]).",
-  gangP:"Células ganglionares submucosas: Presentes.",
-  gangD:"Células ganglionares submucosas: Duvidosas (células isoladas, de identificação incerta).",
-  gangN:"Células ganglionares submucosas: Não identificadas.",
+  subP:"Plexo da submucosa: "+HS_GANG.pres+".",
+  subD:"Plexo da submucosa: "+HS_GANG.duv+".",
+  subA:"Plexo da submucosa: "+HS_GANG.aus+".",
+  mpP:"Plexo da muscular própria: "+HS_GANG.pres+".",
+  mpA:"Plexo da muscular própria: "+HS_GANG.aus+".",
+  mpN:"Plexo da muscular própria: Não amostrado.",
+  mpCong:"Plexo da muscular própria: "+HS_GANG.pres+" (biópsia pontual: não exclui zona de transição [@veras]).",
+  camSub:"Submucosa: Preservada.",
+  camMp:"Muscular própria: Preservada (camadas circular interna e longitudinal externa).",
+  camSer:"Serosa/adventícia: Preservada.",
   nervA:"Nervos submucosos hipertróficos: Ausentes.",
   nervP:"Nervos submucosos hipertróficos: Presentes (mais de 2 nervos com mais de 40 µm de espessura no mesmo campo de grande aumento [@veras]).",
   calP:"Calretinina: Inervação mucosa preservada (neuritos imunorreativos em lâmina própria e muscular da mucosa).",
@@ -808,60 +810,121 @@ const HS_L = {
 };
 const HS_NOME = {"Congelação / nivelamento":"Biópsias de nivelamento (congelação)","Peça de abaixamento":"Produto de abaixamento de retossigmoide","Rebiopsia / reoperação":"Biópsia retal pós-abaixamento"};
 const HS_AMOSTRAGEM = ["Fragmentos examinados: 3.","Examinados 10 níveis de corte.","Bloco esgotado: Sim."];
+
+// lê os achados nas linhas do bloco (texto é a fonte da verdade); aceita também as linhas da v3.3
+function hsAchados(corpo){
+  const t=corpo||"", tem=re=>re.test(t);
+  const g=re=>{ const m=t.match(re); return !m ? null : /^p/i.test(m[1]) ? "pres" : /^d/i.test(m[1]) ? "duv" : "aus"; };
+  const sub=g(/^- (?:Plexo da submucosa: Células ganglionares|Células ganglionares submucosas:) (presentes|duvidosas|ausentes|Presentes|Duvidosas|Não identificadas)/m);
+  const mp=g(/^- (?:Plexo da muscular própria: Células ganglionares|Gânglios mioentéricos:) (presentes|duvidosas|ausentes|Presentes|Não identificados)/m);
+  const est=[sub,mp].filter(Boolean);
+  return {
+    adeq: tem(/^- Amostra inadequada/m) ? "inad" : tem(/^- Amostra adequada/m) ? "ok" : null,
+    sub, mp,
+    gang: !est.length ? null : est.includes("duv") ? "duv" : est.every(x=>x==="pres") ? "pres" : est.every(x=>x==="aus") ? "nao" : "misto",
+    nerv: tem(/^- Nervos submucosos hipertróficos: Presentes/m),
+    cal: tem(/^- Calretinina: Ausência/m) ? "aus" : tem(/^- Calretinina: Inervação mucosa esparsa/m) ? "esp" : tem(/^- Calretinina: Imunorreatividade restrita/m) ? "sub" : tem(/^- Calretinina: Inervação mucosa preservada/m) ? "pres" : null,
+    ctrl: tem(/^- Controle interno da calretinina: Presente/m),
+    amostragem: tem(/níveis de corte/) && tem(/^- Bloco esgotado: /m) && tem(/^- Fragmentos examinados: /m)
+  };
+}
+// tabela de decisão aprovada (8 linhas + plexos divergentes): devolve a chave da interpretação, que escolhe a nota; null = sem dado de células ganglionares
+function hsEstado(a){
+  if(a.gang==="pres") return (a.nerv || ["aus","esp","sub"].includes(a.cal)) ? "gangCorr" : "gang";
+  if(a.gang==="duv") return "duv";
+  if(a.gang==="misto") return "misto";
+  if(a.gang!=="nao") return null;
+  if(a.adeq==="inad") return a.cal==="aus" ? "inadCal" : "inad";
+  if(a.cal==="aus") return a.ctrl ? "agang" : "pend";
+  if(a.cal) return "inconc";
+  return "pend";
+}
+function hsReop(corpo){ return /^- (Técnica prévia informada|Nível da amostra): /m.test(corpo||""); }
+// título, item 1: rótulo + valor da linha da mucosa
+function hsTitMucosa(corpo){
+  const m=(corpo||"").match(/^- (Mucosa[^:\n]*): (.+)$/m); if(!m) return null;
+  return (m[1]+" "+m[2].replace(/ ?\[@[^\]]*\]/g,"").replace(/\.\s*$/,"")).toUpperCase();
+}
+// título, item 2: presentes/ausentes e em que plexo; na peça, pelo segmento aganglionar e pela margem proximal
+const HS_LOC = {sub:"DA SUBMUCOSA", mp:"DA MUSCULAR PRÓPRIA"}, HS_EST = {pres:"PRESENTES", aus:"AUSENTES", duv:"DUVIDOSA"};
+function hsTitGang(corpo, cong){
+  const t=corpo||"", P0="PESQUISA PARA CÉLULAS GANGLIONARES", seg=t.match(/^- Segmento aganglionar: ([\d.,]+) cm\./m);
+  if(seg){
+    const zt=/^- Margem proximal: Achados de zona de transição presentes: /m.test(t), ag=/^- Margem proximal: Aganglionar/m.test(t);
+    const base=P0+": AUSENTES NOS PLEXOS NEURAIS DA SUBMUCOSA E DA MUSCULAR PRÓPRIA NO SEGMENTO DISTAL DE ";
+    if(zt || ag) return base+"PELO MENOS "+seg[1]+" CM; "+(zt ? "MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO" : "AUSENTES NA MARGEM PROXIMAL")+" (VIDE NOTA)";
+    return /^- Margem proximal: Sem achados/m.test(t) ? base+seg[1]+" CM; PRESENTES NA MARGEM PROXIMAL" : null;
+  }
+  const a=hsAchados(t), grupos=[];
+  ["sub","mp"].forEach(k=>{ if(!a[k]) return; const g=grupos.find(x=>x.e===a[k]); if(g) g.l.push(k); else grupos.push({e:a[k], l:[k]}); });
+  if(!grupos.length) return null;
+  const onde=grupos.map((g,i)=>HS_EST[g.e]+(i ? " NOS " : " NOS PLEXOS NEURAIS ")+g.l.map(k=>HS_LOC[k]).join(" E ")).join(" E ");
+  const nota=!cong && !hsReop(t) && !["gang","agang"].includes(hsEstado(a));
+  return P0+(cong ? " (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO)" : "")+": "+onde+(nota ? " (VIDE NOTA)" : "");
+}
+// texto pronto de Hirschsprung: os dois itens do título saem das próprias linhas; rot = rótulo curto do botão; esp = tipos de espécime
+function HP(rot, esp, bullets){
+  const corpo=bullets.map(b=>"- "+b).join(L);
+  return {titulo:[hsTitMucosa(corpo), hsTitGang(corpo, esp[0]===2)].filter(Boolean).join(":"+L+"- "), bullets, rot, esp};
+}
+const HS_BX = ["Biópsia retal por sucção.", HS_L.muc, HS_L.adeq].concat(HS_AMOSTRAGEM);
 SEED_SITES.hirschsprung = {
   nome:"Hirschsprung", nomeAmostra:"Biópsia retal", eos:"",
   segmentos:["Biópsia retal por sucção","Biópsia retal incisional (espessura total)","Congelação / nivelamento","Peça de abaixamento","Rebiopsia / reoperação"],
   presets:[
-    P(HS_T.gang,["Biópsia retal por sucção.", HS_L.adeq].concat(HS_AMOSTRAGEM,[HS_L.gangP, HS_L.nervA, HS_L.calP, HS_L.ctrlP])),
-    P(HS_T.agang,["Biópsia retal por sucção.", HS_L.adeq].concat(HS_AMOSTRAGEM,[HS_L.gangN, HS_L.nervP, HS_L.calA, HS_L.ctrlP])),
-    P(HS_T.inconc,["Biópsia retal por sucção.", HS_L.adeq].concat(HS_AMOSTRAGEM,[HS_L.gangN, HS_L.nervA, HS_L.calP, HS_L.ctrlP])),
-    P(HS_T.pend,["Biópsia retal por sucção.", HS_L.adeq].concat(HS_AMOSTRAGEM,[HS_L.gangN, HS_L.nervA, HS_L.calN])),
-    P(HS_T.gangCorr,["Biópsia retal por sucção.", HS_L.adeq].concat(HS_AMOSTRAGEM,[HS_L.gangP, HS_L.nervP, HS_L.calE, HS_L.ctrlP])),
-    P(HS_T.inad,["Biópsia retal por sucção.","Amostra inadequada: Mucosa escamosa ou transicional, indicando biópsia baixa.", HS_L.gangN, HS_L.calN]),
-    P("EXAME INTRAOPERATÓRIO POR CONGELAÇÃO (NIVELAMENTO)",[
-      "Células ganglionares presentes na biópsia de nivelamento (biópsia pontual: não exclui zona de transição [@veras]).",
-      HS_L.margS]),
-    P("DOENÇA DE HIRSCHSPRUNG: SEGMENTO AGANGLIONAR DE 8 CM; MARGEM PROXIMAL SEM ACHADOS DE ZONA DE TRANSIÇÃO",[
-      "Espécime: Retossigmoide.","Técnica informada: Soave.","Comprimento do espécime: 20 cm.","Segmento aganglionar: 8 cm.",
-      "Intestino ganglionado ressecado: 12 cm.","Margem distal: Aganglionar.", HS_L.margS,
+    HP("Células ganglionares presentes",[0,1],HS_BX.concat([HS_L.subP, HS_L.nervA, HS_L.calP, HS_L.ctrlP])),
+    HP("Células ganglionares ausentes, calretinina ausente",[0,1],HS_BX.concat([HS_L.subA, HS_L.nervP, HS_L.calA, HS_L.ctrlP])),
+    HP("Células ganglionares ausentes, calretinina preservada",[0,1],HS_BX.concat([HS_L.subA, HS_L.nervA, HS_L.calP, HS_L.ctrlP])),
+    HP("Células ganglionares ausentes, calretinina não realizada",[0,1],HS_BX.concat([HS_L.subA, HS_L.nervA, HS_L.calN])),
+    HP("Células ganglionares presentes, com achados a correlacionar",[0,1],HS_BX.concat([HS_L.subP, HS_L.nervP, HS_L.calE, HS_L.ctrlP])),
+    HP("Amostra inadequada",[0,1],["Biópsia retal por sucção.","Amostra inadequada: Mucosa escamosa ou transicional, indicando biópsia baixa.", HS_L.subA, HS_L.calN]),
+    HP("Congelação: células ganglionares presentes",[2],[HS_L.mpCong, HS_L.margS]),
+    HP("Peça: segmento aganglionar, margem proximal sem zona de transição",[3],[
+      "Espécime: Retossigmoide.","Técnica informada: Soave.","Comprimento do espécime: 20 cm.",
+      HS_L.muc, HS_L.camSub, HS_L.camMp, HS_L.camSer,
+      "Segmento aganglionar: 8 cm.","Intestino ganglionado ressecado: 12 cm.","Margem distal: Aganglionar.", HS_L.margS,
       "Enterocolite: Não identificada.","Áreas saltadas: Não identificadas.","Ganglioneuromas: Não identificados."]),
-    P("REBIOPSIA APÓS ABAIXAMENTO: INTESTINO ACIMA DA ANASTOMOSE SEM ACHADOS DE ZONA DE TRANSIÇÃO",[
-      "Técnica prévia informada: Soave.","Nível da amostra: Acima da anastomose.", HS_L.gangP,
+    HP("Rebiopsia: acima da anastomose, sem zona de transição",[4],[
+      "Técnica prévia informada: Soave.","Nível da amostra: Acima da anastomose.", HS_L.muc, HS_L.subP,
       "Intestino acima da anastomose: Sem achados de zona de transição.",
       "Reto nativo aganglionar abaixo da anastomose: Não amostrado."])
   ],
   criterios:[
     {g:"Biópsia: tipo", opt:[["Sucção","- Biópsia retal por sucção."],["Incisional (espessura total)","- Biópsia retal incisional, de espessura total."]]},
+    {g:"Mucosa", dica:"Primeiro item do título. Sem particularidades de praxe; se houver alteração, edite a linha e o título acompanha (e vice-versa).",
+      opt:[["Retal","- "+HS_L.muc],["De cólon sigmoide","- Mucosa de cólon sigmoide: "+HS_SEM],["De cólon proximal","- Mucosa de cólon proximal: "+HS_SEM]]},
     {g:"Biópsia: nível (cm acima da linha pectínea)", dica:"Abaixo de 2 cm a zona é fisiologicamente pobre em gânglios (ERNICA 2020).",
       num:{tpl:"- Nível informado: {n} cm acima da linha pectínea.", btn:"inserir"}},
     {g:"Biópsia: adequação", dica:"Adequada: 3 mm ou mais, submucosa em pelo menos 1/3, a 2 cm ou mais da linha pectínea (ERNICA 2020). Inadequada: marque os motivos.",
       opt:[["Adequada","- "+HS_L.adeq]],
       stack:{pre:"- Amostra inadequada: ", itens:[["submucosa insuficiente","submucosa insuficiente"],["mucosa escamosa/transicional","mucosa escamosa ou transicional, indicando biópsia baixa"],["esmagamento","artefato de esmagamento"]]}},
     {g:"Biópsia: fragmentos examinados", num:{tpl:"- Fragmentos examinados: {n}.", btn:"inserir"}},
-    {g:"Biópsia: níveis de corte", dica:"Obrigatório para o título de aganglionose.", num:{tpl:"- Examinados {n} níveis de corte.", btn:"inserir"}},
+    {g:"Biópsia: níveis de corte", dica:"Obrigatório quando as células ganglionares estão ausentes.", num:{tpl:"- Examinados {n} níveis de corte.", btn:"inserir"}},
     {g:"Biópsia: bloco esgotado", opt:[["Sim","- Bloco esgotado: Sim."],["Não","- Bloco esgotado: Não."]]},
-    {g:"Células ganglionares submucosas", opt:[["Presentes (definidas)","- "+HS_L.gangP],["Duvidosas","- "+HS_L.gangD],["Não identificadas","- "+HS_L.gangN]]},
+    {g:"Células ganglionares: plexo da submucosa", dica:"Segundo item do título: presentes ou ausentes, e em que plexo.",
+      opt:[["Presentes","- "+HS_L.subP],["Duvidosas","- "+HS_L.subD],["Ausentes","- "+HS_L.subA]]},
+    {g:"Células ganglionares: plexo da muscular própria", opt:[["Presentes","- "+HS_L.mpP],["Ausentes","- "+HS_L.mpA],["Não amostrado","- "+HS_L.mpN]]},
     {g:"Nervos submucosos hipertróficos", dica:"Depois de 1 ano de idade, nervo acima de 40 µm é normal no reto distal (Kapur 2016): não usar como critério isolado.",
       opt:[["Ausentes","- "+HS_L.nervA],["Presentes","- "+HS_L.nervP]]},
     {g:"Calretinina", dica:"Só \"ausente\", com controle interno positivo, sustenta aganglionose. Presente não exclui segmento muito curto (Kapur 2014).",
       opt:[["Preservada","- "+HS_L.calP],["Esparsa ou fraca","- "+HS_L.calE],["Só em nervos submucosos","- "+HS_L.calS],["Ausente","- "+HS_L.calA],["Não realizada","- "+HS_L.calN]]},
     {g:"Calretinina: controle interno positivo", opt:[["Presente","- "+HS_L.ctrlP],["Ausente","- "+HS_L.ctrlA]]},
-    {g:"Biópsia incisional: muscular própria e plexo mioentérico", opt:[["Amostrados","- Muscular própria e plexo mioentérico: Amostrados."],["Não amostrados","- Muscular própria e plexo mioentérico: Não amostrados."]]},
-    {g:"Biópsia incisional: gânglios mioentéricos", opt:[["Presentes","- Gânglios mioentéricos: Presentes."],["Não identificados","- Gânglios mioentéricos: Não identificados."]]},
     {g:"Outras alterações", opt:[["Gânglios imaturos","- Células ganglionares de aspecto imaturo."],["Hipoganglionose","- Hipoganglionose (células ganglionares esparsas)."],["Colite ativa","- Presença de colite ativa."]]},
     {g:"Contexto clínico (gera alerta)", opt:[["Trissomia 21","- Contexto informado: trissomia 21."],["Mais de 1 ano de idade","- Contexto informado: idade maior que 1 ano."],["Menos de 3 semanas de vida","- Contexto informado: menos de 3 semanas de vida."]]},
-    {g:"Congelação: biópsia de nivelamento (uma linha por biópsia; acrescente o sítio)", dica:"Adequada: mais de 3 mm de parede, com as duas camadas da muscular própria (Veras 2019).",
-      opt:[["Gânglios presentes","- Células ganglionares presentes na biópsia de nivelamento (biópsia pontual: não exclui zona de transição [@veras])."],
-        ["Gânglios ausentes","- Células ganglionares ausentes na biópsia de nivelamento."],
+    {g:"Congelação: biópsia de nivelamento", dica:"Uma amostra por biópsia (o sítio vai no nome da amostra). Adequada: mais de 3 mm de parede, com as duas camadas da muscular própria (Veras 2019).",
+      opt:[["Células ganglionares presentes","- "+HS_L.mpCong],
+        ["Células ganglionares ausentes","- "+HS_L.mpA],
         ["Inadequada","- Biópsia de nivelamento inadequada/insuficiente (adequada: mais de 3 mm de parede, com as duas camadas da muscular própria [@veras])."]]},
-    {g:"Margem proximal (circunferência completa)", dica:"Na peça, a margem define o título. Marque os achados de zona de transição presentes e clique em inserir.",
+    {g:"Margem proximal (circunferência completa)", dica:"Na peça, a margem entra no título. Marque os achados de zona de transição presentes e clique em inserir.",
       opt:[["Sem achados de zona de transição","- "+HS_L.margS]],
       stack:{pre:"- "+HS_L.margPre, itens:[["aganglionose parcial","aganglionose parcial circunferencial (1/8 ou mais da circunferência)"],
         ["hipoganglionose mioentérica","hipoganglionose mioentérica (1/8 ou mais da circunferência)"],
         ["nervos hipertróficos","hipertrofia de nervos submucosos (mais de 2 nervos com mais de 40 µm por campo)"]]}},
     {g:"Peça: técnica", opt:[["Soave","- Técnica informada: Soave."],["Swenson","- Técnica informada: Swenson."],["Duhamel","- Técnica informada: Duhamel."]]},
     {g:"Peça: comprimento do espécime (cm)", num:{tpl:"- Comprimento do espécime: {n} cm.", btn:"inserir"}},
-    {g:"Peça: segmento aganglionar (cm)", dica:"Define o título da peça.", num:{tpl:"- Segmento aganglionar: {n} cm.", btn:"inserir"}},
+    {g:"Peça: camadas da parede", dica:"Preservadas de praxe, uma linha por camada (a mucosa está no grupo \"Mucosa\"). Se houver alteração, edite a linha e ajuste o título.",
+      opt:[["Submucosa preservada","- "+HS_L.camSub],["Muscular própria preservada","- "+HS_L.camMp],["Serosa/adventícia preservada","- "+HS_L.camSer]]},
+    {g:"Peça: segmento aganglionar (cm)", dica:"Entra no título da peça.", num:{tpl:"- Segmento aganglionar: {n} cm.", btn:"inserir"}},
     {g:"Peça: intestino ganglionado ressecado (cm)", num:{tpl:"- Intestino ganglionado ressecado: {n} cm.", btn:"inserir"}},
     {g:"Peça: margem distal", opt:[["Aganglionar","- Margem distal: Aganglionar."],["Ganglionada","- Margem distal: Ganglionada."]]},
     {g:"Peça: enterocolite", opt:[["Não identificada","- Enterocolite: Não identificada."],["Presente","- Enterocolite: Presente."]]},
@@ -879,10 +942,9 @@ SEED_SITES.hirschsprung = {
 };
 
 // Hirschsprung: cada grupo de achados aparece só nos tipos de espécime a que se aplica (índices de `segmentos`: 0 sucção, 1 incisional, 2 congelação, 3 peça, 4 rebiopsia)
-const HS_ESP = [[/^Biópsia: /,[0,1]], [/^Biópsia incisional: /,[1,4]], [/^(Células ganglionares submucosas|Nervos submucosos|Calretinina|Contexto clínico)/,[0,1,4]],
-  [/^Outras alterações/,[0,1,3,4]], [/^Congelação: /,[2]], [/^Margem proximal/,[2,3,4]], [/^Peça: /,[3]], [/^Reoperação: /,[4]]];
+const HS_ESP = [[/^Biópsia: /,[0,1]], [/^Mucosa$/,[0,1,3,4]], [/^(Células ganglionares: plexo da submucosa|Nervos submucosos|Calretinina|Contexto clínico)/,[0,1,4]],
+  [/^Células ganglionares: plexo da muscular/,[1,4]], [/^Outras alterações/,[0,1,3,4]], [/^Congelação: /,[2]], [/^Margem proximal/,[2,3,4]], [/^Peça: /,[3]], [/^Reoperação: /,[4]]];
 SEED_SITES.hirschsprung.criterios.forEach(c=>{ const m=HS_ESP.filter(([re])=>re.test(c.g)).pop(); c.esp=m[1]; });
-SEED_SITES.hirschsprung.presets.forEach(p=>{ p.esp = /^EXAME INTRAOPERATÓRIO/.test(p.titulo) ? [2] : /^DOENÇA DE HIRSCHSPRUNG:/.test(p.titulo) ? [3] : /^REBIOPSIA/.test(p.titulo) ? [4] : [0,1]; });
 function hsTextos(site, seg){ const i=site.segmentos.indexOf(seg); return i<0 ? site.presets : site.presets.filter(p=>p.esp.includes(i)); }
 function hsGrupos(site, seg){ const i=site.segmentos.indexOf(seg); return i<0 ? site.criterios : site.criterios.filter(c=>c.esp.includes(i)); }
 
@@ -989,7 +1051,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.3.1";
+const APP_VERSION="3.4.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1104,7 +1166,7 @@ function vr(text){
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
-  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/];
+  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /];
 function setLinha(line){
   const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [];
   let start=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
@@ -1124,76 +1186,109 @@ function appendLine(line){
 function appendBlock(block){
   const ta=$("corpo"); let v=ta.value.trim();
   ta.value = v ? v+"\n \n"+vr(block) : vr(block);
-  prevTit=ultimoTitulo(ta.value);
+  prevTit=ultimoTitulo(ta.value); hsPrev=hsBloco(ta.value).tits.join("\n");
   ta.focus(); ta.scrollTop = ta.scrollHeight;
 }
 
-/* ============================ HIRSCHSPRUNG: título pelos achados ============================ */
-// lê os achados nas linhas do bloco (texto é a fonte da verdade)
-function hsAchados(corpo){
-  const t=corpo||"", tem=re=>re.test(t);
-  return {
-    adeq: tem(/^- Amostra inadequada/m) ? "inad" : tem(/^- Amostra adequada/m) ? "ok" : null,
-    gang: tem(/^- Células ganglionares submucosas: Presentes/m) ? "pres" : tem(/^- Células ganglionares submucosas: Duvidosas/m) ? "duv" : tem(/^- Células ganglionares submucosas: Não identificadas/m) ? "nao" : null,
-    nerv: tem(/^- Nervos submucosos hipertróficos: Presentes/m),
-    cal: tem(/^- Calretinina: Ausência/m) ? "aus" : tem(/^- Calretinina: Inervação mucosa esparsa/m) ? "esp" : tem(/^- Calretinina: Imunorreatividade restrita/m) ? "sub" : tem(/^- Calretinina: Inervação mucosa preservada/m) ? "pres" : null,
-    ctrl: tem(/^- Controle interno da calretinina: Presente/m),
-    amostragem: tem(/níveis de corte/) && tem(/^- Bloco esgotado: /m) && tem(/^- Fragmentos examinados: /m)
-  };
+/* ============================ HIRSCHSPRUNG: título <-> achados, notas, alertas ============================ */
+// títulos de Hirschsprung que o app reconhece e pode trocar (os da v3.3 entram para rascunho salvo ser convertido); título digitado com outra redação fica
+const HS_RE_MUC=/^- MUCOSA /, HS_RE_PESQ=/^- PESQUISA PARA CÉLULAS GANGLIONARES/,
+  HS_RE_GANG=/^- (PESQUISA PARA CÉLULAS GANGLIONARES|BIÓPSIA RETAL|CÉLULAS GANGLIONARES PRESENTES|AGANGLIONOSE EM BIÓPSIA RETAL|DOENÇA DE HIRSCHSPRUNG:|EXAME INTRAOPERATÓRIO POR CONGELAÇÃO|REBIOPSIA APÓS ABAIXAMENTO)/;
+let hsPrev="";
+// bloco em edição: as linhas de título seguidas (ini..end) e o que vem depois delas
+function hsBloco(v){
+  const ls=(v||"").split("\n"); let end=-1;
+  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ end=i; break; }
+  let ini=end; while(ini>0 && lineKind(ls[ini-1])==="b") ini--;
+  return {ls, ini, end, tits: end<0 ? [] : ls.slice(ini, end+1)};
 }
-// tabela de decisão aprovada (8 linhas); null = ainda não há dado de células ganglionares
-function hsTitulo(a){
-  if(a.gang==="pres") return (a.nerv || ["aus","esp","sub"].includes(a.cal)) ? HS_T.gangCorr : HS_T.gang;
-  if(a.gang==="duv") return HS_T.duv;
-  if(a.gang!=="nao") return null;
-  if(a.adeq==="inad") return a.cal==="aus" ? HS_T.inadCal : HS_T.inad;
-  if(a.cal==="aus") return a.ctrl ? HS_T.agang : HS_T.pend;
-  if(a.cal) return HS_T.inconc;
-  return HS_T.pend;
-}
-function hsTituloPeca(corpo){
-  const seg=(corpo||"").match(/^- Segmento aganglionar: ([\d.,]+) cm\./m); if(!seg) return null;
-  const zt=(corpo||"").match(/^- Margem proximal: Achados de zona de transição presentes: (.+)\.$/m), distAg=/^- Margem proximal: Aganglionar/m.test(corpo||"");
-  if(zt || distAg) return "DOENÇA DE HIRSCHSPRUNG: SEGMENTO AGANGLIONAR DE PELO MENOS "+seg[1]+" CM; MARGEM PROXIMAL COM "+(zt ? "ACHADOS DE ZONA DE TRANSIÇÃO" : "AGANGLIONOSE")+" (VIDE NOTA)";
-  return /^- Margem proximal: Sem achados/m.test(corpo||"") ? "DOENÇA DE HIRSCHSPRUNG: SEGMENTO AGANGLIONAR DE "+seg[1]+" CM; MARGEM PROXIMAL SEM ACHADOS DE ZONA DE TRANSIÇÃO" : null;
-}
-const HS_RE_BIOPSIA=/^- (BIÓPSIA RETAL|CÉLULAS GANGLIONARES PRESENTES|AGANGLIONOSE EM BIÓPSIA RETAL)/, HS_RE_PECA=/^- DOENÇA DE HIRSCHSPRUNG:/;
-// recalcula o título do bloco em edição; só troca título que seja do mesmo tipo (título digitado à mão com outra redação fica)
+function hsCong(seg, tits){ return seg===HS_CONG || /EXAME INTRAOPERATÓRIO/.test(tits); }
+// texto -> título: recalcula os dois itens do título do bloco em edição
 function hsSinc(){
-  const ta=$("corpo"), ls=ta.value.split("\n"); let start=-1;
-  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
-  const bloco=ls.slice(start+1).join("\n"), tb=hsTitulo(hsAchados(bloco)), tp=hsTituloPeca(bloco);
-  const novo = tp || tb, re = tp ? HS_RE_PECA : HS_RE_BIOPSIA;
-  if(!novo) return;
-  if(start<0){ ta.value="- "+novo+":\n"+ta.value; return; }
-  if(re.test(ls[start]) || (tp && HS_RE_BIOPSIA.test(ls[start]))){ ls[start]="- "+novo+":"; ta.value=ls.join("\n"); }
+  const ta=$("corpo"), {ls,ini,end,tits}=hsBloco(ta.value), bloco=ls.slice(end+1).join("\n");
+  const tm=hsTitMucosa(bloco), tg=hsTitGang(bloco, hsCong($("fSeg").value, tits.join(" ")));
+  if(tm || tg){
+    const m = tm ? "- "+tm+":" : tits.find(x=>HS_RE_MUC.test(x)), g = tg ? "- "+tg+":" : tits.find(x=>HS_RE_GANG.test(x));
+    const novo=tits.filter(x=>!HS_RE_MUC.test(x) && !HS_RE_GANG.test(x)).concat([m,g].filter(Boolean));
+    if(end<0) ta.value=novo.join("\n")+"\n"+ta.value;
+    else if(tits.some(x=>HS_RE_MUC.test(x) || HS_RE_GANG.test(x))){ ls.splice(ini, end-ini+1, ...novo); ta.value=ls.join("\n"); }
+  }
+  hsPrev=hsBloco(ta.value).tits.join("\n");
 }
-// notas automáticas de Hirschsprung, pelo título da amostra
-function hsNotas(corpo){
-  const tit=(corpo||"").split("\n").filter(l=>lineKind(l)==="b").join(" "), out=[];
-  const tem=k=>tit.includes(HS_T[k]);
-  if(tem("inadCal")) out.push("a ausência de inervação mucosa à calretinina em amostra inadequada é sugestiva de aganglionose, mas não permite o diagnóstico; recomenda-se nova biópsia, a 2 cm ou mais da linha pectínea e com submucosa representada [@ernica].");
-  else if(tem("inad")) out.push("amostra inadequada para pesquisa de células ganglionares; recomenda-se nova biópsia, a 2 cm ou mais da linha pectínea e com submucosa representada [@ernica].");
-  if(tem("gangCorr")) out.push("células ganglionares presentes, com inervação mucosa reduzida à calretinina e/ou nervos submucosos hipertróficos: os achados podem corresponder a zona de transição e pedem correlação clínica e radiológica [@veras].");
-  else if(tem("gang")) out.push("a presença de células ganglionares exclui doença de Hirschsprung no nível biopsiado [@ernica]; aganglionose de segmento muito curto, distal ao nível da amostra, não é afastada apenas por esta biópsia.");
-  if(tem("agang")) out.push("o diagnóstico de doença de Hirschsprung e a extensão do segmento aganglionar dependem de correlação clínica, radiológica e do estudo intraoperatório.");
-  if(tem("inconc")) out.push("ausência de células ganglionares com inervação mucosa imunorreativa para calretinina: achados conflitantes. A presença de neuritos imunorreativos não exclui aganglionose, em especial no segmento muito curto [@kapur14]; sugere-se nova biópsia, mais generosa em submucosa ou de espessura total.");
-  else if(tem("pend")) out.push("não foram identificadas células ganglionares; recomenda-se estudo complementar por calretinina, com controle interno positivo, antes de firmar o diagnóstico [@ernica].");
-  else if(tem("duv")) out.push("células de identificação duvidosa; sugere-se confirmação imuno-histoquímica ou nova biópsia.");
-  if(/MARGEM PROXIMAL COM /.test(tit)) out.push("achados de zona de transição ou aganglionose na margem proximal indicam ressecção possivelmente incompleta do segmento com inervação anormal; o comprimento informado do segmento aganglionar é um mínimo [@veras,kapur25].");
-  return out;
+// título -> texto: título editado à mão ajusta a linha da mucosa, as linhas dos plexos e, na peça, o segmento aganglionar
+function hsTitParaLinhas(){
+  const ta=$("corpo"), {ls,end,tits}=hsBloco(ta.value); if(end<0) return;
+  const idx=re=>ls.findIndex((l,i)=>i>end && re.test(l)), bloco=()=>ls.slice(end+1).join("\n");
+  const poe=(re, linha)=>{ const j=idx(re); if(j>=0) ls[j]=linha; else { let k=ls.length; while(k>end+1 && !ls[k-1].trim()) k--; ls.splice(k,0,linha); } };
+  const cap=s=>s.charAt(0)+s.slice(1).toLowerCase();
+  const tm=tits.find(x=>HS_RE_MUC.test(x)), tg=tits.find(x=>HS_RE_PESQ.test(x));
+  if(tm){
+    const T=tm.trim().replace(/^- /,"").replace(/:$/,"");
+    const m=T.match(/^(MUCOSA (?:RETAL|DE CÓLON SIGMOIDE|DE CÓLON PROXIMAL)) (.+)$/) || T.match(/^(MUCOSA.*?) ((?:SEM|COM) .+)$/) || T.match(/^(MUCOSA) (.+)$/);
+    if(m && hsTitMucosa(bloco())!==T) poe(/^- Mucosa[^:]*: /, "- "+cap(m[1])+": "+cap(m[2])+".");
+  }
+  if(tg){
+    const seg=idx(/^- Segmento aganglionar: /);
+    if(seg>=0){ const m=tg.match(/SEGMENTO DISTAL DE (?:PELO MENOS )?([\d.,]+) CM/); if(m) ls[seg]="- Segmento aganglionar: "+m[1]+" cm."; }
+    else {
+      const est={}, E={PRESENTES:"pres", POSITIVA:"pres", AUSENTES:"aus", NEGATIVA:"aus", DUVIDOSA:"duv"};
+      for(const m of tg.matchAll(/(PRESENTES|AUSENTES|DUVIDOSA|POSITIVA|NEGATIVA) NOS (?:PLEXOS NEURAIS )?(DA SUBMUCOSA E DA MUSCULAR PRÓPRIA|DA SUBMUCOSA|DA MUSCULAR PRÓPRIA)/g)){
+        if(/SUBMUCOSA/.test(m[2])) est.sub=E[m[1]]; if(/MUSCULAR/.test(m[2])) est.mp=E[m[1]]; }
+      if(est.sub || est.mp){
+        const a=hsAchados(bloco());
+        [["sub","Plexo da submucosa",/^- (Plexo da submucosa: |Células ganglionares submucosas: )/], ["mp","Plexo da muscular própria",/^- (Plexo da muscular própria: |Gânglios mioentéricos: )/]].forEach(([k,rot,re])=>{
+          if(est[k]){ if(a[k]!==est[k]) poe(re, "- "+rot+": "+HS_GANG[est[k]]+"."); }
+          else if(a[k]){ const j=idx(re); if(j>=0) ls.splice(j,1); }
+        });
+      }
+    }
+  }
+  ta.value=ls.join("\n");
 }
-function hsAlertas(rot, corpo){
-  const out=[], t=corpo||"", a=hsAchados(t), tit=t.split("\n").filter(l=>lineKind(l)==="b").join(" ");
-  if(tit.includes(HS_T.agang) && !a.amostragem) out.push({conf:true, msg:rot+": título de aganglionose sem fragmentos, níveis de corte e bloco esgotado informados."});
+// notas automáticas de Hirschsprung, pelos achados da amostra (a interpretação mora aqui, não no título)
+const HS_NOTA = {
+  inadCal:"a ausência de inervação mucosa à calretinina em amostra inadequada é sugestiva de aganglionose, mas não permite o diagnóstico; recomenda-se nova biópsia, a 2 cm ou mais da linha pectínea e com submucosa representada [@ernica].",
+  inad:"amostra inadequada para pesquisa de células ganglionares; recomenda-se nova biópsia, a 2 cm ou mais da linha pectínea e com submucosa representada [@ernica].",
+  gangCorr:"células ganglionares presentes, com inervação mucosa reduzida à calretinina e/ou nervos submucosos hipertróficos: os achados podem corresponder a zona de transição e pedem correlação clínica e radiológica [@veras].",
+  gang:"a presença de células ganglionares desfavorece doença de Hirschsprung no nível biopsiado [@ernica]; aganglionose de segmento muito curto, distal ao nível da amostra, não é afastada apenas por esta biópsia.",
+  agang:"a ausência de células ganglionares, com ausência de inervação mucosa à calretinina, favorece doença de Hirschsprung; o diagnóstico e a extensão do segmento aganglionar dependem de correlação clínica, radiológica e do estudo intraoperatório.",
+  inconc:"ausência de células ganglionares com inervação mucosa imunorreativa para calretinina: achados conflitantes. A presença de neuritos imunorreativos não exclui aganglionose, em especial no segmento muito curto [@kapur14]; sugere-se nova biópsia, mais generosa em submucosa ou de espessura total.",
+  pend:"não foram identificadas células ganglionares; recomenda-se estudo complementar por calretinina, com controle interno positivo, antes de firmar o diagnóstico [@ernica].",
+  duv:"células de identificação duvidosa; sugere-se confirmação imuno-histoquímica ou nova biópsia.",
+  misto:"células ganglionares presentes em apenas um dos plexos avaliados; sugere-se correlação clínica e, se necessário, nova amostragem."
+};
+function hsTits(corpo){ return (corpo||"").split("\n").filter(l=>lineKind(l)==="b").map(l=>l.trim()); }
+// bx = biópsia diagnóstica (as notas e o "vide nota" só valem para ela e para a peça)
+function hsTipo(corpo, seg){
+  const t=corpo||"";
+  return /^- Segmento aganglionar: /m.test(t) ? "peca" : hsReop(t) ? "reop" : hsCong(seg, hsTits(t).join(" ")) || /biópsia (pontual|de nivelamento)/.test(t) ? "cong" : "bx";
+}
+function hsNotas(corpo, seg){
+  const t=corpo||"", tipo=hsTipo(t, seg);
+  if(tipo==="peca"){
+    const tg=hsTitGang(t, false)||"", cm=t.match(/^- Segmento aganglionar: ([\d.,]+) cm\./m);
+    if(/\(VIDE NOTA\)$/.test(tg)) return ["achados de zona de transição ou aganglionose na margem proximal indicam ressecção possivelmente incompleta do segmento com inervação anormal; o comprimento informado do segmento aganglionar é um mínimo [@veras,kapur25]."];
+    return tg && cm ? ["os achados são compatíveis com doença de Hirschsprung, com segmento aganglionar de "+cm[1]+" cm e margem proximal sem achados de zona de transição [@veras]."] : [];
+  }
+  if(tipo!=="bx") return [];
+  const e=hsEstado(hsAchados(t));
+  return e ? [HS_NOTA[e]] : [];
+}
+function hsAlertas(rot, corpo, seg){
+  const out=[], t=corpo||"", a=hsAchados(t), tits=hsTits(t), tipo=hsTipo(t, seg);
+  if(tipo==="bx" && hsEstado(a)==="agang" && !a.amostragem) out.push({conf:true, msg:rot+": células ganglionares ausentes sem fragmentos, níveis de corte e bloco esgotado informados."});
   if(/idade maior que 1 ano/.test(t) && a.nerv) out.push({conf:false, msg:rot+": depois de 1 ano de idade, nervo acima de 40 µm é normal no reto distal; não usar como critério isolado."});
   if(/trissomia 21/.test(t)) out.push({conf:false, msg:rot+": trissomia 21: calretinina e calibre dos nervos são menos confiáveis; correlacionar antes de concluir."});
   if(/menos de 3 semanas de vida/.test(t)) out.push({conf:false, msg:rot+": menos de 3 semanas de vida: células ganglionares pequenas e imaturas; acetilcolinesterase normal não exclui."});
   const niv=t.match(/^- Nível informado: ([\d.,]+) cm/m);
   if(niv && parseFloat(niv[1].replace(",","."))<2) out.push({conf:false, msg:rot+": biópsia a menos de 2 cm da linha pectínea: zona fisiologicamente pobre em gânglios."});
   if(/^- Nível da amostra: Na anastomose/m.test(t)) out.push({conf:false, msg:rot+": biópsia na anastomose não serve para excluir zona de transição; nervo acima de 40 µm não vale como índice após o abaixamento."});
-  const esperado=hsTitulo(a);
-  if(esperado && HS_RE_BIOPSIA.test(tit) && !tit.includes(esperado)) out.push({conf:true, msg:rot+": o título não corresponde aos achados (esperado: "+esperado.toLowerCase()+")."});
+  [[HS_RE_MUC, hsTitMucosa(t)], [HS_RE_GANG, hsTitGang(t, tipo==="cong")]].forEach(([re, esperado])=>{
+    const atual=tits.find(x=>re.test(x));
+    if(esperado && atual && atual!=="- "+esperado+":") out.push({conf:true, msg:rot+": o título não corresponde aos achados (esperado: "+esperado.toLowerCase()+")."});
+  });
+  if(/^- (Submucosa|Muscular própria|Serosa\/adventícia): (?!Preservada)/m.test(t) && tits.some(x=>HS_RE_MUC.test(x) && /SEM PARTICULARIDADES/.test(x)))
+    out.push({conf:false, msg:rot+": há camada da parede com alteração descrita; confira se o título continua adequado."});
   return out;
 }
 
@@ -1202,7 +1297,7 @@ function hsAlertas(rot, corpo){
 // (3) "Rótulo: Presente/Ausente/(Não) identificado"; (4) "1 eosinófilo" x "2 eosinófilos". Fora do vocabulário, não mexe.
 const CG_NOMES = {
   m:"agregado folículo microabscesso abscesso corpo eosinófilo linfócito neutrófilo leucócito plasmócito fragmento granuloma pólipo espaço parasito achado infiltrado material gânglio nervo neurito plexo ganglioneuroma",
-  f:"cripta glândula vilosidade célula erosão ulceração fovéola papila linfangiectasia alteração amostra área metaplasia atrofia displasia hiperplasia eosinofilia criptite linfocitose plasmocitose celularidade lâmina"
+  f:"cripta glândula vilosidade célula erosão ulceração fovéola papila linfangiectasia alteração amostra área metaplasia atrofia displasia hiperplasia eosinofilia criptite linfocitose plasmocitose celularidade lâmina mucosa serosa camada"
 };
 const CG_ADJ_INV="linfoide intraepitelial glandular focal exuberante grande mononuclear caliciforme superficial intercelular folicular ganglionar";
 const CG_ADJ_VAR="eosinofílico neutrofílico apoptótico inflamatório hipertrófico atrófico hipotrófico dilatado contíguo isolado reativo disqueratótico citopático significativo examinado preservado pequeno mononucleado linfoplasmocitário entremeado degranulado identificado evidenciado detectado representado observado submucoso mioentérico imunorreativo imaturo esparso amostrado saltado";
@@ -1357,7 +1452,7 @@ function ressincEditor(){
   const ta=$("corpo"), site=$("fSitio").value, seg=$("fSeg").value;
   ta.value=ta.value.split("\n").map(l=>fraseLie(fraseEos(l, site, seg), site)).join("\n");
   corrigeCampo("corpo");
-  if(site==="hirschsprung") hsSinc();
+  if(site==="hirschsprung"){ if(hsBloco(ta.value).tits.join("\n")!==hsPrev) hsTitParaLinhas(); hsSinc(); }
   const tit=ultimoTitulo(ta.value);
   if(tit && tit!==prevTit) tituloParaLinha(site);
   else { const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
@@ -1527,7 +1622,7 @@ function autoNotas(){
       if(c.lie!==undefined) add(L_, lieNota(c.lie));
       if(c.linf!==undefined) add(L_, linfNota(ESO_LINF[s.seg], c.linf));
     }
-    if(s.site==="hirschsprung") hsNotas(s.corpo).forEach(n=>add(L_, n));
+    if(s.site==="hirschsprung") hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n));
     if(s.dech){ if(s.dech.viral && !extra.includes(NOTA_VIRAL)) extra.push(NOTA_VIRAL); if(!extra.includes(NOTA_DECH)) extra.push(NOTA_DECH); }
   });
   const lista=l=> l.length===1 ? "Amostra "+l[0] : "Amostras "+l.slice(0,-1).join(", ")+" e "+l[l.length-1];
@@ -1575,7 +1670,7 @@ function alertas(){
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
   WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
-  WORK.samples.forEach((s,i)=>{ if(s.site==="hirschsprung") hsAlertas("Amostra "+letterOf(i), s.corpo).forEach(a=>out.push(a)); });
+  WORK.samples.forEach((s,i)=>{ if(s.site==="hirschsprung") hsAlertas("Amostra "+letterOf(i), s.corpo, s.seg).forEach(a=>out.push(a)); });
   if(WORK.semRefs && WORK.notasSel.map(notaById).filter(Boolean).concat([{texto:WORK.notasFree||""}]).some(n=>/vide referências bibliográficas/i.test(n.texto)))
     out.push({conf:false, msg:"Notas: há nota que diz \"vide referências bibliográficas\", mas as referências estão desligadas."});
   return out;
@@ -1656,7 +1751,7 @@ function renderPresets(){
   if(!lista.length){ box.innerHTML='<p class="hint">Nenhum diagnóstico pronto para este sítio.</p>'; return; }
   lista.forEach(p=>{
     const b=document.createElement("button"); b.type="button"; b.className="preset";
-    b.innerHTML=`<b>${fmtInline(p.titulo)}</b><span>${(p.bullets||[]).length} itens · clique p/ inserir bloco</span>`;
+    b.innerHTML=`<b>${fmtInline(p.rot||p.titulo)}</b><span>${(p.bullets||[]).length} itens · clique p/ inserir bloco</span>`;
     b.onclick=()=>{ appendBlock(presetText(p)); toast("Bloco inserido"); };
     box.appendChild(b);
   });
@@ -1905,7 +2000,7 @@ $("notas").onchange=()=>{ if(corrigeCampo("notas")){ WORK.notasFree=$("notas").v
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
 $("notaSearch").oninput=renderNotasToggles;
 $("corpo").onchange=ressincEditor;
-$("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); };
+$("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); hsPrev=hsBloco($("corpo").value).tits.join("\n"); };
 function aplicaTema(t){ t = t==="claro" ? "claro" : "escuro"; if(document.documentElement) document.documentElement.setAttribute("data-tema", t); $("temaSel").value=t; return t; }
 $("temaSel").onchange=()=>{ store(LS_TEMA, aplicaTema($("temaSel").value)); };
 $("dechDet").ontoggle=()=>{ store(LS_DECH_ABERTO, !!$("dechDet").open); };

@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.4.0 — 2026-10-10
+- Hirschsprung: o título passa a ser descritivo, em dois itens: mucosa (retal, de cólon sigmoide ou de cólon proximal; "sem particularidades histológicas significativas" de praxe) e pesquisa para células ganglionares (presentes ou ausentes, e em que plexo: da submucosa e/ou da muscular própria). Vale para biópsias, congelação, peça e rebiopsia; saem os títulos diagnósticos ("aganglionose… compatível com doença de Hirschsprung", "inconclusiva", "inadequada", "doença de Hirschsprung: segmento…").
+- Texto e título andam juntos nos dois sentidos: editar a linha da mucosa, de um plexo ou do segmento aganglionar muda o título; editar o título muda as linhas.
+- A interpretação vai para a nota, pelos achados: presença de células ganglionares "desfavorece" (não mais "exclui") doença de Hirschsprung no nível biopsiado; ausência com calretinina ausente e controle interno "favorece"; na peça, "achados compatíveis com doença de Hirschsprung". O título ganha "(vide nota)" só quando há ressalva.
+- Peça de abaixamento: seção com as camadas da parede, uma por linha (mucosa, submucosa, muscular própria, serosa/adventícia), preservadas de praxe e editáveis; alerta para conferir o título quando alguma camada é alterada.
+- Laudos salvos com os títulos e as linhas da v3.3 continuam lidos e são convertidos ao editar.
+
 ## v3.3.1 — 2026-10-09
 - Hirschsprung: os textos prontos também aparecem só para o tipo de espécime escolhido.
 
