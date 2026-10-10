@@ -277,6 +277,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
   <div class="editor-actions noprint">
     <button class="primary" id="btnCopiar">📋 Copiar tudo</button>
     <button class="ghost" id="btnImprimir">🖨 Imprimir / PDF</button>
+    <button class="ghost" id="btnRefs" title="Liga ou desliga os números de referência no texto e a lista de referências do laudo">Referências: com</button>
     <span class="spacer"></span>
     <button class="danger" id="btnLimparTudo">Limpar laudo</button>
   </div>
@@ -290,7 +291,8 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
       <textarea id="notas" rows="3" spellcheck="true" lang="pt-BR" placeholder="Notas adicionais (texto livre)."></textarea>
     </div>
 
-    <div class="acc-refs" style="margin-top:12px;padding-top:12px;padding-bottom:8px;">
+    <div class="acc-refs" id="refsPainel" style="margin-top:12px;padding-top:12px;padding-bottom:8px;">
+      <p class="hint" id="refsAviso" hidden>Referências desligadas: os números e a lista não saem no laudo. Nada foi apagado; ligue de novo para voltar.</p>
       <label class="fld">Referências: as citadas no texto entram numeradas sozinhas; clique para acrescentar outras</label>
       <input type="text" id="refSearch" placeholder="🔎 buscar referência…" style="margin-bottom:8px;">
       <div class="notas-toggles" id="refsToggles"></div>
@@ -865,7 +867,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.2.0";
+const APP_VERSION="3.3.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1346,7 +1348,9 @@ function fmtNums(ns){
     out.push(j-i>=2 ? ns[i]+"-"+ns[j] : ns.slice(i,j+1).join(",")); i=j+1; }
   return out.join(",");
 }
-function resolveCites(txt){
+// semRefs: em vez de numerar, retira as marcas (e o espaço antes delas)
+function resolveCites(txt, semRefs){
+  if(semRefs) return { txt:txt.replace(/ ?\[@[a-z0-9]+(?:,[a-z0-9]+)*\]/g, ""), order:[] };
   const order=[];
   const out=txt.replace(CITE_RE,(m,keys)=>{
     const ns=keys.split(",").filter(k=>CITE[k]).map(k=>{ let i=order.indexOf(k); if(i<0){ order.push(k); i=order.length-1; } return i+1; });
@@ -1371,10 +1375,14 @@ function alertas(){
       out.push({conf:true, msg:rot+": OLGIM estágio 0 com metaplasia intestinal presente."});
     if(/OLGA: Estágio 0/.test(corpo||"") && /Atrofia: Presente/.test(corpo||""))
       out.push({conf:true, msg:rot+": OLGA estágio 0 com atrofia presente."});
+    if(WORK.semRefs && /vide referências bibliográficas/i.test(corpo||""))
+      out.push({conf:false, msg:rot+": o texto diz \"vide referências bibliográficas\", mas as referências estão desligadas."});
     if(dech && dech.manual && dech.manual!==dech.sug)
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
   WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
+  if(WORK.semRefs && WORK.notasSel.map(notaById).filter(Boolean).concat([{texto:WORK.notasFree||""}]).some(n=>/vide referências bibliográficas/i.test(n.texto)))
+    out.push({conf:false, msg:"Notas: há nota que diz \"vide referências bibliográficas\", mas as referências estão desligadas."});
   return out;
 }
 function renderAlertas(){
@@ -1595,7 +1603,8 @@ function buildLaudo(){
   if(free) notasBlock = notasBlock ? notasBlock+L+free : free;
   if(notasBlock) out += L+" "+L+"NOTAS:"+L+notasBlock;
   // REFERÊNCIAS: citadas no texto (numeradas na ordem de aparecimento) + selecionadas + campo livre
-  const res = resolveCites(out); out = res.txt;
+  const res = resolveCites(out, WORK.semRefs); out = res.txt;
+  if(WORK.semRefs) return out;
   const selRefs = WORK.refsSel.map(refById).filter(Boolean).map(r=>r.texto);
   const freeRefs = (WORK.refsFree||"").split("\n").map(s=>s.trim().replace(/^(-|\d+\.)\s*/,"")).filter(Boolean);
   const refs = res.order.map(k=>CITE[k]);
@@ -1631,7 +1640,13 @@ function laudoToRichHTML(txt){
   }).join("");
   return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;">'+body+'</div>';
 }
-function renderLaudo(){ $("laudoMontado").innerHTML = laudoToPreviewHTML(buildLaudo()); renderAlertas(); }
+function renderLaudo(){ $("laudoMontado").innerHTML = laudoToPreviewHTML(buildLaudo()); renderAlertas(); renderRefsChave(); }
+function renderRefsChave(){
+  const sem=!!WORK.semRefs;
+  $("btnRefs").textContent="Referências: "+(sem?"sem":"com");
+  $("refsAviso").hidden=!sem;
+  $("refsPainel").style.opacity=sem?".55":"";
+}
 
 /* ============================ NOTAS / REFS (tags + busca) ============================ */
 function renderChipList(boxId, list, selArr, rerender){
@@ -1698,6 +1713,7 @@ function aplicaTema(t){ t = t==="claro" ? "claro" : "escuro"; if(document.docume
 $("temaSel").onchange=()=>{ store(LS_TEMA, aplicaTema($("temaSel").value)); };
 $("dechDet").ontoggle=()=>{ store(LS_DECH_ABERTO, !!$("dechDet").open); };
 $("refSearch").oninput=renderRefsToggles;
+$("btnRefs").onclick=()=>{ WORK.semRefs=!WORK.semRefs; saveNow(); renderLaudo(); toast(WORK.semRefs ? "Laudo sem referências" : "Laudo com referências"); };
 
 /* ============================ INIT ============================ */
 function renderAll(){ renderSampleList(); renderNotasToggles(); renderRefsToggles(); renderLaudo(); }

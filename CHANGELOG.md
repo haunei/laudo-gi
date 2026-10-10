@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.3.0 — em validação (ramo melhorias-v3.3, não publicado)
+- Chave "Referências: com / sem" no laudo: em "sem", saem os números do texto e a lista de referências; valores de referência e notas continuam. A escolha fica gravada no rascunho e pode ser desfeita a qualquer momento.
+
 ## v3.2.0 — 2026-10-09
 - Layout: três colunas no desktop (amostra e textos prontos · achados · editor e laudo), cada uma rolando por dentro; editor ao lado dos achados; lista de amostras salvas no fim; bloco DECH recolhível (estado lembrado).
 - Tema: seletor Escuro/Claro com escolha gravada no navegador (não segue o sistema); tema claro em azul-claro.

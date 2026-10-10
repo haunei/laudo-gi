@@ -402,4 +402,31 @@ ok(els.corpo.value.endsWith("- Agregado linfoide: Presente."), "editor corrige a
 ok(/Concordância: Agregado linfoides → Agregado linfoide/.test(els.toast.textContent), "aviso mostra o que foi trocado");
 ok(html.includes('id="corpo" rows="10" spellcheck="true" lang="pt-BR"'), "ortografia do navegador ligada no editor");
 
+// 14. Chave "Referências: com / sem"
+const st4 = {}; ({ t, els } = boot(st4));
+const corpoRef = "- COLITE CRÔNICA INATIVA:\n" + t.comVR("- Presença de eosinófilos (até 38 eosinófilos/campo de grande aumento).", "colon", "Ceco");
+t.WORK.samples.push({ nome: "Ceco", corpo: corpoRef, site: "colon", seg: "Ceco" });
+t.WORK.refsSel.push(t.LIB.refs[0].id); t.WORK.refsFree = "Ref livre.";
+const comRefs = t.buildLaudo();
+ok(/\[1\]/.test(comRefs) && comRefs.includes("REFERÊNCIAS BIBLIOGRÁFICAS:") && comRefs.includes("Ref livre."), "com referências: números e lista");
+eq(els.btnRefs.textContent, "Referências: com", "rótulo da chave");
+els.btnRefs.onclick();
+const semRefs = t.buildLaudo();
+ok(!/\[\d+(?:[-,]\d+)*\]/.test(semRefs) && !/\[@/.test(semRefs), "sem referências: nenhum número ou marca no texto");
+ok(!semRefs.includes("REFERÊNCIAS BIBLIOGRÁFICAS:") && !semRefs.includes(t.CITE.pap) && !semRefs.includes("Ref livre."), "sem referências: sem lista (citadas, escolhidas ou livres)");
+ok(semRefs.includes("valor de referência: limiar a partir de 370/mm²; normal 20,3 ± 8,2 e 49,5 ± 22,4 por campo)."), "valor de referência continua, sem os números");
+ok(semRefs.includes("NOTAS:\n- Amostra A: a contagem de eosinófilos está abaixo do limiar de consenso para o ceco/cólon ascendente e dentro da faixa descrita em crianças sem doença: o achado desfavorece"), "nota de conclusão continua, sem os números");
+ok(!/ [.,;:)]| {2}/.test(semRefs.split("\n").filter(l => l.trim()).join("\n")), "sem espaço sobrando onde havia número");
+eq(els.btnRefs.textContent, "Referências: sem", "rótulo muda");
+ok(!els.refsAviso.hidden, "aviso no painel de referências");
+({ t, els } = boot(st4));
+ok(t.WORK.semRefs === true && els.btnRefs.textContent === "Referências: sem", "escolha persiste ao recarregar");
+eq(t.buildLaudo(), semRefs, "mesma saída após recarregar");
+els.btnRefs.onclick();
+eq(t.buildLaudo(), comRefs, "religar devolve o laudo original");
+t.WORK.notasSel.push(t.LIB.notas.find(x => /Vide referências bibliográficas/.test(x.texto)).id);
+eq(t.alertas().length, 0, "com referências: sem alerta");
+els.btnRefs.onclick();
+eq(t.alertas().length, 1, "sem referências: alerta para nota que manda ver as referências");
+
 console.log(`OK — ${n} asserts`);
