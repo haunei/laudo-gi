@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.5.0 — 2026-10-15
+- Duodeno: a nota de falta de consenso sobre o número normal de eosinófilos passa a nomear só os segmentos com contagem no laudo (estômago, duodeno, íleo, cólon, reto); antes saía sempre "do íleo e do cólon". Segmento "2ª porção (descendente)" vira "2ª porção" (amostra "Mucosa duodenal (2ª porção)").
+- Amostra exígua: texto pronto em esôfago, estômago (antral e oxíntico), duodeno, íleo, cólon e reto ("EXÍGUO FRAGMENTO DE MUCOSA … SEM ALTERAÇÕES/PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS"), com a linha "Amostra exígua, pouco representativa.".
+- Modificador "Amostra" nesses sítios: exígua, superficial ou adequada; insere a linha e ajusta o início do título ("EXÍGUO FRAGMENTO DE …" / "FRAGMENTO SUPERFICIAL DE …"; título que não começa por "MUCOSA" ganha "… DE MUCOSA <sítio> APRESENTANDO …"). Nota automática de viés amostral; alerta quando título e linha não batem.
+- Editor da amostra: barra com caixa alta, caixa baixa, negrito, itálico e sublinhado no trecho selecionado (clicar de novo desfaz). Negrito, itálico e sublinhado saem formatados na prévia e na cópia para o MV; na cópia em texto simples, as marcas saem.
+
 ## v3.4.0 — 2026-10-10
 - Hirschsprung: o título passa a ser descritivo, em dois itens: mucosa (retal, de cólon sigmoide ou de cólon proximal; "sem particularidades histológicas significativas" de praxe) e pesquisa para células ganglionares (presentes ou ausentes, e em que plexo: da submucosa e/ou da muscular própria). Vale para biópsias, congelação, peça e rebiopsia; saem os títulos diagnósticos ("aganglionose… compatível com doença de Hirschsprung", "inconclusiva", "inadequada", "doença de Hirschsprung: segmento…").
 - Texto e título andam juntos nos dois sentidos: editar a linha da mucosa, de um plexo ou do segmento aganglionar muda o título; editar o título muda as linhas.

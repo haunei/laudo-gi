@@ -147,6 +147,8 @@ table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowra
 .out .ll{font-family:Arial,Helvetica,sans-serif;font-size:11.5px;line-height:1.3;color:#000;text-align:justify;white-space:pre-wrap;word-break:break-word;}
 .out .ll.b{font-weight:bold;}
 .out .ll.sp{height:.6em;}
+.tbar{display:flex;gap:4px;margin:6px 0 4px;}
+.tbar button{min-width:34px;padding:3px 8px;font-size:12px;line-height:1.2;}
 .out .empty{color:var(--muted);font-size:.85rem;font-style:italic;}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--dark);
   padding:11px 20px;border-radius:9px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
@@ -260,6 +262,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 <section class="card col" id="colC">
   <div class="noprint">
     <label class="fld">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
+      <span class="tbar" id="tbar"><button type="button" class="ghost" id="tb_up" data-fx="up" title="Caixa alta no trecho selecionado">AA</button><button type="button" class="ghost" id="tb_low" data-fx="low" title="Caixa baixa no trecho selecionado">aa</button><button type="button" class="ghost" id="tb_b" data-fx="b" title="Negrito"><b>N</b></button><button type="button" class="ghost" id="tb_i" data-fx="i" title="Itálico"><i>I</i></button><button type="button" class="ghost" id="tb_u" data-fx="u" title="Sublinhado"><u>S</u></button></span>
       <textarea id="corpo" rows="10" spellcheck="true" lang="pt-BR" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
     </label>
     <div class="editor-actions">
@@ -500,7 +503,7 @@ const SEED_SITES = {
 
   duodeno:{
     nome:"Duodeno", nomeAmostra:"Mucosa duodenal", eos:"EoN",
-    segmentos:["Bulbo","2ª porção (descendente)","Distal"],
+    segmentos:["Bulbo","2ª porção","Distal"],
     presets:[
       P("MUCOSA DUODENAL SEM PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
@@ -689,6 +692,18 @@ const ACHADOS_EOS = {g:"Eosinófilos: achados associados", dica:"Marque os prese
   stack:{pre:"- Achados eosinofílicos associados: ", itens:[["degranulação","degranulação de eosinófilos"],["microabscessos eosinofílicos","microabscessos eosinofílicos"]]}};
 [SEED_SITES.esofago.criterios, SEED_SITES.gastrica.criterios, SEED_SITES.duodeno.criterios, SEED_SITES.ileo.criterios, CRIT_COLON].forEach(cr=>{
   const i=cr.findIndex(c=>/^(Eosinófilos|Exocitose de eosinófilos)/.test(c.g)); cr.splice(i+1, 0, ACHADOS_EOS); });
+
+// Amostra exígua: um texto pronto por sítio, com as linhas do texto de normalidade e a linha de amostragem
+const AM_LINHA = {exigua:"Amostra exígua, pouco representativa.", superficial:"Amostra superficial, pouco representativa."};
+const AM_PRE = {exigua:"EXÍGUO FRAGMENTO DE ", superficial:"FRAGMENTO SUPERFICIAL DE "};
+const MUC_SITIO = {esofago:"MUCOSA ESOFÁGICA", gastrica:"MUCOSA GÁSTRICA", duodeno:"MUCOSA DUODENAL", ileo:"MUCOSA DE ÍLEO", colon:"MUCOSA COLÔNICA", reto:"MUCOSA RETAL"};
+["esofago","gastrica","duodeno","colon"].forEach(k=>{
+  const site=SEED_SITES[k], normais=site.presets.filter(p=>/^MUCOSA .*SEM (ALTERAÇÕES|PARTICULARIDADES) HISTOPATOLÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
+  normais.forEach(p=>site.presets.push(P(AM_PRE.exigua+p.titulo, [AM_LINHA.exigua].concat(p.bullets))));
+});
+// íleo: o texto de normalidade tem título incompleto ("MUCOSA DE ÍLEO APRESENTANDO") e linhas de hiperplasia folicular e edema; o exíguo usa só as três linhas de normalidade
+SEED_SITES.ileo.presets.push(P(AM_PRE.exigua+"MUCOSA DE ÍLEO SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",
+  [AM_LINHA.exigua].concat(SEED_SITES.ileo.presets.find(p=>p.titulo==="MUCOSA DE ÍLEO APRESENTANDO").bullets.slice(0,3))));
 
 // Reto: mesmos textos do cólon, com a nomenclatura de reto
 SEED_SITES.reto.presets = SEED_SITES.reto.presets.filter(p=>/^RETITE/.test(p.titulo)).concat(SEED_SITES.colon.presets.map(p=>
@@ -1018,7 +1033,14 @@ const DECH_CRIPTAS = [
 ];
 const NOTA_VIRAL="As alterações citopáticas descritas são sugestivas de ação viral; é necessária pesquisa imuno-histoquímica para confirmação e definição do agente.";
 const NOTA_DECH="Imprescindível correlação com dados clínicos e laboratoriais para melhor investigação de possibilidade de DECH (diagnóstico diferencial: alterações decorrentes de medicações em uso?). Categorias conforme o consenso NIH 2014 [@shulman].";
-const NOTA_EOS_CONSENSO="Não há consenso sobre o número normal de eosinófilos na mucosa do íleo e do cólon; os valores variam com o segmento, a população e a área do campo microscópico [@pap,deb,iwa].";
+// nota de falta de consenso: nomeia só os segmentos com contagem de eosinófilos no laudo
+const EOS_SEG_NOME = {gastrica:"do estômago", duodeno:"do duodeno", ileo:"do íleo", colon:"do cólon", reto:"do reto"};
+function notaEosConsenso(sitios){
+  const ns=Object.keys(EOS_SEG_NOME).filter(k=>sitios.includes(k)).map(k=>EOS_SEG_NOME[k]);
+  return "Não há consenso sobre o número normal de eosinófilos na mucosa "+juntar(ns)+"; os valores variam com o segmento, a população e a área do campo microscópico [@pap,deb,iwa].";
+}
+const NOTA_EXIGUA="o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral.";
+const NOTA_SUPERF="o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral.";
 
 const REFS_HEADER = "REFERÊNCIAS BIBLIOGRÁFICAS:";
 // REFS do SEED (tag eosinofílica; tags/CRUD chegam na Etapa 3)
@@ -1051,7 +1073,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.4.0";
+const APP_VERSION="3.5.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1166,7 +1188,7 @@ function vr(text){
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
-  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /];
+  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- Amostra (exígua|superficial), /];
 function setLinha(line){
   const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [];
   let start=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
@@ -1427,6 +1449,24 @@ function linhaNeutroDoBloco(){
   for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
   return ls.find((l,i)=>i>start && RE_NEUTRO.test(l)) || null;
 }
+// amostra exígua/superficial: prefixo do título (padrão "EXÍGUO FRAGMENTO DE MUCOSA … APRESENTANDO …") e linha de amostragem
+const RE_AM_PRE=/^(EXÍGUOS? FRAGMENTOS? DE |FRAGMENTOS? SUPERFICIA(?:L|IS) DE )/;
+function titleSetAmostra(title, tipo, site){
+  const muc=MUC_SITIO[site]; let t=title.replace(/^- /,"").replace(/:$/,"");
+  if(RE_AM_PRE.test(t)){ t=t.replace(RE_AM_PRE,""); if(muc && t.startsWith(muc+" APRESENTANDO ")) t=t.slice(muc.length+14); }
+  if(tipo) t = /^MUCOSA /.test(t) || !muc ? AM_PRE[tipo]+t : AM_PRE[tipo]+muc+" APRESENTANDO "+t;
+  return "- "+t+":";
+}
+function amostraMod(tipo){
+  const ta=$("corpo"), site=$("fSitio").value;
+  if(tipo) appendLine("- "+AM_LINHA[tipo]);
+  else { const ls=ta.value.split("\n"); let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+    const j=ls.findIndex((l,i)=>i>st && /^- Amostra (exígua|superficial), /.test(l)); if(j>=0){ ls.splice(j,1); ta.value=ls.join("\n"); } }
+  const ok=editTitle(t=>titleSetAmostra(t, tipo, site));
+  prevTit=ultimoTitulo(ta.value);
+  return ok;
+}
+
 // critério clicado -> título (e, no H. pylori, linha de atividade coerente com o título)
 function sincAposLinha(line){
   const site=$("fSitio").value;
@@ -1612,22 +1652,26 @@ function editTitle(fn){
 }
 // notas automáticas (contagens e DECH), lidas do texto das amostras salvas; amostras com a mesma conclusão saem juntas
 function autoNotas(){
-  const grupos=[], extra=[]; let consenso=false;
+  const grupos=[], extra=[], consenso=[];
   const add=(letra, corpo)=>{ const g=grupos.find(x=>x.corpo===corpo); if(g) g.letras.push(letra); else grupos.push({letras:[letra], corpo}); };
   WORK.samples.forEach((s,i)=>{
     const L_=letterOf(i);
     if(s.site){
       const c=contagens(s), k=eosKey(s.site, s.seg);
-      if(k && c.eos!==undefined){ add(L_, eosNota(k, c.eos)); if(k!=="esofago") consenso=true; }
+      if(k && c.eos!==undefined){ add(L_, eosNota(k, c.eos)); if(EOS_SEG_NOME[s.site] && !consenso.includes(s.site)) consenso.push(s.site); }
       if(c.lie!==undefined) add(L_, lieNota(c.lie));
       if(c.linf!==undefined) add(L_, linfNota(ESO_LINF[s.seg], c.linf));
     }
     if(s.site==="hirschsprung") hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n));
+    if(MUC_SITIO[s.site]){
+      if(/^- Amostra exígua/m.test(s.corpo||"")) add(L_, NOTA_EXIGUA);
+      if(/^- (Amostra superficial|Amostragem: Mucosa gástrica superficial)/m.test(s.corpo||"")) add(L_, NOTA_SUPERF);
+    }
     if(s.dech){ if(s.dech.viral && !extra.includes(NOTA_VIRAL)) extra.push(NOTA_VIRAL); if(!extra.includes(NOTA_DECH)) extra.push(NOTA_DECH); }
   });
   const lista=l=> l.length===1 ? "Amostra "+l[0] : "Amostras "+l.slice(0,-1).join(", ")+" e "+l[l.length-1];
   const out=grupos.map(g=>lista(g.letras)+": "+g.corpo).concat(extra);
-  if(consenso) out.push(NOTA_EOS_CONSENSO);
+  if(consenso.length) out.push(notaEosConsenso(consenso));
   return out;
 }
 // [@a,b] -> [n,m] na ordem de aparecimento; devolve o texto e a lista de chaves citadas
@@ -1670,6 +1714,9 @@ function alertas(){
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
   WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
+  WORK.samples.forEach((s,i)=>{ if(!MUC_SITIO[s.site]) return; const c=tiraMarcas(s.corpo||"");
+    [["exígua",/^- EXÍGUOS? FRAGMENTOS? DE /m,/^- Amostra exígua/m],["superficial",/^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /m,/^- Amostra superficial/m]].forEach(([nome,rt,rl])=>{
+      if(rt.test(c)!==rl.test(c)) out.push({conf:false, msg:"Amostra "+letterOf(i)+": título e linha de amostra "+nome+" não batem; confira."}); }); });
   WORK.samples.forEach((s,i)=>{ if(s.site==="hirschsprung") hsAlertas("Amostra "+letterOf(i), s.corpo, s.seg).forEach(a=>out.push(a)); });
   if(WORK.semRefs && WORK.notasSel.map(notaById).filter(Boolean).concat([{texto:WORK.notasFree||""}]).some(n=>/vide referências bibliográficas/i.test(n.texto)))
     out.push({conf:false, msg:"Notas: há nota que diz \"vide referências bibliográficas\", mas as referências estão desligadas."});
@@ -1762,6 +1809,7 @@ function renderCrit(){
   const box=$("critBox"); box.innerHTML="";
   const grupos=(site.id==="hirschsprung" ? hsGrupos(site, $("fSeg").value) : (site.criterios||[])).slice();
   if(["ileo","colon","reto"].includes(site.id)) grupos.unshift({g:"Atividade: criptas com criptite ou abscesso", ativ:true, dica:"Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada. Insere a linha e ajusta o título."});
+  if(MUC_SITIO[site.id]) grupos.push({g:"Amostra (modificador)", amostra:true, dica:"Exígua ou superficial: insere a linha, ajusta o início do título e gera a nota de viés amostral. Adequada desfaz."});
   if(!grupos.length){ box.innerHTML='<p class="hint">Nenhum critério para este sítio.</p>'; return; }
   const mkb=(par, label, fn, cls)=>{ const b=document.createElement("button"); b.type="button"; b.innerHTML=fmtInline(label); if(cls) b.className=cls; b.onclick=()=>fn(b); par.appendChild(b); return b; };
   grupos.forEach(c=>{
@@ -1796,6 +1844,8 @@ function renderCrit(){
       });
       mkb(opts, "inserir linha", ()=>{ appendLine(c.combo.monta(sel)); const d=c.combo.depois && c.combo.depois(sel); if(d) appendLine(d); toast("Linha inserida"); }, "go");
     }
+    if(c.amostra) [["Exígua","exigua"],["Superficial","superficial"],["Adequada",null]].forEach(([label,tipo])=>mkb(opts, label, ()=>{
+      toast(amostraMod(tipo) ? "Amostra: "+label.toLowerCase() : "Sem título no editor: só a linha foi ajustada"); }));
     if(c.ativ){
       const mkn=()=>{ const w=document.createElement("span"); w.className="num"; const i=document.createElement("input"); i.type="number"; i.min="0"; i.placeholder="nº"; w.appendChild(i); opts.appendChild(w); return i; };
       const a=mkn(); const de=document.createElement("span"); de.className="muted"; de.textContent="de"; opts.appendChild(de); const b=mkn();
@@ -1916,11 +1966,24 @@ function laudoLines(txt){ return txt.split("\n").map(line=>({cls:lineKind(line),
 // H. pylori sai sempre em itálico, em qualquer grafia (H. PYLORI, H.pylori, Helicobacter pylori)
 const HP_RE=/(?<!<i>)(H\.\s?pylori|Helicobacter pylori)(?![A-Za-z])/gi;
 function fmtInline(s){ return esc(s).replace(SPECIES_RE,"<i>$1</i>").replace(HP_RE,"<i>$1</i>"); }
+// barra do editor: negrito, itálico e sublinhado ficam no texto como **x**, *x*, __x__ e saem formatados no laudo
+const MARCAS = {b:"**", i:"*", u:"__"};
+function marcaSel(text, a, b, tipo){
+  if(a===b) return null;
+  const sel=text.slice(a,b);
+  if(tipo==="up" || tipo==="low"){ const n = tipo==="up" ? sel.toUpperCase() : sel.toLowerCase(); return {text:text.slice(0,a)+n+text.slice(b), a, b:a+n.length}; }
+  const m=MARCAS[tipo], L=m.length, dentro=sel.length>2*L && sel.startsWith(m) && sel.endsWith(m) && (tipo!=="i" || !sel.startsWith("**") || sel.startsWith("***"));
+  if(dentro){ const n=sel.slice(L,-L); return {text:text.slice(0,a)+n+text.slice(b), a, b:a+n.length}; }
+  if(text.slice(a-L,a)===m && text.slice(b,b+L)===m && (tipo!=="i" || (text[a-2]!=="*" && text[b+1]!=="*"))) return {text:text.slice(0,a-L)+sel+text.slice(b+L), a:a-L, b:b-L};
+  return {text:text.slice(0,a)+m+sel+m+text.slice(b), a:a+L, b:b+L};
+}
+function fmtMarcas(h){ return h.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>").replace(/__(.+?)__/g,"<u>$1</u>").replace(/\*([^*\n]+?)\*/g,"<i>$1</i>"); }
+function tiraMarcas(t){ return t.replace(/\*\*(.+?)\*\*/g,"$1").replace(/__(.+?)__/g,"$1").replace(/\*([^*\n]+?)\*/g,"$1"); }
 function laudoToPreviewHTML(txt){
   if(!txt.trim()) return '<span class="empty">Nenhuma amostra salva ainda — monte acima e clique “Salvar amostra”.</span>';
   return laudoLines(txt).map(o=> o.cls==="sp"
     ? '<div class="ll sp"></div>'
-    : '<div class="ll'+(o.cls?" "+o.cls:"")+'">'+fmtInline(o.text)+'</div>'
+    : '<div class="ll'+(o.cls?" "+o.cls:"")+'">'+fmtMarcas(fmtInline(o.text))+'</div>'
   ).join("");
 }
 // HTML rich p/ clipboard (estilos inline, colável no MV PEP/Word)
@@ -1928,7 +1991,7 @@ function laudoToRichHTML(txt){
   const base="margin:0;font-family:Arial,Helvetica,sans-serif;font-size:8pt;line-height:1.15;color:#000000;text-align:justify;";
   const body = laudoLines(txt).map(o=>{
     if(o.cls==="sp") return '<p style="'+base+'">&nbsp;</p>';
-    return '<p style="'+base+(o.cls==="b"?"font-weight:bold;":"")+'">'+fmtInline(o.text)+'</p>';
+    return '<p style="'+base+(o.cls==="b"?"font-weight:bold;":"")+'">'+fmtMarcas(fmtInline(o.text))+'</p>';
   }).join("");
   return '<div style="font-family:Arial,Helvetica,sans-serif;font-size:8pt;color:#000000;">'+body+'</div>';
 }
@@ -1964,9 +2027,9 @@ function renderRefsToggles(){
 
 /* ============================ EXPORT ============================ */
 $("btnCopiar").onclick=async()=>{
-  const txt=buildLaudo();
-  if(!txt.trim()){ toast("Nada para copiar"); return; }
-  const html=laudoToRichHTML(txt);
+  const bruto=buildLaudo();
+  if(!bruto.trim()){ toast("Nada para copiar"); return; }
+  const html=laudoToRichHTML(bruto), txt=tiraMarcas(bruto);
   try{
     if(typeof ClipboardItem!=="undefined" && navigator.clipboard && navigator.clipboard.write){
       const item=new ClipboardItem({
@@ -2000,6 +2063,11 @@ $("notas").onchange=()=>{ if(corrigeCampo("notas")){ WORK.notasFree=$("notas").v
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
 $("notaSearch").oninput=renderNotasToggles;
 $("corpo").onchange=ressincEditor;
+["up","low","b","i","u"].forEach(fx=>{ const b=$("tb_"+fx);
+  b.onmousedown=e=>e.preventDefault();
+  b.onclick=()=>{ const ta=$("corpo"), r=marcaSel(ta.value, ta.selectionStart, ta.selectionEnd, fx);
+    if(!r){ toast("Selecione um trecho no editor"); return; }
+    ta.value=r.text; ta.focus(); ta.setSelectionRange(r.a, r.b); }; });
 $("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); hsPrev=hsBloco($("corpo").value).tits.join("\n"); };
 function aplicaTema(t){ t = t==="claro" ? "claro" : "escuro"; if(document.documentElement) document.documentElement.setAttribute("data-tema", t); $("temaSel").value=t; return t; }
 $("temaSel").onchange=()=>{ store(LS_TEMA, aplicaTema($("temaSel").value)); };
