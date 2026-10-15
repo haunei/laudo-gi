@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.5.2 — 2026-10-15
+- Esôfago e estômago no mesmo esquema de título de duodeno, íleo, cólon e reto: "MUCOSA ESOFÁGICA / GÁSTRICA DE PADRÃO ANTRAL / GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS" (antes "…SEM ALTERAÇÕES HISTOPATOLÓGICAS…") e "… APRESENTANDO", cada um com os achados do próprio sítio; os exíguos acompanham.
+
 ## v3.5.1 — 2026-10-15
 - Duodeno, cólon e reto, como o íleo: dois cabeçalhos de normalidade para os mesmos achados, "MUCOSA DUODENAL/COLÔNICA/RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS" (antes "…SEM PARTICULARIDADES HISTOPATOLÓGICAS…" no duodeno e "…SEM ALTERAÇÕES HISTOPATOLÓGICAS…" no cólon/reto) e "MUCOSA … APRESENTANDO"; o exíguo de cada sítio acompanha o primeiro.
 

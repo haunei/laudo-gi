@@ -75,7 +75,7 @@ eq(lines[0], "Materiais: Biópsias endoscópicas/colonoscópicas de: A) Mucosa e
 ok(lines.some(l => /^-{100}$/.test(l)), "separador ----- entre amostras");
 eq(lines.filter(l => /^-{5,}$/.test(l)).length, 1, "1 separador para 2 amostras");
 eq(t.lineKind("A) Mucosa esofágica:"), "", "cabeçalho da amostra sem negrito");
-eq(t.lineKind("- MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:"), "b", "título em negrito");
+eq(t.lineKind("- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:"), "b", "título em negrito");
 eq(t.lineKind("- " + gHp.titulo + ":"), "b", "título com H. pylori em negrito");
 eq(t.lineKind("- Ausência de hiperplasia da camada basal."), "", "item normal");
 eq(t.lineKind("- Hiperplasia foveolar: Não identificada."), "", "par rótulo: valor normal");
@@ -276,7 +276,7 @@ const gNeutro = t.SEED_SITES.gastrica.criterios.find(c => c.g === "Infiltrado ne
 eq(t.grauDaLinha(gNeutro[0][1]), "INATIVA", "linha ausente"); eq(t.grauDaLinha(gNeutro[2][1]), "EM ATIVIDADE MODERADA", "linha moderada");
 eq(t.tituloComAtiv("- GASTRITE CRÔNICA INATIVA:", "EM ATIVIDADE MODERADA"), "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA:", "critério -> título");
 eq(t.tituloComAtiv("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:", "INATIVA"), "- GASTRITE CRÔNICA INATIVA, ASSOCIADA A H. pylori:", "critério ausente -> título");
-eq(t.tituloComAtiv("- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "INATIVA"), "- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "título não inflamatório não muda");
+eq(t.tituloComAtiv("- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "INATIVA"), "- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "título não inflamatório não muda");
 eq(t.tituloComAtiv("- RETITE ATIVA LEVE:", "EM ATIVIDADE ACENTUADA"), "- RETITE ATIVA ACENTUADA:", "convenção 'ativa' preservada");
 eq(t.linhaAtiv("gastrica", "EM ATIVIDADE MODERADA"), gNeutro[2][1].slice(2), "título -> linha (estômago)");
 ok(t.linhaAtiv("colon", "EM ATIVIDADE LEVE").includes("criptite ocasional"), "título -> linha (cólon)");
@@ -649,7 +649,7 @@ for (const [sg, nm] of [["Íleo terminal", "Mucosa de íleo terminal"], ["Íleo 
   els.fSitio.value = "ileo"; els.fSeg.value = sg; els.fSeg.onchange(); eq(els.fNome.value, nm, "nome do íleo sem repetição: " + (sg || "sem segmento")); }
 // modificador
 const TA = t.titleSetAmostra;
-eq(TA("- MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "exigua", "esofago"), "- EXÍGUO FRAGMENTO DE MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "título MUCOSA: só prefixo");
+eq(TA("- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "exigua", "esofago"), "- EXÍGUO FRAGMENTO DE MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "título MUCOSA: só prefixo");
 eq(TA("- COLITE CRÔNICA INATIVA:", "exigua", "colon"), "- EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "outro título: mucosa do sítio + apresentando");
 eq(TA("- EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "superficial", "colon"), "- FRAGMENTO SUPERFICIAL DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "exígua -> superficial");
 eq(TA("- FRAGMENTO SUPERFICIAL DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", null, "colon"), "- COLITE CRÔNICA INATIVA:", "adequada desfaz");
@@ -689,7 +689,7 @@ ok(t.laudoToPreviewHTML("Materiais: x.\n \nA) X:\n- Linha com *itálico*.").incl
 ok(t.laudoToRichHTML("Materiais: x.\n \nA) X:\n- GASTRITE ASSOCIADA A H. PYLORI:").includes("<i>H. PYLORI</i>"), "itálico do H. pylori continua");
 
 // 17. v3.5.1: duodeno, cólon e reto com os dois cabeçalhos de normalidade (como o íleo)
-for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔNICA"], ["reto", "MUCOSA RETAL"], ["ileo", "MUCOSA DE ÍLEO"]]) {
+for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔNICA"], ["reto", "MUCOSA RETAL"], ["ileo", "MUCOSA DE ÍLEO"], ["esofago", "MUCOSA ESOFÁGICA"], ["gastrica", "MUCOSA GÁSTRICA DE PADRÃO ANTRAL"], ["gastrica", "MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO"]]) {
   const ps = t.SEED_SITES[k].presets, achar = (tt) => ps.filter(p => p.titulo === tt);
   const sem = achar(muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), apr = achar(muc + " APRESENTANDO"), ex = achar("EXÍGUO FRAGMENTO DE " + muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
   ok(sem.length === 1 && apr.length === 1 && ex.length === 1, k + ": dois cabeçalhos e um exíguo");

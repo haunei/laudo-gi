@@ -337,7 +337,14 @@ const SEED_SITES = {
     nome:"Esôfago", nomeAmostra:"Mucosa esofágica", eos:"EoE",
     segmentos:["Terço proximal","Terço médio","Terço distal","Transição esôfago-gástrica"],
     presets:[
-      P("MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+      P("MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
+        "Ausência de hiperplasia da camada basal.",
+        "Ausência de ascensão vascular capilar intraepitelial.",
+        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
+        "Não foi identificada metaplasia intestinal."]),
+      P("MUCOSA ESOFÁGICA APRESENTANDO",[
         "Ausência de hiperplasia da camada basal.",
         "Ausência de ascensão vascular capilar intraepitelial.",
         "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
@@ -410,13 +417,25 @@ const SEED_SITES = {
     nome:"Mucosa gástrica", nomeAmostra:"Mucosa gástrica", eos:"EoG",
     segmentos:["Cárdia","Antro","Corpo/fundo (oxíntico)","Transição corpo-antro","Misto oxíntico/mucinoso","Incisura","Transição esôfago-gástrica"],
     presets:[
-      P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+      P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Amostragem: Mucosa gástrica de padrão antral.",
         "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa.","Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
-      P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+      P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL APRESENTANDO",[
+        "Amostragem: Mucosa gástrica de padrão antral.",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa.","Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
+      P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa."]),
+      P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO APRESENTANDO",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
         "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
@@ -1089,7 +1108,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.5.1";
+const APP_VERSION="3.5.2";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
