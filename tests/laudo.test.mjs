@@ -632,7 +632,7 @@ els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.fSeg.onchange
 eq(els.fNome.value, "Mucosa duodenal (2ª porção)", "nome da amostra do duodeno");
 // textos prontos de amostra exígua
 for (const k of ["esofago", "gastrica", "duodeno", "ileo", "colon", "reto"]) {
-  const ex = t.SEED_SITES[k].presets.filter(p => /^EXÍGUO FRAGMENTO DE MUCOSA .* SEM (ALTERAÇÕES|PARTICULARIDADES) HISTOPATOLÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
+  const ex = t.SEED_SITES[k].presets.filter(p => /^EXÍGUO FRAGMENTO DE MUCOSA .* SEM (ALTERAÇÕES|PARTICULARIDADES) HISTO(PATO)?LÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
   ok(ex.length >= 1, "texto pronto exíguo: " + k);
   for (const p of ex) {
     eq(p.bullets[0], "Amostra exígua, pouco representativa.", "linha de amostragem primeiro: " + p.titulo);
@@ -641,7 +641,12 @@ for (const k of ["esofago", "gastrica", "duodeno", "ileo", "colon", "reto"]) {
   }
 }
 eq(t.SEED_SITES.gastrica.presets.filter(p => /^EXÍGUO/.test(p.titulo)).length, 2, "estômago: antral e oxíntico");
-ok(!t.SEED_SITES.ileo.presets.find(p => /^EXÍGUO/.test(p.titulo)).bullets.some(b => /folicular|edema/.test(b)), "íleo exíguo só com linhas de normalidade");
+const ilN = t.SEED_SITES.ileo.presets.filter(p => /^(EXÍGUO FRAGMENTO DE )?MUCOSA DE ÍLEO (SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS|APRESENTANDO)$/.test(p.titulo));
+eq(ilN.map(p => p.titulo).join(" | "), "MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS | MUCOSA DE ÍLEO APRESENTANDO | EXÍGUO FRAGMENTO DE MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "íleo: dois cabeçalhos de normalidade e o exíguo");
+eq(ilN[0].bullets.join("|"), ilN[1].bullets.join("|"), "íleo: os dois cabeçalhos com os mesmos achados");
+eq(ilN[2].bullets.slice(1).join("|"), ilN[0].bullets.join("|"), "íleo exíguo: mesmos achados + linha de amostragem");
+for (const [sg, nm] of [["Íleo terminal", "Mucosa de íleo terminal"], ["Íleo (neoterminal)", "Mucosa de íleo neoterminal"], ["Bolsa ileal", "Mucosa de bolsa ileal"], ["", "Mucosa de íleo terminal"]]) {
+  els.fSitio.value = "ileo"; els.fSeg.value = sg; els.fSeg.onchange(); eq(els.fNome.value, nm, "nome do íleo sem repetição: " + (sg || "sem segmento")); }
 // modificador
 const TA = t.titleSetAmostra;
 eq(TA("- MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "exigua", "esofago"), "- EXÍGUO FRAGMENTO DE MUCOSA ESOFÁGICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS:", "título MUCOSA: só prefixo");

@@ -4,6 +4,7 @@
 - Duodeno: a nota de falta de consenso sobre o número normal de eosinófilos passa a nomear só os segmentos com contagem no laudo (estômago, duodeno, íleo, cólon, reto); antes saía sempre "do íleo e do cólon". Segmento "2ª porção (descendente)" vira "2ª porção" (amostra "Mucosa duodenal (2ª porção)").
 - Amostra exígua: texto pronto em esôfago, estômago (antral e oxíntico), duodeno, íleo, cólon e reto ("EXÍGUO FRAGMENTO DE MUCOSA … SEM ALTERAÇÕES/PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS"), com a linha "Amostra exígua, pouco representativa.".
 - Modificador "Amostra" nesses sítios: exígua, superficial ou adequada; insere a linha e ajusta o início do título ("EXÍGUO FRAGMENTO DE …" / "FRAGMENTO SUPERFICIAL DE …"; título que não começa por "MUCOSA" ganha "… DE MUCOSA <sítio> APRESENTANDO …"). Nota automática de viés amostral; alerta quando título e linha não batem.
+- Íleo: dois cabeçalhos de normalidade com os mesmos achados ("MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS" e "MUCOSA DE ÍLEO APRESENTANDO"); o exíguo segue o primeiro, com os mesmos achados. Nome padrão sem repetição: "Mucosa de íleo terminal", "Mucosa de íleo neoterminal", "Mucosa de bolsa ileal".
 - Editor da amostra: barra com caixa alta, caixa baixa, negrito, itálico e sublinhado no trecho selecionado (clicar de novo desfaz). Negrito, itálico e sublinhado saem formatados na prévia e na cópia para o MV; na cópia em texto simples, as marcas saem.
 
 ## v3.4.0 — 2026-10-10

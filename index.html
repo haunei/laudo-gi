@@ -555,6 +555,11 @@ const SEED_SITES = {
     nome:"Íleo", nomeAmostra:"Mucosa de íleo terminal", eos:"EoN",
     segmentos:["Íleo terminal","Íleo (neoterminal)","Bolsa ileal"],
     presets:[
+      P("MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
+        "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("MUCOSA DE ÍLEO APRESENTANDO",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
         "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
@@ -697,13 +702,10 @@ const ACHADOS_EOS = {g:"Eosinófilos: achados associados", dica:"Marque os prese
 const AM_LINHA = {exigua:"Amostra exígua, pouco representativa.", superficial:"Amostra superficial, pouco representativa."};
 const AM_PRE = {exigua:"EXÍGUO FRAGMENTO DE ", superficial:"FRAGMENTO SUPERFICIAL DE "};
 const MUC_SITIO = {esofago:"MUCOSA ESOFÁGICA", gastrica:"MUCOSA GÁSTRICA", duodeno:"MUCOSA DUODENAL", ileo:"MUCOSA DE ÍLEO", colon:"MUCOSA COLÔNICA", reto:"MUCOSA RETAL"};
-["esofago","gastrica","duodeno","colon"].forEach(k=>{
-  const site=SEED_SITES[k], normais=site.presets.filter(p=>/^MUCOSA .*SEM (ALTERAÇÕES|PARTICULARIDADES) HISTOPATOLÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
+["esofago","gastrica","duodeno","ileo","colon"].forEach(k=>{
+  const site=SEED_SITES[k], normais=site.presets.filter(p=>/^MUCOSA .*SEM (ALTERAÇÕES|PARTICULARIDADES) HISTO(PATO)?LÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
   normais.forEach(p=>site.presets.push(P(AM_PRE.exigua+p.titulo, [AM_LINHA.exigua].concat(p.bullets))));
 });
-// íleo: o texto de normalidade tem título incompleto ("MUCOSA DE ÍLEO APRESENTANDO") e linhas de hiperplasia folicular e edema; o exíguo usa só as três linhas de normalidade
-SEED_SITES.ileo.presets.push(P(AM_PRE.exigua+"MUCOSA DE ÍLEO SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",
-  [AM_LINHA.exigua].concat(SEED_SITES.ileo.presets.find(p=>p.titulo==="MUCOSA DE ÍLEO APRESENTANDO").bullets.slice(0,3))));
 
 // Reto: mesmos textos do cólon, com a nomenclatura de reto
 SEED_SITES.reto.presets = SEED_SITES.reto.presets.filter(p=>/^RETITE/.test(p.titulo)).concat(SEED_SITES.colon.presets.map(p=>
@@ -823,6 +825,7 @@ const HS_L = {
   margS:"Margem proximal: Sem achados de zona de transição (aganglionose parcial circunferencial, hipoganglionose mioentérica ou hipertrofia de nervos submucosos [@veras]).",
   margPre:"Margem proximal: Achados de zona de transição presentes: "
 };
+const ILEO_NOME = {"Íleo terminal":"Mucosa de íleo terminal","Íleo (neoterminal)":"Mucosa de íleo neoterminal","Bolsa ileal":"Mucosa de bolsa ileal"};
 const HS_NOME = {"Congelação / nivelamento":"Biópsias de nivelamento (congelação)","Peça de abaixamento":"Produto de abaixamento de retossigmoide","Rebiopsia / reoperação":"Biópsia retal pós-abaixamento"};
 const HS_AMOSTRAGEM = ["Fragmentos examinados: 3.","Examinados 10 níveis de corte.","Bloco esgotado: Sim."];
 
@@ -1864,6 +1867,7 @@ function applyDefaultName(){
   const site=currentSite(), seg=$("fSeg").value;
   let base=site.nomeAmostra;
   if(site.id==="hirschsprung"){ $("fNome").value = HS_NOME[seg] || base; return; }
+  if(site.id==="ileo"){ $("fNome").value = ILEO_NOME[seg] || base; return; }
   if(seg){ base = (site.nome==="Cólon"||site.nome==="Reto") ? seg : base+" ("+seg.toLowerCase()+")"; }
   $("fNome").value=base;
 }
