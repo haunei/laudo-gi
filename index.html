@@ -505,7 +505,15 @@ const SEED_SITES = {
     nome:"Duodeno", nomeAmostra:"Mucosa duodenal", eos:"EoN",
     segmentos:["Bulbo","2ª porção","Distal"],
     presets:[
-      P("MUCOSA DUODENAL SEM PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+      P("MUCOSA DUODENAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
+        "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
+        "Presença de glândulas de Brünner.",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos nas pontas das vilosidades).",
+        "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
+        "Classificação de Marsh-Oberhuber (1999): 0."]),
+      P("MUCOSA DUODENAL APRESENTANDO",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
         "Presença de glândulas de Brünner.",
         "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
@@ -595,7 +603,12 @@ const SEED_SITES = {
     nome:"Cólon", nomeAmostra:"Mucosa colônica", eos:"EoC",
     segmentos:["Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Anastomose íleo-retal"],
     presets:[
-      P("MUCOSA COLÔNICA SEM ALTERAÇÕES HISTOPATOLÓGICAS SIGNIFICATIVAS",[
+      P("MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
+        "Arquitetura glandular preservada.",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Presença de edema e vasocongestão."]),
+      P("MUCOSA COLÔNICA APRESENTANDO",[
         "Arquitetura glandular preservada.",
         "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
@@ -1076,7 +1089,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.5.0";
+const APP_VERSION="3.5.1";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.

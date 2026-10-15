@@ -617,7 +617,7 @@ ok(gr("Rebiopsia / reoperação").some(g => /^Reoperação: técnica prévia/.te
 
 // 16. v3.5: nota de consenso por segmento, duodeno, amostra exígua/superficial, barra do editor
 ({ t, els } = boot({}));
-const duoCorpo = "- MUCOSA DUODENAL SEM PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS:\n" + t.comVR("- Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção");
+const duoCorpo = "- MUCOSA DUODENAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n" + t.comVR("- Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção");
 t.WORK.samples.push({ nome: "Mucosa duodenal (2ª porção)", corpo: duoCorpo, site: "duodeno", seg: "2ª porção" });
 let l16 = t.buildLaudo();
 ok(l16.includes("- Não há consenso sobre o número normal de eosinófilos na mucosa do duodeno; os valores variam"), "duodeno: nota de consenso fala do duodeno");
@@ -687,6 +687,18 @@ eq(t.tiraMarcas("a **b** *c* __d__"), "a b c d", "texto simples sem marcas");
 ok(t.laudoToRichHTML("Materiais: x.\n \nA) X:\n- Linha com **destaque** e __sublinhado__.").includes("Linha com <b>destaque</b> e <u>sublinhado</u>."), "cópia formatada para o MV");
 ok(t.laudoToPreviewHTML("Materiais: x.\n \nA) X:\n- Linha com *itálico*.").includes("<i>itálico</i>"), "prévia formatada");
 ok(t.laudoToRichHTML("Materiais: x.\n \nA) X:\n- GASTRITE ASSOCIADA A H. PYLORI:").includes("<i>H. PYLORI</i>"), "itálico do H. pylori continua");
+
+// 17. v3.5.1: duodeno, cólon e reto com os dois cabeçalhos de normalidade (como o íleo)
+for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔNICA"], ["reto", "MUCOSA RETAL"], ["ileo", "MUCOSA DE ÍLEO"]]) {
+  const ps = t.SEED_SITES[k].presets, achar = (tt) => ps.filter(p => p.titulo === tt);
+  const sem = achar(muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), apr = achar(muc + " APRESENTANDO"), ex = achar("EXÍGUO FRAGMENTO DE " + muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
+  ok(sem.length === 1 && apr.length === 1 && ex.length === 1, k + ": dois cabeçalhos e um exíguo");
+  eq(apr[0].bullets.join("|"), sem[0].bullets.join("|"), k + ": mesmos achados nos dois cabeçalhos");
+  eq(ex[0].bullets.join("|"), ["Amostra exígua, pouco representativa."].concat(sem[0].bullets).join("|"), k + ": exíguo com os mesmos achados");
+  ok(!ps.some(p => /SEM (ALTERAÇÕES|PARTICULARIDADES) HISTOPATOLÓGICAS/.test(p.titulo)), k + ": sem a redação antiga");
+  for (const p of [sem[0], apr[0], ex[0]]) { eq(t.lineKind("- " + p.titulo + ":"), "b", "negrito: " + p.titulo); eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância: " + p.titulo); }
+  eq(ps.indexOf(apr[0]), ps.indexOf(sem[0]) + 1, k + ": \"apresentando\" logo depois");
+}
 
 console.log(`OK — ${n} asserts`);
 

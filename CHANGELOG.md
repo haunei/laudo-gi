@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.5.1 — 2026-10-15
+- Duodeno, cólon e reto, como o íleo: dois cabeçalhos de normalidade para os mesmos achados, "MUCOSA DUODENAL/COLÔNICA/RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS" (antes "…SEM PARTICULARIDADES HISTOPATOLÓGICAS…" no duodeno e "…SEM ALTERAÇÕES HISTOPATOLÓGICAS…" no cólon/reto) e "MUCOSA … APRESENTANDO"; o exíguo de cada sítio acompanha o primeiro.
+
 ## v3.5.0 — 2026-10-15
 - Duodeno: a nota de falta de consenso sobre o número normal de eosinófilos passa a nomear só os segmentos com contagem no laudo (estômago, duodeno, íleo, cólon, reto); antes saía sempre "do íleo e do cólon". Segmento "2ª porção (descendente)" vira "2ª porção" (amostra "Mucosa duodenal (2ª porção)").
 - Amostra exígua: texto pronto em esôfago, estômago (antral e oxíntico), duodeno, íleo, cólon e reto ("EXÍGUO FRAGMENTO DE MUCOSA … SEM ALTERAÇÕES/PARTICULARIDADES HISTOPATOLÓGICAS SIGNIFICATIVAS"), com a linha "Amostra exígua, pouco representativa.".
