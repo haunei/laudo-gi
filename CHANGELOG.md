@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.6.1 — 2026-10-19
+- Barra do editor: botão ⟳ "Atualizar título e achados", que roda a sincronia título ↔ linhas sob demanda (trazido da cópia v3.5.3 do vault).
+
 ## v3.6.0 — 2026-10-18
 - Estômago conforme o segmento: escolher Antro, Corpo/fundo, transição corpo-antro ou misto adapta os textos prontos (título "EM MUCOSA DE …" e linha "Amostragem") e o bloco que está no editor; o botão "Amostragem (padrão)" ajusta o título e o título editado ajusta a linha. Cárdia, incisura e transição esôfago-gástrica ficam como estão.
 - Estômago: a linha de neutrófilos dos textos prontos segue o grau do título (Sistema Sydney atualizado); a gastropatia linfocitária "em atividade moderada" passa a ter a linha moderada.

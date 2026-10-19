@@ -818,6 +818,14 @@ const lz = t.buildLaudo();
 ok(lz.includes(t.CITE.corazza07) && lz.includes(t.CITE.husby20) && !/\[@/.test(lz), "refs de Corazza e Husby numeradas");
 for (const p of D2.presets) eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância: " + p.titulo.slice(0, 40));
 
+// 20. v3.6.1: botão ⟳ (vindo da v3.5.3 do vault) roda a sincronia título <-> linhas
+({ t, els } = boot({}));
+els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção";
+els.corpo.value = "- DUODENITE CRÔNICA INATIVA:\n- Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo).";
+els.tb_sync.onclick();
+ok(/Corazza-Villanacci \(2007\): B2/.test(els.corpo.value), "⟳ sincroniza (Corazza a partir do Marsh)");
+ok(html.includes('id="tb_sync"'), "botão ⟳ na barra do editor");
+
 console.log(`OK — ${n} asserts`);
 
 

@@ -262,7 +262,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 <section class="card col" id="colC">
   <div class="noprint">
     <label class="fld">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
-      <span class="tbar" id="tbar"><button type="button" class="ghost" id="tb_up" data-fx="up" title="Caixa alta no trecho selecionado">AA</button><button type="button" class="ghost" id="tb_low" data-fx="low" title="Caixa baixa no trecho selecionado">aa</button><button type="button" class="ghost" id="tb_b" data-fx="b" title="Negrito"><b>N</b></button><button type="button" class="ghost" id="tb_i" data-fx="i" title="Itálico"><i>I</i></button><button type="button" class="ghost" id="tb_u" data-fx="u" title="Sublinhado"><u>S</u></button></span>
+      <span class="tbar" id="tbar"><button type="button" class="ghost" id="tb_up" data-fx="up" title="Caixa alta no trecho selecionado">AA</button><button type="button" class="ghost" id="tb_low" data-fx="low" title="Caixa baixa no trecho selecionado">aa</button><button type="button" class="ghost" id="tb_b" data-fx="b" title="Negrito"><b>N</b></button><button type="button" class="ghost" id="tb_i" data-fx="i" title="Itálico"><i>I</i></button><button type="button" class="ghost" id="tb_u" data-fx="u" title="Sublinhado"><u>S</u></button><button type="button" class="ghost" id="tb_sync" title="Atualizar título e achados (sincronia título ↔ linhas)" aria-label="Atualizar título e achados">⟳</button></span>
       <textarea id="corpo" rows="10" spellcheck="true" lang="pt-BR" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
     </label>
     <div class="editor-actions">
@@ -1162,7 +1162,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.6.0";
+const APP_VERSION="3.6.1";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -2217,6 +2217,8 @@ $("corpo").onchange=ressincEditor;
   b.onclick=()=>{ const ta=$("corpo"), r=marcaSel(ta.value, ta.selectionStart, ta.selectionEnd, fx);
     if(!r){ toast("Selecione um trecho no editor"); return; }
     ta.value=r.text; ta.focus(); ta.setSelectionRange(r.a, r.b); }; });
+$("tb_sync").onmousedown=e=>e.preventDefault();
+$("tb_sync").onclick=()=>{ ressincEditor(); $("corpo").focus(); toast("Título e achados sincronizados"); };
 $("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); hsPrev=hsBloco($("corpo").value).tits.join("\n"); };
 function aplicaTema(t){ t = t==="claro" ? "claro" : "escuro"; if(document.documentElement) document.documentElement.setAttribute("data-tema", t); $("temaSel").value=t; return t; }
 $("temaSel").onchange=()=>{ store(LS_TEMA, aplicaTema($("temaSel").value)); };
