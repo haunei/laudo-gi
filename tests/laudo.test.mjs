@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -893,7 +893,76 @@ for (const k of ["esofago", "gastrica", "duodeno", "colon"]) { const g = grupoAs
   eq(t.concorda(linha).trocas.length, 0, "concordância da linha de achados: " + k); eq(t.concorda(g.opt[0][1]).trocas.length, 0, "concordância de \"ausentes\": " + k); }
 ok(html.includes("Campora M, et al. Pathologica. 2022;114(1):79-88") && html.includes("grupo \"Eosinófilos: achados associados\""), "painel com fonte e indicação do grupo");
 
+// 22. v3.8: Materiais (lista visível), nome da amostra do esôfago, esofagite dissecante superficial
+({ t, els } = boot({}));
+const selHtml = html.match(/<select id="fPrefixoSel">([\s\S]*?)<\/select>/)[1];
+eq((selHtml.match(/<option/g) || []).length, 7, "Materiais: 6 opções + Outro…");
+for (const p of t.PREFIXOS) ok(selHtml.includes(">" + p + "<"), "opção visível: " + p);
+ok(!/<datalist id="prefixList"/.test(html), "sem datalist que escondia as opções");
+els.fPrefixoSel.value = "Biópsias colonoscópicas de:"; els.fPrefixoSel.onchange();
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Reto", corpo: "- RETITE CRÔNICA INATIVA:", site: "reto", seg: "Reto" });
+ok(t.buildLaudo().startsWith("Materiais: Biópsias colonoscópicas de: A) Reto."), "opção da lista vai para o laudo");
+els.fPrefixoSel.value = "__outro"; els.fPrefixo.value = "Fragmentos de:"; els.fPrefixoSel.onchange();
+ok(!els.fPrefixo.hidden && t.buildLaudo().startsWith("Materiais: Fragmentos de: A) Reto."), "Outro… com texto livre");
+const st22 = {}; ({ t, els } = boot(st22)); t.WORK.prefixo = "Peças cirúrgicas de:"; t.saveNow();
+({ t, els } = boot(st22));
+ok(els.fPrefixoSel.value === "__outro" && els.fPrefixo.value === "Peças cirúrgicas de:" && !els.fPrefixo.hidden, "rascunho com prefixo fora da lista abre em Outro…");
+// nome da amostra no esôfago
+({ t, els } = boot({}));
+for (const [sg, nm] of [["", "Esôfago"], ["Terço proximal", "Esôfago proximal"], ["Terço distal", "Esôfago distal"], ["Terço médio", "Mucosa esofágica (terço médio)"], ["Transição esôfago-gástrica", "Mucosa esofágica (transição esôfago-gástrica)"]]) {
+  els.fSitio.value = "esofago"; els.fSeg.value = sg; els.fSeg.onchange(); eq(els.fNome.value, nm, "nome do esôfago: " + (sg || "sem segmento")); }
+ok(!els.nomeBtns.hidden, "botões de nome visíveis no esôfago");
+els.nb_esodist.onclick(); eq(els.fNome.value, "Esôfago distal", "botão Esôfago distal");
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.fSeg.onchange(); ok(els.nomeBtns.hidden, "botões escondidos fora do esôfago");
+ok(t.MATS_PADRAO.includes("Esôfago proximal") && t.MATS_PADRAO.includes("Esôfago distal"), "nomes no autocompletar");
+// EDS
+const gE = t.SEED_SITES.esofago.criterios.find(c => /^Descamação superficial/.test(c.g));
+ok(gE && gE.stack.pos === " [@carmack09,hart15,rubrecht25]", "grupo de descamação com referências");
+const L3 = "- Achados de descamação superficial: Aspecto em dois tons (camada superficial necrótica, eosinofílica, sobre epitélio viável basofílico), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial e paraqueratose [@carmack09,hart15,rubrecht25].";
+const L1 = "- Achados de descamação superficial: Paraqueratose [@carmack09,hart15,rubrecht25].";
+eq(t.edsEstado(L3), "suficiente", "3 critérios: suficiente");
+eq(t.edsEstado(L1), "inesp", "1 critério: inespecífico");
+eq(t.edsEstado("- Achados de descamação superficial: Aspecto em dois tons (x) e paraqueratose [@carmack09]."), "inesp", "2 critérios: inespecífico");
+eq(t.edsEstado("- Achados de descamação superficial: Não identificados."), null, "ausentes");
+eq(t.edsEstado("- Ausência de hiperplasia da camada basal."), undefined, "sem linha");
+eq(t.titleSetEds("- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "suficiente"), "- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "normalidade vira título de EDS");
+eq(t.titleSetEds("- MUCOSA ESOFÁGICA APRESENTANDO:", "suficiente"), "- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "\"apresentando\" vira título de EDS");
+const tEoE = "- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):";
+const tEoEeds = t.titleSetEds(tEoE, "suficiente");
+eq(tEoEeds, "- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "esofagite ganha o trecho de EDS");
+eq(t.titleSetEds(tEoEeds, "inesp"), tEoE, "trecho sai quando os critérios caem");
+eq(t.titleSetEds(tEoE, "inesp"), tEoE, "inespecífico não muda o título");
+eq(t.lineKind(tEoEeds), "b", "título em negrito");
+// editor
+els.fSitio.value = "esofago"; els.fSeg.value = "Terço distal"; els.corpo.value = "- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Ausência de hiperplasia da camada basal.";
+t.appendLine(L3);
+ok(els.corpo.value.startsWith("- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):"), "editor: 3 critérios mudam o título");
+t.appendLine(L1);
+ok(els.corpo.value.split("\n").filter(l => /^- Achados de descamação/.test(l)).length === 1, "linha de descamação troca, não duplica");
+els.corpo.value = tEoE + "\n- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).";
+els.corpo.onfocus(); els.corpo.value += "\n" + L3; els.corpo.onchange();
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):"), "edição à mão: EoE ganha o trecho de EDS");
+// texto pronto, notas, alertas
+const pEds = t.SEED_SITES.esofago.presets.find(p => /^ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE/.test(p.titulo));
+ok(pEds && t.edsEstado(t.presetText(pEds)) === "suficiente", "texto pronto de EDS coerente com a regra");
+t.WORK.samples.length = 0;
+t.WORK.samples.push({ nome: "Esôfago distal", corpo: t.presetText(pEds), site: "esofago", seg: "Terço distal" }, { nome: "Esôfago proximal", corpo: t.presetText(pEds), site: "esofago", seg: "Terço proximal" },
+  { nome: "Esôfago", corpo: "- ESOFAGITE CRÔNICA INATIVA:\n" + L1, site: "esofago", seg: "" });
+const l22 = t.buildLaudo();
+ok(/- Amostras A e B: os achados histológicos \(aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose\) são compatíveis com esofagite dissecante superficial \[[\d,-]+\]; o diagnóstico requer correlação com o achado endoscópico/.test(l22), "nota de EDS, amostras juntas");
+ok(/- Amostra C: os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial/.test(l22), "nota de achado inespecífico");
+ok(["carmack09", "hart15", "rubrecht25", "ebigbo21"].every(k => l22.includes(t.CITE[k])) && !/\[@/.test(l22), "4 referências de EDS numeradas");
+ok(!t.alertas().some(a => /dissecante/.test(a.msg)), "títulos coerentes: sem alerta");
+t.WORK.samples[2].corpo = "- ESOFAGITE CRÔNICA INATIVA, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):\n" + L1;
+ok(t.alertas().some(a => /Amostra C: o título fala em esofagite dissecante superficial, mas a linha de descamação não tem os 3 critérios/.test(a.msg)), "alerta: título de EDS sem critérios");
+t.WORK.samples[2].corpo = "- ESOFAGITE CRÔNICA INATIVA:\n" + L3;
+ok(t.alertas().some(a => /Amostra C: a linha de descamação tem os critérios de esofagite dissecante superficial e o título não os menciona/.test(a.msg)), "alerta: critérios sem título de EDS");
+ok(t.LIB.notas.some(n => n.tag === "EDS") && t.LIB.notas.some(n => n.tag === "Descamação inespecífica"), "notas de EDS na biblioteca");
+eq(t.concorda(t.presetText(pEds)).trocas.length, 0, "concordância do texto pronto de EDS");
+eq(t.concorda(gE.stack.pre + gE.stack.itens.map(i => i[1]).join(", ") + gE.stack.pos + ".").trocas.length, 0, "concordância da linha de descamação");
+
 console.log(`OK — ${n} asserts`);
+
 
 
 

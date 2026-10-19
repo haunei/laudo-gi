@@ -224,8 +224,8 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 <section class="card col noprint" id="colA">
   <h2><span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 15h9"/></svg></span>Amostra</h2>
   <label class="fld">Materiais: início da frase
-    <input type="text" id="fPrefixo" list="prefixList">
-    <datalist id="prefixList"><option value="Biópsias endoscópicas/colonoscópicas de:"><option value="Biópsia endoscópica/colonoscópica de:"><option value="Biópsias endoscópicas de:"><option value="Biópsia endoscópica de:"><option value="Biópsias colonoscópicas de:"></datalist>
+    <select id="fPrefixoSel"><option>Biópsias endoscópicas/colonoscópicas de:</option><option>Biópsia endoscópica/colonoscópica de:</option><option>Biópsias endoscópicas de:</option><option>Biópsia endoscópica de:</option><option>Biópsias colonoscópicas de:</option><option>Biópsia colonoscópica de:</option><option value="__outro">Outro…</option></select>
+    <input type="text" id="fPrefixo" hidden placeholder="Escreva o início da frase" style="margin-top:6px;">
   </label>
   <div class="grid-id acc acc-id">
     <label class="fld">Letra
@@ -240,6 +240,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
     <label class="fld" style="grid-column:1/-1;">Nome da amostra (vai em “Materiais” e no cabeçalho)
       <input type="text" id="fNome" list="matList" placeholder="ex.: Mucosa esofágica">
       <datalist id="matList"></datalist>
+      <span class="tbar" id="nomeBtns" hidden><button type="button" class="ghost" id="nb_eso">Esôfago</button><button type="button" class="ghost" id="nb_esoprox">Esôfago proximal</button><button type="button" class="ghost" id="nb_esodist">Esôfago distal</button></span>
     </label>
   </div>
   <div class="subpanel acc-dx grow">
@@ -351,6 +352,12 @@ const SEED_SITES = {
         "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
+      P("ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS)",[
+        "Achados de descamação superficial: Aspecto em dois tons (camada superficial necrótica, eosinofílica, sobre epitélio viável basofílico), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial, paraqueratose e inflamação mínima ou ausente [@carmack09,hart15,rubrecht25].",
+        "Ausência de hiperplasia da camada basal.",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
+        "Não foi identificada metaplasia intestinal."]),
       P("ESOFAGITE CRÔNICA INATIVA",[
         "Hiperplasia da camada basal.",
         "Espongiose.",
@@ -403,6 +410,13 @@ const SEED_SITES = {
       {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
           monta:x=>"- Metaplasia intestinal: Presente"+(x[0]?", "+x[0]:"")+(x[1]?", "+x[1]:"")+"."}},
+      {g:"Descamação superficial (padrão de esofagite dissecante)", dica:"Dois tons + descamação/flaking com clivagem + paraqueratose = critérios de esofagite dissecante superficial (Rubrecht 2025; Hart 2015): o título muda. Com menos itens, fica como achado inespecífico, em qualquer título.",
+        opt:[["Ausentes","- Achados de descamação superficial: Não identificados."]],
+        stack:{pre:"- Achados de descamação superficial: ", pos:" [@carmack09,hart15,rubrecht25]", itens:[
+          ["dois tons","aspecto em dois tons (camada superficial necrótica, eosinofílica, sobre epitélio viável basofílico)"],
+          ["descamação/flaking","descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial"],
+          ["paraqueratose","paraqueratose"],["bolhas","bolhas intraepiteliais"],
+          ["clivagem do conjuntivo","clivagem do tecido conjuntivo"],["inflamação mínima","inflamação mínima ou ausente"]]}},
       {g:"Lâmina própria superficial", opt:[
         ["Representada","- Lâmina própria superficial: Representada."],["Não representada","- Lâmina própria superficial: Não representada."]]},
       {g:"Infiltrado inflamatório na lâmina própria", opt:[
@@ -915,6 +929,7 @@ const HS_L = {
   margS:"Margem proximal: Sem achados de zona de transição (aganglionose parcial circunferencial, hipoganglionose mioentérica ou hipertrofia de nervos submucosos [@veras]).",
   margPre:"Margem proximal: Achados de zona de transição presentes: "
 };
+const ESO_NOME = {"":"Esôfago", "Terço proximal":"Esôfago proximal", "Terço distal":"Esôfago distal"};
 const ILEO_NOME = {"Íleo terminal":"Mucosa de íleo terminal","Íleo (neoterminal)":"Mucosa de íleo neoterminal","Bolsa ileal":"Mucosa de bolsa ileal"};
 const HS_NOME = {"Congelação / nivelamento":"Biópsias de nivelamento (congelação)","Peça de abaixamento":"Produto de abaixamento de retossigmoide","Rebiopsia / reoperação":"Biópsia retal pós-abaixamento"};
 const HS_AMOSTRAGEM = ["Fragmentos examinados: 3.","Examinados 10 níveis de corte.","Bloco esgotado: Sim."];
@@ -1072,12 +1087,18 @@ const NOTAS_PADRAO = [
   {tag:"Pólipo hamartomatoso", texto:"Pólipo hamartomatoso: recomenda-se correlação com o número e a localização dos pólipos e com a história familiar, para avaliação de síndrome de polipose."},
   {tag:"Granulomas", texto:"Não foram identificados granulomas em nenhuma das amostras examinadas."},
   {tag:"Displasia", texto:"Não foi identificada displasia em nenhuma das amostras examinadas."},
+  {tag:"EDS", texto:"Os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica [@carmack09]. Em crianças, há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21]."},
+  {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09]."},
   {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
   {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
 ];
 
 /* ============================ REFERÊNCIAS CITÁVEIS (marca [@chave] no texto vira [n]) ============================ */
 const CITE = {
+  carmack09:"Carmack SW, Vemulapalli R, Spechler SJ, Genta RM. Esophagitis dissecans superficialis (\"sloughing esophagitis\"): a clinicopathologic study of 12 cases. Am J Surg Pathol. 2009;33(12):1789-94. doi:10.1097/PAS.0b013e3181b7ce21.",
+  hart15:"Hart PA, Romano RC, Moreira RK, Ravi K, Sweetser S. Esophagitis Dissecans Superficialis: Clinical, Endoscopic, and Histologic Features. Dig Dis Sci. 2015;60(7):2049-57. doi:10.1007/s10620-015-3590-3.",
+  rubrecht25:"Rubrecht A, Saulino D, Nasri E, Esnakula AK, Gonzalo DH, Feely MM, et al. Sloughing Esophagitis in the Pediatric Age Group: Clinicopathologic Characteristics of 12 Cases. Pediatr Dev Pathol. 2025;28(3):172-178. doi:10.1177/10935266251322063.",
+  ebigbo21:"Ebigbo N, Park JY, Cheng E, Gurram B. Esophagitis Dissecans Superficialis in Children. J Pediatr Gastroenterol Nutr. 2021;73(2):e30-e34. doi:10.1097/MPG.0000000000003154.",
   campora22:"Campora M, Mastracci L, Carlin L, Unti E, Parente P, Fassan M, et al. Pathologist's approach to paediatric and neonatal eosinophilic gastrointestinal disorders. Pathologica. 2022;114(1):79-88. doi:10.32074/1591-951X-734.",
   corazza07:"Corazza GR, Villanacci V, Zambelli C, Milione M, Luinetti O, Vindigni C, et al. Comparison of the interobserver reproducibility with different histologic criteria used in celiac disease. Clin Gastroenterol Hepatol. 2007;5(7):838-43. doi:10.1016/j.cgh.2007.03.019.",
   villanacci20:"Villanacci V, Vanoli A, Leoncini G, Arpa G, Salviato T, Bonetti LR, et al. Celiac disease: histology-differential diagnosis-complications. A practical approach. Pathologica. 2020;112(3):186-196. doi:10.32074/1591-951X-157.",
@@ -1126,8 +1147,14 @@ const EOS_VR = {
 };
 const ESO_EOS_CAMPO=12;            // 15 por 0,3 mm² no campo FN 22
 const ESO_LINF = {"Transição esôfago-gástrica":62, "Terço distal":46, "Terço médio":41, "Terço proximal":41}; // Putra 2016
-const MATS_PADRAO = ["Esôfago","Mucosa esofágica","Lesão de esôfago","Mucosa gástrica","Estômago","Duodeno","Mucosa duodenal","Íleo","Íleo terminal","Mucosa de íleo terminal","Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Reto","Anastomose íleo-retal"];
+const MATS_PADRAO = ["Esôfago","Esôfago proximal","Esôfago distal","Mucosa esofágica","Lesão de esôfago","Mucosa gástrica","Estômago","Duodeno","Mucosa duodenal","Íleo","Íleo terminal","Mucosa de íleo terminal","Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Reto","Anastomose íleo-retal"];
 const PREFIXO_PADRAO = "Biópsias endoscópicas/colonoscópicas de:";
+const PREFIXOS = [PREFIXO_PADRAO, "Biópsia endoscópica/colonoscópica de:", "Biópsias endoscópicas de:", "Biópsia endoscópica de:", "Biópsias colonoscópicas de:", "Biópsia colonoscópica de:"];
+// mostra o início da frase na lista; texto fora da lista abre em "Outro…" com o texto preservado
+function renderPrefixo(){
+  const v=WORK.prefixo||PREFIXO_PADRAO, na=PREFIXOS.includes(v);
+  $("fPrefixoSel").value = na ? v : "__outro"; $("fPrefixo").hidden = na; $("fPrefixo").value = na ? "" : v;
+}
 const DECH_CRIPTAS = [
   ["sem","sem destruição","apoptose isolada, criptas íntegras (grau 1 de Lerner)"],
   ["isolada","destruição isolada","perda de uma cripta ou microabscesso apoptótico (grau 2)"],
@@ -1153,6 +1180,8 @@ function notaCeliaca(corpo){
 }
 const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
 const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
+const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica [@carmack09]. Em crianças, há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
+const NOTA_DESC_INESP="os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09].";
 const NOTA_EXIGUA="o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral.";
 const NOTA_SUPERF="o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral.";
 
@@ -1187,7 +1216,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.7.0";
+const APP_VERSION="3.8.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1654,6 +1683,33 @@ function eosSinc(){
   editTitle(t=>titleSetEos(t, est));
 }
 
+// esofagite dissecante superficial: "suficiente" (dois tons + descamação com clivagem + paraqueratose), "inesp" (menos itens), null (ausentes), undefined (sem linha)
+const RE_EDS_LINHA=/^- Achados de descamação superficial: (.*)$/m;
+const RE_T_EDS_FULL=/^- (?:(?:EXÍGUO FRAGMENTO|FRAGMENTO SUPERFICIAL) DE )?ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL/, RE_T_EDS_TR=/(,? )COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL/;
+const T_EDS="- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):";
+function edsEstado(txt){
+  const m=(txt||"").match(RE_EDS_LINHA); if(!m) return undefined;
+  if(/^Não identificados/.test(m[1])) return null;
+  return (/dois tons/i.test(m[1]) && /descamação e flaking/i.test(m[1]) && /paraqueratose/i.test(m[1])) ? "suficiente" : "inesp";
+}
+function titleSetEds(title, est){
+  if(est===undefined || RE_T_EDS_FULL.test(title)) return title;
+  if(est==="suficiente"){
+    if(/^- MUCOSA ESOFÁGICA/.test(title)) return T_EDS;
+    if(!/ESOFAGITE/.test(title)) return title;
+    let t=titleSetTrecho(title, RE_T_EDS_TR, "COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL", true);
+    return /\(VIDE NOTAS?\)/.test(t) ? t : t.replace(/:$/, " (VIDE NOTAS):");
+  }
+  return titleSetTrecho(title, RE_T_EDS_TR, "", false);
+}
+function edsSinc(){
+  const ta=$("corpo"), ls=ta.value.split("\n"); let st=-1;
+  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  if(st<0) return;
+  const est=edsEstado(ls.slice(st+1).join("\n"));
+  editTitle(t=>titleSetEds(t, est));
+}
+
 // critério clicado -> título (e, no H. pylori, linha de atividade coerente com o título)
 function sincAposLinha(line){
   const site=$("fSitio").value;
@@ -1670,6 +1726,7 @@ function sincAposLinha(line){
   else if(/^- Grau da duodenite: /.test(line)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(line)));
   else if(RE_MARSH.test(line)) corazzaSinc();
   if(/eosinófilos?\/campo de grande aumento|^- Achados eosinofílicos associados: /.test(line)) eosSinc();
+  if(site==="esofago" && /^- Achados de descamação superficial: /.test(line)) edsSinc();
 }
 // título -> linha de neutrófilos do bloco
 function tituloParaLinha(site){
@@ -1688,6 +1745,7 @@ function ressincEditor(){
   if(site==="gastrica" && tit && tit!==prevTit){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
   if(site==="duodeno") corazzaSinc();
   if(EOS_ASSOC[site] || ["duodeno","ileo","reto"].includes(site)) eosSinc();
+  if(site==="esofago") edsSinc();
   if(site==="duodeno" && /DUODENITE CRÔNICA/.test(tit)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(ta.value.split("\n").slice(ta.value.split("\n").lastIndexOf(tit)).join("\n"))));
   if(tit && tit!==prevTit) tituloParaLinha(site);
   else { const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
@@ -1859,6 +1917,7 @@ function autoNotas(){
     }
     if(s.site==="hirschsprung") hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n));
     if(s.site==="duodeno"){ const nc=notaCeliaca(s.corpo); if(nc) add(L_, nc); }
+    if(s.site==="esofago"){ const ed=edsEstado(s.corpo); if(ed==="suficiente") add(L_, NOTA_EDS); else if(ed==="inesp") add(L_, NOTA_DESC_INESP); }
     if(RE_EOS_ASSOC_POS.test(s.corpo||"")){
       if(s.site==="esofago" && /^- Achados eosinofílicos associados: .*(microabscessos eosinofílicos|camada superficial)/mi.test(s.corpo)) add(L_, NOTA_EOE_QUAL);
       add(L_, NOTA_EOS_QUAL);
@@ -1917,6 +1976,9 @@ function alertas(){
   WORK.samples.forEach((s,i)=>{ const c=s.corpo||"", tit=c.split("\n").filter(l=>lineKind(l)==="b").pop()||"";
     if(!tit || !s.site) return;
     const est=eosEstado(c, s.site, s.seg);
+    if(s.site==="esofago"){ const ed=edsEstado(c), tEds=RE_T_EDS_FULL.test(tit) || RE_T_EDS_TR.test(tit);
+      if(tEds && ed!=="suficiente") out.push({conf:false, msg:"Amostra "+letterOf(i)+": o título fala em esofagite dissecante superficial, mas a linha de descamação não tem os 3 critérios (dois tons, descamação com clivagem, paraqueratose)."});
+      if(!tEds && ed==="suficiente") out.push({conf:false, msg:"Amostra "+letterOf(i)+": a linha de descamação tem os critérios de esofagite dissecante superficial e o título não os menciona; confira o título."}); }
     if(est && !RE_T_EOS.test(tit)) out.push({conf:false, msg:"Amostra "+letterOf(i)+": há "+(RE_EOS_ASSOC_POS.test(c) ? "achados eosinofílicos associados" : "contagem de eosinófilos acima do limiar")+" e o título não indica o padrão eosinofílico; confira o título."});
   });
   WORK.samples.forEach((s,i)=>{ if(s.site!=="duodeno") return; const c=s.corpo||"", rot="Amostra "+letterOf(i);
@@ -2073,6 +2135,8 @@ function applyDefaultName(){
   const site=currentSite(), seg=$("fSeg").value;
   let base=site.nomeAmostra;
   if(site.id==="hirschsprung"){ $("fNome").value = HS_NOME[seg] || base; return; }
+  $("nomeBtns").hidden = site.id!=="esofago";
+  if(site.id==="esofago" && seg in ESO_NOME){ $("fNome").value = ESO_NOME[seg]; return; }
   if(site.id==="ileo"){ $("fNome").value = ILEO_NOME[seg] || base; return; }
   if(seg){ base = (site.nome==="Cólon"||site.nome==="Reto") ? seg : base+" ("+seg.toLowerCase()+")"; }
   $("fNome").value=base;
@@ -2270,6 +2334,9 @@ $("fSeg").onchange=()=>{ applyDefaultName(); const st=$("fSitio").value;
   if(st==="hirschsprung"){ renderPresets(); renderCrit(); }
   if(st==="gastrica"){ renderPresets(); const ta=$("corpo"), n=adaptaGas(ta.value, $("fSeg").value); if(n!==ta.value){ ta.value=n; prevTit=ultimoTitulo(n); toast("Texto ajustado ao segmento"); } } };
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
+[["nb_eso","Esôfago"],["nb_esoprox","Esôfago proximal"],["nb_esodist","Esôfago distal"]].forEach(([id,n])=>{ $(id).onclick=()=>{ $("fNome").value=n; }; });
+$("fPrefixoSel").onchange=()=>{ const v=$("fPrefixoSel").value, outro=v==="__outro";
+  $("fPrefixo").hidden=!outro; WORK.prefixo = outro ? $("fPrefixo").value : v; if(outro) $("fPrefixo").focus(); save(); renderLaudo(); };
 $("notas").oninput=()=>{ WORK.notasFree=$("notas").value; save(); renderLaudo(); };
 $("notas").onchange=()=>{ if(corrigeCampo("notas")){ WORK.notasFree=$("notas").value; save(); renderLaudo(); } };
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
@@ -2298,7 +2365,7 @@ function init(){
   renderSitioSelect();
   onSiteChange();
   $("fLetra").value=nextLetter();
-  $("fPrefixo").value=WORK.prefixo||PREFIXO_PADRAO;
+  renderPrefixo();
   renderMatList();
   $("notas").value=WORK.notasFree||"";
   $("refsFree").value=WORK.refsFree||"";
