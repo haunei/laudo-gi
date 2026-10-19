@@ -353,7 +353,7 @@ const SEED_SITES = {
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
       P("ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS)",[
-        "Achados de descamação superficial: Aspecto em dois tons (camada superficial necrótica, eosinofílica, sobre epitélio viável basofílico), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial, paraqueratose e inflamação mínima ou ausente [@carmack09,hart15,rubrecht25].",
+        "Achados de descamação superficial: Aspecto em dois tons (núcleos picnóticos e necróticos na zona superficial, sobre zona basal de aspecto normal), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial, paraqueratose proeminente (de várias camadas celulares) e inflamação mínima ou ausente [@carmack09,hart15,rubrecht25].",
         "Ausência de hiperplasia da camada basal.",
         "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
@@ -374,7 +374,7 @@ const SEED_SITES = {
         "Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).",
         "A exocitose de eosinófilos é localizada predominantemente no terço médio da espessura do epitélio mucoso.",
         "Achados eosinofílicos associados: Não identificados (sem microabscessos eosinofílicos, eosinófilos em camada superficial ou degranulação [@gio]).",
-        "Presença de áreas de descamação superficial de células epiteliais escamosas de aspecto reativo, não sendo evidenciados eosinófilos entremeados.",
+        "Achados de descamação superficial: Descamação de células epiteliais escamosas superficiais de aspecto reativo, sem eosinófilos entremeados [@carmack09,hart15,rubrecht25].",
         "Não foi representada lâmina própria.",
         "Não foi identificada metaplasia intestinal."]),
       P("ESOFAGITE EROSIVA FÚNGICA (VIDE NOTAS)",[
@@ -410,12 +410,12 @@ const SEED_SITES = {
       {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
           monta:x=>"- Metaplasia intestinal: Presente"+(x[0]?", "+x[0]:"")+(x[1]?", "+x[1]:"")+"."}},
-      {g:"Descamação superficial (padrão de esofagite dissecante)", dica:"Dois tons + descamação/flaking com clivagem + paraqueratose = critérios de esofagite dissecante superficial (Rubrecht 2025; Hart 2015): o título muda. Com menos itens, fica como achado inespecífico, em qualquer título.",
+      {g:"Descamação superficial (padrão de esofagite dissecante)", dica:"Dois tons + descamação/flaking com clivagem + paraqueratose = critérios de esofagite dissecante superficial (Rubrecht 2025; Hart 2015): o título muda. Com menos itens, fica como achado inespecífico, em qualquer título. Epitélio destacado sem necrose, inflamação ou paraqueratose pode ser artefato do procedimento; paraqueratose fina, de poucas camadas, aparece também sobre estenoses (Carmack 2009).",
         opt:[["Ausentes","- Achados de descamação superficial: Não identificados."]],
         stack:{pre:"- Achados de descamação superficial: ", pos:" [@carmack09,hart15,rubrecht25]", itens:[
-          ["dois tons","aspecto em dois tons (camada superficial necrótica, eosinofílica, sobre epitélio viável basofílico)"],
+          ["dois tons","aspecto em dois tons (núcleos picnóticos e necróticos na zona superficial, sobre zona basal de aspecto normal)"],
           ["descamação/flaking","descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial"],
-          ["paraqueratose","paraqueratose"],["bolhas","bolhas intraepiteliais"],
+          ["paraqueratose","paraqueratose proeminente (de várias camadas celulares)"],["bolhas","bolhas intraepiteliais"],
           ["clivagem do conjuntivo","clivagem do tecido conjuntivo"],["inflamação mínima","inflamação mínima ou ausente"]]}},
       {g:"Lâmina própria superficial", opt:[
         ["Representada","- Lâmina própria superficial: Representada."],["Não representada","- Lâmina própria superficial: Não representada."]]},
@@ -1087,8 +1087,8 @@ const NOTAS_PADRAO = [
   {tag:"Pólipo hamartomatoso", texto:"Pólipo hamartomatoso: recomenda-se correlação com o número e a localização dos pólipos e com a história familiar, para avaliação de síndrome de polipose."},
   {tag:"Granulomas", texto:"Não foram identificados granulomas em nenhuma das amostras examinadas."},
   {tag:"Displasia", texto:"Não foi identificada displasia em nenhuma das amostras examinadas."},
-  {tag:"EDS", texto:"Os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica [@carmack09]. Em crianças, há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21]."},
-  {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09]."},
+  {tag:"EDS", texto:"Os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21]."},
+  {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09]; epitélio escamoso destacado, sem necrose, inflamação ou paraqueratose, pode corresponder a artefato do procedimento e não é, por si só, diagnóstico [@carmack09]."},
   {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
   {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
 ];
@@ -1180,8 +1180,9 @@ function notaCeliaca(corpo){
 }
 const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
 const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
-const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica [@carmack09]. Em crianças, há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
-const NOTA_DESC_INESP="os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09].";
+const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
+const NOTA_DESC_INESP="os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09]; epitélio escamoso destacado, sem necrose, inflamação ou paraqueratose, pode corresponder a artefato do procedimento e não é, por si só, diagnóstico [@carmack09].";
+const NOTA_EDS_BOLHA="bolhas e clivagem intraepitelial proeminentes exigem exclusão de dermatoses vesicobolhosas (síndrome de Stevens-Johnson, pênfigo, penfigoide), por imunofluorescência e correlação clínica [@carmack09].";
 const NOTA_EXIGUA="o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral.";
 const NOTA_SUPERF="o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral.";
 
@@ -1917,7 +1918,7 @@ function autoNotas(){
     }
     if(s.site==="hirschsprung") hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n));
     if(s.site==="duodeno"){ const nc=notaCeliaca(s.corpo); if(nc) add(L_, nc); }
-    if(s.site==="esofago"){ const ed=edsEstado(s.corpo); if(ed==="suficiente") add(L_, NOTA_EDS); else if(ed==="inesp") add(L_, NOTA_DESC_INESP); }
+    if(s.site==="esofago"){ const ed=edsEstado(s.corpo); if(ed==="suficiente") add(L_, NOTA_EDS); else if(ed==="inesp") add(L_, NOTA_DESC_INESP); if(ed && /^- Achados de descamação superficial: .*bolhas intraepiteliais/mi.test(s.corpo)) add(L_, NOTA_EDS_BOLHA); }
     if(RE_EOS_ASSOC_POS.test(s.corpo||"")){
       if(s.site==="esofago" && /^- Achados eosinofílicos associados: .*(microabscessos eosinofílicos|camada superficial)/mi.test(s.corpo)) add(L_, NOTA_EOE_QUAL);
       add(L_, NOTA_EOS_QUAL);

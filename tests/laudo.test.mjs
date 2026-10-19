@@ -918,7 +918,7 @@ ok(t.MATS_PADRAO.includes("Esôfago proximal") && t.MATS_PADRAO.includes("Esôfa
 // EDS
 const gE = t.SEED_SITES.esofago.criterios.find(c => /^Descamação superficial/.test(c.g));
 ok(gE && gE.stack.pos === " [@carmack09,hart15,rubrecht25]", "grupo de descamação com referências");
-const L3 = "- Achados de descamação superficial: Aspecto em dois tons (camada superficial necrótica, eosinofílica, sobre epitélio viável basofílico), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial e paraqueratose [@carmack09,hart15,rubrecht25].";
+const L3 = "- Achados de descamação superficial: Aspecto em dois tons (núcleos picnóticos e necróticos na zona superficial, sobre zona basal de aspecto normal), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial e paraqueratose proeminente (de várias camadas celulares) [@carmack09,hart15,rubrecht25].";
 const L1 = "- Achados de descamação superficial: Paraqueratose [@carmack09,hart15,rubrecht25].";
 eq(t.edsEstado(L3), "suficiente", "3 critérios: suficiente");
 eq(t.edsEstado(L1), "inesp", "1 critério: inespecífico");
@@ -960,6 +960,21 @@ ok(t.alertas().some(a => /Amostra C: a linha de descamação tem os critérios d
 ok(t.LIB.notas.some(n => n.tag === "EDS") && t.LIB.notas.some(n => n.tag === "Descamação inespecífica"), "notas de EDS na biblioteca");
 eq(t.concorda(t.presetText(pEds)).trocas.length, 0, "concordância do texto pronto de EDS");
 eq(t.concorda(gE.stack.pre + gE.stack.itens.map(i => i[1]).join(", ") + gE.stack.pos + ".").trocas.length, 0, "concordância da linha de descamação");
+
+// 22b. EDS revisto com os textos completos (Carmack 2009, Hart 2015, Rubrecht 2025)
+({ t, els } = boot({}));
+const pEoE2 = t.SEED_SITES.esofago.presets.find(p => /COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA/.test(p.titulo));
+ok(!pEoE2.bullets.some(b => /^Presença de áreas de descamação superficial/.test(b)) && t.edsEstado(t.presetText(pEoE2)) === "inesp", "EoE: frase livre trocada pela linha padronizada (achado inespecífico)");
+t.WORK.samples.length = 0;
+t.WORK.samples.push({ nome: "Esôfago", corpo: t.presetText(pEoE2), site: "esofago", seg: "" });
+let l22b = t.buildLaudo();
+ok(/não é, por si só, diagnóstico \[\d+\]/.test(l22b), "nota inespecífica fala do artefato do procedimento");
+const pEds2 = t.SEED_SITES.esofago.presets.find(p => /^ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE/.test(p.titulo));
+ok(/núcleos picnóticos e necróticos na zona superficial/.test(pEds2.bullets[0]) && /paraqueratose proeminente/.test(pEds2.bullets[0]), "texto pronto com as definições dos artigos");
+t.WORK.samples[0] = { nome: "Esôfago", corpo: t.presetText(pEds2).replace("paraqueratose proeminente", "bolhas intraepiteliais, paraqueratose proeminente"), site: "esofago", seg: "" };
+l22b = t.buildLaudo();
+ok(/sem achado endoscópico característico, o diagnóstico deve permanecer descritivo/.test(l22b) && /o achado endoscópico clássico nem sempre está presente/.test(l22b), "nota de EDS: diagnóstico descritivo sem endoscopia e ressalva pediátrica");
+ok(/dermatoses vesicobolhosas \(síndrome de Stevens-Johnson, pênfigo, penfigoide\), por imunofluorescência/.test(l22b), "bolhas: nota de dermatoses vesicobolhosas");
 
 console.log(`OK — ${n} asserts`);
 
