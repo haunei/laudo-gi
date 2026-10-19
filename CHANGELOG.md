@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.6.0 — 2026-10-18
+- Estômago conforme o segmento: escolher Antro, Corpo/fundo, transição corpo-antro ou misto adapta os textos prontos (título "EM MUCOSA DE …" e linha "Amostragem") e o bloco que está no editor; o botão "Amostragem (padrão)" ajusta o título e o título editado ajusta a linha. Cárdia, incisura e transição esôfago-gástrica ficam como estão.
+- Estômago: a linha de neutrófilos dos textos prontos segue o grau do título (Sistema Sydney atualizado); a gastropatia linfocitária "em atividade moderada" passa a ter a linha moderada.
+- Doença celíaca: notas automáticas no duodeno — padrão linfocítico inespecífico (linfocitose sem atrofia) e linfocitose com atrofia vilositária favorecendo doença celíaca — com referências (ESPGHAN 2020, Lauwers 2015, Smyrk 2017); as duas também na biblioteca de notas.
+- Duodeno: linha de neutrófilos sempre diz se há criptite (ausente / presente sem criptite / presente com criptite); atividade segue presente ou ausente, como em Whitehead 1975. Título "DUODENITE CRÔNICA DE PADRÃO LINFOCÍTICO, EM ATIVIDADE / INATIVA (VIDE NOTAS)", sem vilosidades e criptas no título. Novo grau da duodenite (Whitehead 1975: leve, moderada, acentuada), que entra no título.
+- Agregados linfoides (presentes / não identificados) no estômago e no íleo. Metaplasia foveolar gástrica (grau qualitativo, sem escala publicada) e atrofia vilositária (parcial, subtotal, total = Marsh-Oberhuber 3A, 3B, 3C) no duodeno e no íleo.
+
 ## v3.5.2 — 2026-10-15
 - Esôfago e estômago no mesmo esquema de título de duodeno, íleo, cólon e reto: "MUCOSA ESOFÁGICA / GÁSTRICA DE PADRÃO ANTRAL / GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS" (antes "…SEM ALTERAÇÕES HISTOPATOLÓGICAS…") e "… APRESENTANDO", cada um com os achados do próprio sítio; os exíguos acompanham.
 
