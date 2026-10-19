@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -43,6 +43,7 @@ function boot(storage) {
 
 let n = 0; const ok = (c, m) => { assert.ok(c, m); n++; };
 const eq = (a, b, m) => { assert.equal(a, b, m); n++; };
+const alertasSemEos = (t) => t.alertas().filter(a => !/padrão eosinofílico/.test(a.msg));
 
 // 1. Primeira abertura, navegador limpo
 let st = {};
@@ -197,11 +198,11 @@ t.WORK.samples.push({ nome: "Íleo", corpo: "- MUCOSA DE ÍLEO INATIVA (DECH POS
 const l9 = t.buildLaudo();
 ok(l9.includes("- As alterações citopáticas descritas são sugestivas de ação viral; é necessária pesquisa imuno-histoquímica"), "nota viral automática");
 ok(/Categorias conforme o consenso NIH 2014 \[\d+\]\./.test(l9) && l9.includes(t.CITE.shulman), "nota e ref de DECH");
-eq(t.alertas().length, 1, "alerta de categoria DECH divergente");
+eq(t.alertas().filter(a => /DECH/.test(a.msg)).length, 1, "alerta de categoria DECH divergente"); ok(t.alertas().some(a => /Amostra B: há contagem de eosinófilos acima do limiar/.test(a.msg)), "v3.7: cólon com 95 e título sem padrão eosinofílico gera alerta");
 t.WORK.samples.push({ nome: "Reto", corpo: "- RETITE CRÔNICA INATIVA:\n- Presença de criptite neutrofílica (3 de 60 criptas avaliadas; 5%)." });
-eq(t.alertas().length, 2, "alerta de título INATIVA com criptite");
+eq(alertasSemEos(t).length, 2, "alerta de título INATIVA com criptite");
 t.WORK.samples.push({ nome: "Sigmoide", corpo: "- COLITE CRÔNICA EM ATIVIDADE MODERADA:\n- " + t.SEED_SITES.colon.criterios.find(c => c.g === "Infiltrado neutrofílico").opt[3][1].slice(2) });
-eq(t.alertas().length, 3, "alerta de grau do título diferente do grau da linha");
+eq(alertasSemEos(t).length, 3, "alerta de grau do título diferente do grau da linha");
 t.WORK.samples.pop();
 for (const [k, base] of [["esofago", "ESOFAGITE CRÔNICA"], ["gastrica", "GASTRITE CRÔNICA"], ["duodeno", "DUODENITE CRÔNICA"], ["ileo", "ILEÍTE CRÔNICA"], ["colon", "COLITE CRÔNICA"], ["reto", "RETITE CRÔNICA"]])
   for (const g of (k === "esofago" ? ["INATIVA", "EM ATIVIDADE", "EM ATIVIDADE, EROSIVA"] : k === "duodeno" ? ["INATIVA", "EM ATIVIDADE"] : ["INATIVA", "EM ATIVIDADE LEVE", "EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA"]))
@@ -325,7 +326,7 @@ ok(t.SEED_SITES.gastrica.segmentos.includes("Transição corpo-antro"), "segment
 ok(t.SEED_SITES.gastrica.criterios.find(c => /Amostragem/.test(c.g)).opt.some(o => o[1] === "- Amostragem: Mucosa gástrica de transição corpo-antro."), "amostragem de transição corpo-antro");
 for (const k of ["esofago", "gastrica", "duodeno", "ileo", "colon", "reto"]) {
   const a = t.SEED_SITES[k].criterios.find(c => c.g === "Eosinófilos: achados associados");
-  ok(a && a.stack.itens.some(i => /degranulação/.test(i[1])) && a.stack.itens.some(i => /microabscessos eosinofílicos/.test(i[1])), k + ": degranulação e microabscessos eosinofílicos");
+  ok(a && a.stack.itens.some(i => /degranulação/.test(i[1])) && a.stack.itens.some(i => /microabscessos eosinofílicos|abscesso eosinofílico/.test(i[1])), k + ": degranulação e microabscessos/abscesso eosinofílico");
 }
 ok(!t.SEED_SITES.polipo.criterios.some(c => /achados associados/.test(c.g)), "pólipo sem grupo de eosinófilos");
 const lp = t.SEED_SITES.esofago.criterios.filter(c => /^Lâmina própria superficial$|^Infiltrado inflamatório na lâmina própria$/.test(c.g));
@@ -338,7 +339,7 @@ t.WORK.samples.push({ nome: "Ceco", corpo: "- COLITE CRÔNICA INATIVA:" }); t.WO
 ok(t.buildLaudo().includes("NOTAS:\n- " + nG.texto + "\n- " + nD.texto), "notas em linhas separadas com '- '");
 t.WORK.samples.push({ nome: "Duodeno", corpo: "- DUODENITE:\n- Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos).\n- Classificação de Marsh-Oberhuber (1999): 3A." },
   { nome: "Antro", corpo: "- GASTRITE:\n- Metaplasia intestinal: Presente, completa, leve.\n- Atrofia: Presente, leve.\n- Classificação OLGIM: Estágio 0.\n- Classificação OLGA: Estágio 0." });
-eq(t.alertas().length, 3, "alertas de Marsh, OLGIM e OLGA incoerentes");
+eq(alertasSemEos(t).length, 3, "alertas de Marsh, OLGIM e OLGA incoerentes");
 // tema e DECH recolhível
 ok(!/prefers-color-scheme/.test(html), "tema não segue o sistema");
 ok(html.includes(':root[data-tema="claro"]') && html.includes('id="temaSel"'), "tema claro e seletor");
@@ -826,6 +827,73 @@ els.tb_sync.onclick();
 ok(/Corazza-Villanacci \(2007\): B2/.test(els.corpo.value), "⟳ sincroniza (Corazza a partir do Marsh)");
 ok(html.includes('id="tb_sync"'), "botão ⟳ na barra do editor");
 
+// 21. v3.7: achados eosinofílicos associados integrados (achados por sítio, título, notas, alertas, referências)
+({ t, els } = boot({}));
+const grupoAss = (k) => t.SEED_SITES[k].criterios.find(c => c.g === "Eosinófilos: achados associados");
+eq(grupoAss("esofago").stack.pos, " [@gio]", "esôfago: referência Giordano");
+for (const k of ["gastrica", "duodeno", "ileo", "colon", "reto"]) eq(grupoAss(k).stack.pos, " [@campora22]", k + ": referência Campora");
+ok(grupoAss("esofago").stack.itens.some(i => /4 ou mais eosinófilos, sem epitélio entre eles/.test(i[1])) && grupoAss("esofago").stack.itens.some(i => /3 ou mais alinhados no terço superior/.test(i[1])), "esôfago: critérios de microabscesso e camada superficial");
+ok(grupoAss("gastrica").stack.itens.some(i => /muscular da mucosa/.test(i[1])) && grupoAss("gastrica").stack.itens.some(i => /destruição glandular/.test(i[1])), "estômago: muscular da mucosa e destruição glandular");
+ok(grupoAss("duodeno").stack.itens.some(i => /camadas profundas/.test(i[1])) && grupoAss("duodeno").stack.itens.some(i => /epitélio de superfície e nas criptas/.test(i[1])), "duodeno: epitélio/criptas e camadas profundas");
+ok(grupoAss("colon").stack.itens.some(i => /criptite eosinofílica/.test(i[1])) && grupoAss("colon").stack.itens.some(i => /lençóis/.test(i[1])), "cólon: criptite e lençóis");
+ok(grupoAss("colon") === grupoAss("reto"), "reto usa o grupo do cólon");
+for (const k of ["esofago", "gastrica", "duodeno", "colon"]) ok(/\[@(gio|campora22)\]\)\.$/.test(grupoAss(k).opt[0][1]), k + ": \"Ausentes\" com referência");
+// título
+const TE = (tt, est) => t.titleSetEos(tt, est);
+eq(TE("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO:", "padrao"), "- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", "padrão eosinofílico entra no título");
+eq(TE("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", null), "- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO (VIDE NOTAS):", "e sai quando não há padrão");
+eq(TE("- ESOFAGITE CRÔNICA INATIVA:", "eoe"), "- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):", "esôfago: compatível com EoE");
+eq(TE("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):", "padrao"), "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", "esôfago: troca para padrão");
+eq(TE("- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "padrao"), "- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "normalidade não muda");
+eq(TE("- COLITE CRÔNICA INATIVA:", undefined), "- COLITE CRÔNICA INATIVA:", "sem dado de eosinófilos não mexe");
+eq(TE("- COLITE CRÔNICA INATIVA (DECH POSSÍVEL – NIH/2014):", "padrao"), "- COLITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (DECH POSSÍVEL – NIH/2014) (VIDE NOTAS):", "preserva o sufixo DECH");
+eq(t.eosEstado("- Presença de eosinófilos (até 44 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção"), "padrao", "duodeno 44: compatível");
+eq(t.eosEstado("- Presença de eosinófilos (até 30 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção"), null, "duodeno 30: sem padrão");
+eq(t.eosEstado("- Presença de eosinófilos (até 88 eosinófilos/campo de grande aumento).", "colon", "Ceco"), "padrao", "ceco 88: compatível");
+eq(t.eosEstado("- Exocitose de eosinófilos (até 12 eosinófilos/campo de grande aumento).", "esofago", ""), "eoe", "esôfago 12: EoE");
+eq(t.eosEstado("- Exocitose de eosinófilos (até 11 eosinófilos/campo de grande aumento).", "esofago", ""), null, "esôfago 11: sem padrão");
+eq(t.eosEstado("- Exocitose de eosinófilos (até 5 eosinófilos/campo de grande aumento).\n- Achados eosinofílicos associados: Microabscessos eosinofílicos [@gio].", "esofago", ""), "padrao", "esôfago abaixo do limiar com achado: padrão");
+eq(t.eosEstado("- Arquitetura glandular preservada.", "colon", "Ceco"), undefined, "sem dado: indefinido");
+// editor
+const hcE = (k, g, i) => t.SEED_SITES[k].criterios.find(c => c.g === g).opt[i][1];
+els.fSitio.value = "gastrica"; els.fSeg.value = "Antro"; els.corpo.value = "- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO:\n- Amostragem: Mucosa gástrica de padrão antral.";
+const ga = grupoAss("gastrica"), linhaGa = ga.stack.pre + "Eosinófilos em muscular da mucosa" + ga.stack.pos + ".";
+t.appendLine(linhaGa);
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):"), "editor: achado associado ajusta o título");
+t.appendLine(ga.opt[0][1]);
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO (VIDE NOTAS):") && els.corpo.value.split("\n").filter(l => /^- Achados eosinofílicos associados/.test(l)).length === 1, "editor: \"Ausentes\" troca a linha e tira o padrão");
+els.fSitio.value = "esofago"; els.fSeg.value = ""; els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:";
+t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).");
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):"), "editor: esôfago 21 vira compatível com EoE");
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("até 21 eosinófilos", "até 3 eosinófilos"); els.corpo.onchange();
+ok(!/EOSINOF/.test(els.corpo.value.split("\n")[0]), "editor: contagem editada à mão abaixo do limiar tira o trecho");
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Presença de eosinófilos (até 90 eosinófilos/campo de grande aumento).";
+els.tb_sync.onclick();
+ok(/^- COLITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(els.corpo.value), "botão ⟳: cólon 90 ganha padrão eosinofílico");
+// texto pronto da EoE e notas
+const eoeP = t.SEED_SITES.esofago.presets.find(p => /COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA/.test(p.titulo));
+ok(eoeP && eoeP.bullets.some(b => /^Achados eosinofílicos associados: Não identificados/.test(b)) && !t.SEED_SITES.esofago.presets.some(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)"), "texto pronto da EoE coerente com a regra");
+eq(t.eosEstado(t.presetText(eoeP), "esofago", ""), "eoe", "texto pronto da EoE: estado eoe");
+t.WORK.samples.length = 0;
+const eoeMicro = t.presetText(eoeP).replace(/- Achados eosinofílicos associados: .*/, "- Achados eosinofílicos associados: Microabscessos eosinofílicos (agrupamentos de 4 ou mais eosinófilos, sem epitélio entre eles) [@gio].");
+t.WORK.samples.push({ nome: "Esôfago distal", corpo: eoeMicro, site: "esofago", seg: "Terço distal" }, { nome: "Esôfago proximal", corpo: eoeMicro, site: "esofago", seg: "Terço proximal" },
+  { nome: "Antro", corpo: "- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):\n" + linhaGa, site: "gastrica", seg: "Antro" });
+const l21 = t.buildLaudo();
+ok(/- Amostras A e B: microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites \[\d+\]\./.test(l21), "nota da EoE com microabscesso, amostras juntas");
+ok(/- Amostras A, B e C: os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente/.test(l21), "nota dos achados qualitativos, amostras juntas");
+ok(/achado compatível com esofagite eosinofílica, na dependência de correlação clínica e da exclusão de causas secundárias de eosinofilia esofágica \[\d+\]/.test(l21), "nota de contagem do esôfago revista");
+ok(l21.includes(t.CITE.campora22) && l21.includes(t.CITE.gio) && !/\[@/.test(l21), "referências Campora e Giordano numeradas");
+ok(!t.alertas().some(a => /padrão eosinofílico/.test(a.msg)), "títulos coerentes: sem alerta de padrão eosinofílico");
+t.WORK.samples.push({ nome: "Ceco", corpo: "- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Achados eosinofílicos associados: Criptite eosinofílica [@campora22].", site: "colon", seg: "Ceco" });
+ok(t.alertas().some(a => /Amostra D: há achados eosinofílicos associados e o título não indica o padrão eosinofílico/.test(a.msg)), "normalidade com achado: alerta");
+t.WORK.samples.length = 0;
+t.WORK.samples.push({ nome: "Ceco", corpo: "- COLITE CRÔNICA INATIVA:\n- Achados eosinofílicos associados: Não identificados (sem agregados) [@campora22].", site: "colon", seg: "Ceco" });
+ok(!/reforçam o padrão eosinofílico/.test(t.buildLaudo()), "achados ausentes: sem nota nova");
+for (const k of ["esofago", "gastrica", "duodeno", "colon"]) { const g = grupoAss(k); const linha = g.stack.pre + g.stack.itens.map(i => i[1]).join(", ") + g.stack.pos + ".";
+  eq(t.concorda(linha).trocas.length, 0, "concordância da linha de achados: " + k); eq(t.concorda(g.opt[0][1]).trocas.length, 0, "concordância de \"ausentes\": " + k); }
+ok(html.includes("Campora M, et al. Pathologica. 2022;114(1):79-88") && html.includes("grupo \"Eosinófilos: achados associados\""), "painel com fonte e indicação do grupo");
+
 console.log(`OK — ${n} asserts`);
+
 
 

@@ -1,5 +1,11 @@
 # Changelog
 
+## v3.7.0 — 2026-10-19
+- Achados eosinofílicos associados integrados ao laudo (antes só no painel de limiares): grupo próprio por sítio, com critério e referência — esôfago (microabscessos ≥4, camada superficial ≥3, degranulação, alteração epitelial superficial, fibrose de lâmina própria; Giordano 2026), estômago (agrupamentos, intraepiteliais, abscesso intraluminal, destruição glandular, muscular da mucosa, degranulação), duodeno/íleo (epitélio de superfície e criptas, degranulação, microabscessos, camadas profundas) e cólon/reto (agregados/lençóis, intraepiteliais, criptite eosinofílica, microabscessos, degranulação, muscular da mucosa) (Campora 2022).
+- Título automático: achado associado ou contagem acima do limiar acrescenta "DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)"; no esôfago, com 15/0,3 mm² ou mais, "COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS)". Sai quando os dados deixam de sustentar. Títulos de normalidade não mudam: geram alerta.
+- Notas automáticas: achados qualitativos (densidade isolada não basta; exclusão de causas secundárias) e, no esôfago, microabscesso/camada superficial como característicos de EoE. Nota de contagem do esôfago passa a "compatível com esofagite eosinofílica".
+- Texto pronto da EoE renomeado e com a linha padronizada de achados associados; painel de limiares com as fontes e a indicação do grupo.
+
 ## v3.6.1 — 2026-10-19
 - Barra do editor: botão ⟳ "Atualizar título e achados", que roda a sincronia título ↔ linhas sob demanda (trazido da cópia v3.5.3 do vault).
 

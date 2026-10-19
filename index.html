@@ -214,7 +214,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
           <td>Eosinófilos em lâmina própria entre/dentro de criptas, intraepiteliais, em muscular da mucosa; criptite/abscesso eosinofílico.</td></tr>
       </tbody>
     </table>
-    <p class="eos-refs"><b>Pontos comuns:</b> procurar extensão para epitélio, microabscessos eosinofílicos (≥4 agrupados), degranulação, eosinófilos em camadas profundas (muscular da mucosa/submucosa). Densidade isolada é insuficiente — integrar com distribuição e arquitetura.<br>
+    <p class="eos-refs"><b>Pontos comuns:</b> procurar extensão para epitélio, microabscessos eosinofílicos (≥4 agrupados), degranulação, eosinófilos em camadas profundas (muscular da mucosa/submucosa). Densidade isolada é insuficiente — integrar com distribuição e arquitetura (Campora M, et al. Pathologica. 2022;114(1):79-88; esôfago: Giordano C, et al. Pathologica. 2026;118(1):4-14). No laudo: grupo "Eosinófilos: achados associados" de cada sítio, que ajusta o título e gera nota.<br>
     <b>Fonte dos limiares:</b> estômago, duodeno, íleo e cólon: Papadopoulou A, et al. J Pediatr Gastroenterol Nutr. 2024;78(1):122-152 (Tabela 6; consenso de especialistas, não dispensa clínica e exclusão de causas secundárias). Esôfago: Dellon ES, et al. Gastroenterology. 2018;155(4):1022-1033.e10.</p>
   </div>
 </details>
@@ -359,14 +359,14 @@ const SEED_SITES = {
         "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
-      P("ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)",[
+      P("ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS)",[
         "Hiperplasia exuberante (papilar) da camada basal.",
         "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
         "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).",
-        "A exocitose de eosinófilos é localizada predominantemente do terço médio da espessura do epitélio mucoso, não sendo evidenciados microabscessos eosinofílicos.",
-        "Não foi evidenciada degranulação franca de eosinófilos intraepiteliais, no material examinado.",
+        "A exocitose de eosinófilos é localizada predominantemente no terço médio da espessura do epitélio mucoso.",
+        "Achados eosinofílicos associados: Não identificados (sem microabscessos eosinofílicos, eosinófilos em camada superficial ou degranulação [@gio]).",
         "Presença de áreas de descamação superficial de células epiteliais escamosas de aspecto reativo, não sendo evidenciados eosinófilos entremeados.",
         "Não foi representada lâmina própria.",
         "Não foi identificada metaplasia intestinal."]),
@@ -729,11 +729,33 @@ SEED_SITES.colon.criterios = CRIT_COLON;
 SEED_SITES.reto.criterios = CRIT_COLON;
 
 // Achados associados aos eosinófilos (pilha), logo depois do grupo de contagem de cada sítio
-const ACHADOS_EOS = {g:"Eosinófilos: achados associados", dica:"Marque os presentes e clique em inserir: sai uma linha só.",
-  opt:[["Ausentes","- Achados eosinofílicos associados: Não identificados (sem degranulação ou microabscessos eosinofílicos)."]],
-  stack:{pre:"- Achados eosinofílicos associados: ", itens:[["degranulação","degranulação de eosinófilos"],["microabscessos eosinofílicos","microabscessos eosinofílicos"]]}};
-[SEED_SITES.esofago.criterios, SEED_SITES.gastrica.criterios, SEED_SITES.duodeno.criterios, SEED_SITES.ileo.criterios, CRIT_COLON].forEach(cr=>{
-  const i=cr.findIndex(c=>/^(Eosinófilos|Exocitose de eosinófilos)/.test(c.g)); cr.splice(i+1, 0, ACHADOS_EOS); });
+// A densidade isolada não basta: distribuição na parede, degranulação, criptite e abscessos entram no laudo (Campora 2022; no esôfago, Giordano 2026).
+// Marcar 1 ou mais itens põe o título em "DE PADRÃO EOSINOFÍLICO" (no esôfago com 15/0,3 mm² ou mais: "COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA") e gera nota.
+const EOS_ASSOC_DICA="Marque os presentes e clique em inserir: sai uma linha só, e o título passa a indicar o padrão eosinofílico. A densidade isolada não basta: distribuição, degranulação, criptite e abscessos contam.";
+const EOS_ASSOC = {
+  esofago:{ref:" [@gio]", aus:"sem microabscessos eosinofílicos, eosinófilos em camada superficial ou degranulação [@gio]", itens:[
+    ["microabscessos (4 ou mais)","microabscessos eosinofílicos (agrupamentos de 4 ou mais eosinófilos, sem epitélio entre eles)"],
+    ["camada superficial","eosinófilos em camada superficial (3 ou mais alinhados no terço superior do epitélio)"],
+    ["degranulação","degranulação de eosinófilos (grânulos extracelulares)"],
+    ["alteração epitelial superficial","alteração epitelial superficial (eosinofilia tintorial das células da superfície)"],
+    ["fibrose de lâmina própria","fibrose de lâmina própria"]]},
+  gastrica:{ref:" [@campora22]", aus:"sem eosinófilos intraepiteliais, abscessos, destruição glandular, eosinófilos em muscular da mucosa ou degranulação [@campora22]", itens:[
+    ["agrupamentos","agrupamentos de eosinófilos"],["intraepiteliais","eosinófilos intraepiteliais (epitélio foveolar/glandular)"],
+    ["abscesso intraluminal","abscesso eosinofílico intraluminal"],["destruição glandular","destruição glandular"],
+    ["muscular da mucosa","eosinófilos em muscular da mucosa"],["degranulação","degranulação de eosinófilos"]]},
+  intestino:{ref:" [@campora22]", aus:"sem eosinófilos no epitélio de superfície ou nas criptas, microabscessos, degranulação ou eosinófilos em camadas profundas [@campora22]", itens:[
+    ["epitélio de superfície e criptas","eosinófilos no epitélio de superfície e nas criptas (isolados ou em pequenos grupos)"],
+    ["degranulação","degranulação de eosinófilos"],["microabscessos","microabscessos eosinofílicos"],
+    ["camadas profundas","eosinófilos em camadas profundas (muscular da mucosa/submucosa)"]]},
+  colon:{ref:" [@campora22]", aus:"sem agregados de eosinófilos, eosinófilos intraepiteliais, criptite ou microabscessos eosinofílicos, degranulação ou eosinófilos em muscular da mucosa [@campora22]", itens:[
+    ["agregados/lençóis","agregados ou lençóis de eosinófilos"],["intraepiteliais","eosinófilos intraepiteliais (criptas/superfície)"],
+    ["criptite eosinofílica","criptite eosinofílica"],["microabscessos","microabscessos eosinofílicos"],
+    ["degranulação","degranulação de eosinófilos"],["muscular da mucosa","eosinófilos em muscular da mucosa"]]}
+};
+const grupoEosAssoc=k=>{ const a=EOS_ASSOC[k]; return {g:"Eosinófilos: achados associados", dica:EOS_ASSOC_DICA,
+  opt:[["Ausentes","- Achados eosinofílicos associados: Não identificados ("+a.aus+")."]], stack:{pre:"- Achados eosinofílicos associados: ", pos:a.ref, itens:a.itens}}; };
+[[SEED_SITES.esofago.criterios,"esofago"], [SEED_SITES.gastrica.criterios,"gastrica"], [SEED_SITES.duodeno.criterios,"intestino"], [SEED_SITES.ileo.criterios,"intestino"], [CRIT_COLON,"colon"]].forEach(([cr,k])=>{
+  const i=cr.findIndex(c=>/^(Eosinófilos|Exocitose de eosinófilos)/.test(c.g)); cr.splice(i+1, 0, grupoEosAssoc(k)); });
 
 // Amostra exígua: um texto pronto por sítio, com as linhas do texto de normalidade e a linha de amostragem
 const AM_LINHA = {exigua:"Amostra exígua, pouco representativa.", superficial:"Amostra superficial, pouco representativa."};
@@ -1056,6 +1078,7 @@ const NOTAS_PADRAO = [
 
 /* ============================ REFERÊNCIAS CITÁVEIS (marca [@chave] no texto vira [n]) ============================ */
 const CITE = {
+  campora22:"Campora M, Mastracci L, Carlin L, Unti E, Parente P, Fassan M, et al. Pathologist's approach to paediatric and neonatal eosinophilic gastrointestinal disorders. Pathologica. 2022;114(1):79-88. doi:10.32074/1591-951X-734.",
   corazza07:"Corazza GR, Villanacci V, Zambelli C, Milione M, Luinetti O, Vindigni C, et al. Comparison of the interobserver reproducibility with different histologic criteria used in celiac disease. Clin Gastroenterol Hepatol. 2007;5(7):838-43. doi:10.1016/j.cgh.2007.03.019.",
   villanacci20:"Villanacci V, Vanoli A, Leoncini G, Arpa G, Salviato T, Bonetti LR, et al. Celiac disease: histology-differential diagnosis-complications. A practical approach. Pathologica. 2020;112(3):186-196. doi:10.32074/1591-951X-157.",
   husby20:"Husby S, Koletzko S, Korponay-Szabó I, Kurppa K, Mearin ML, Ribes-Koninckx C, et al. European Society Paediatric Gastroenterology, Hepatology and Nutrition Guidelines for Diagnosing Coeliac Disease 2020. J Pediatr Gastroenterol Nutr. 2020;70(1):141-156. doi:10.1097/MPG.0000000000002497.",
@@ -1128,6 +1151,8 @@ function notaCeliaca(corpo){
   const atrof=/Marsh-Oberhuber \(1999\): 3[ABC]/.test(c) || /^- Atrofia vilositária: Presente/m.test(c) || /^- Arquitetura alterada: Atrofia/m.test(c);
   return lie && atrof ? NOTA_CELIACA : NOTA_LINF_DUO;
 }
+const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
+const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
 const NOTA_EXIGUA="o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral.";
 const NOTA_SUPERF="o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral.";
 
@@ -1162,7 +1187,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.6.1";
+const APP_VERSION="3.7.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1602,6 +1627,33 @@ function titleSetGrauDuo(t, grau){
 }
 function grauDuoDaLinha(txt){ const m=(txt||"").match(/^- Grau da duodenite: (Leve|Moderado|Acentuado)/m); return m ? {Leve:"LEVE", Moderado:"MODERADA", Acentuado:"ACENTUADA"}[m[1]] : null; }
 
+// eosinófilos -> título: "eoe" (esôfago com 15/0,3 mm² ou mais), "padrao" (achado associado ou contagem acima do limiar), null (dados sem padrão), undefined (sem dado: não mexe)
+const RE_EOS_ASSOC_POS=/^- Achados eosinofílicos associados: (?!Não identificados)/m, RE_EOS_ASSOC=/^- Achados eosinofílicos associados: /m;
+const RE_T_EOS=/(,? )(?:DE PADRÃO EOSINOFÍLICO|COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA)/;
+const RE_T_INFLAM=/ESOFAGITE|GASTRITE|GASTROPATIA|DUODENITE|ILEÍTE|ENTERITE|COLITE|COLOPATIA|RETITE|PROCTITE/;
+function eosEstado(txt, site, seg){
+  const t=txt||"", k=eosKey(site, seg), m=[...t.matchAll(/(\d+) eosinófilos?\/campo de grande aumento/g)].map(x=>+x[1]);
+  const temCont=m.length>0, temAssoc=RE_EOS_ASSOC.test(t);
+  if(!temCont && !temAssoc) return undefined;
+  const n=temCont ? Math.max(...m) : null, compat=k && n!==null && eosEval(k, n)==="compat";
+  if(site==="esofago" && compat) return "eoe";
+  return (compat || RE_EOS_ASSOC_POS.test(t)) ? "padrao" : null;
+}
+function titleSetEos(title, est){
+  if(est===undefined || !RE_T_INFLAM.test(title)) return title;
+  const novo = est==="eoe" ? "COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA" : est==="padrao" ? "DE PADRÃO EOSINOFÍLICO" : "";
+  let t=titleSetTrecho(title, RE_T_EOS, novo, true);
+  if(novo && !/\(VIDE NOTAS?\)/.test(t)) t=t.replace(/:$/, " (VIDE NOTAS):");
+  return t;
+}
+function eosSinc(){
+  const ta=$("corpo"), site=$("fSitio").value, ls=ta.value.split("\n"); let st=-1;
+  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  if(st<0) return;
+  const est=eosEstado(ls.slice(st+1).join("\n"), site, $("fSeg").value);
+  editTitle(t=>titleSetEos(t, est));
+}
+
 // critério clicado -> título (e, no H. pylori, linha de atividade coerente com o título)
 function sincAposLinha(line){
   const site=$("fSitio").value;
@@ -1617,6 +1669,7 @@ function sincAposLinha(line){
   else if(site==="gastrica" && RE_GAS_AM.test(line)){ const g=Object.values(GAS_SEG).find(x=>"- "+x.am===line); editTitle(t=>gasTitulo(t, g)); }
   else if(/^- Grau da duodenite: /.test(line)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(line)));
   else if(RE_MARSH.test(line)) corazzaSinc();
+  if(/eosinófilos?\/campo de grande aumento|^- Achados eosinofílicos associados: /.test(line)) eosSinc();
 }
 // título -> linha de neutrófilos do bloco
 function tituloParaLinha(site){
@@ -1634,6 +1687,7 @@ function ressincEditor(){
   const tit=ultimoTitulo(ta.value);
   if(site==="gastrica" && tit && tit!==prevTit){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
   if(site==="duodeno") corazzaSinc();
+  if(EOS_ASSOC[site] || ["duodeno","ileo","reto"].includes(site)) eosSinc();
   if(site==="duodeno" && /DUODENITE CRÔNICA/.test(tit)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(ta.value.split("\n").slice(ta.value.split("\n").lastIndexOf(tit)).join("\n"))));
   if(tit && tit!==prevTit) tituloParaLinha(site);
   else { const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
@@ -1683,7 +1737,7 @@ function comVR(line, siteId, seg){
 function eosNota(key, n){
   const a="a contagem de eosinófilos ", st=eosEval(key,n);
   if(key==="esofago") return st==="compat"
-    ? a+"atinge o critério histológico de 15 por 0,3 mm² [@agree]: achado compatível com esofagite de padrão eosinofílico, na dependência de correlação clínica."
+    ? a+"atinge o critério histológico de 15 por 0,3 mm² [@agree]: achado compatível com esofagite eosinofílica, na dependência de correlação clínica e da exclusão de causas secundárias de eosinofilia esofágica [@gio]."
     : a+"está abaixo do critério histológico de 15 por 0,3 mm² [@agree]: o achado desfavorece esofagite eosinofílica.";
   const v=EOS_VR[key];
   if(st==="compat") return a+"atinge o limiar de consenso para "+v.rot+" [@pap]: achado compatível com doença gastrointestinal eosinofílica, na dependência de quadro clínico compatível e da exclusão de causas secundárias [@pap].";
@@ -1805,6 +1859,10 @@ function autoNotas(){
     }
     if(s.site==="hirschsprung") hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n));
     if(s.site==="duodeno"){ const nc=notaCeliaca(s.corpo); if(nc) add(L_, nc); }
+    if(RE_EOS_ASSOC_POS.test(s.corpo||"")){
+      if(s.site==="esofago" && /^- Achados eosinofílicos associados: .*(microabscessos eosinofílicos|camada superficial)/mi.test(s.corpo)) add(L_, NOTA_EOE_QUAL);
+      add(L_, NOTA_EOS_QUAL);
+    }
     if(MUC_SITIO[s.site]){
       if(/^- Amostra exígua/m.test(s.corpo||"")) add(L_, NOTA_EXIGUA);
       if(/^- (Amostra superficial|Amostragem: Mucosa gástrica superficial)/m.test(s.corpo||"")) add(L_, NOTA_SUPERF);
@@ -1856,6 +1914,11 @@ function alertas(){
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
   WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
+  WORK.samples.forEach((s,i)=>{ const c=s.corpo||"", tit=c.split("\n").filter(l=>lineKind(l)==="b").pop()||"";
+    if(!tit || !s.site) return;
+    const est=eosEstado(c, s.site, s.seg);
+    if(est && !RE_T_EOS.test(tit)) out.push({conf:false, msg:"Amostra "+letterOf(i)+": há "+(RE_EOS_ASSOC_POS.test(c) ? "achados eosinofílicos associados" : "contagem de eosinófilos acima do limiar")+" e o título não indica o padrão eosinofílico; confira o título."});
+  });
   WORK.samples.forEach((s,i)=>{ if(s.site!=="duodeno") return; const c=s.corpo||"", rot="Amostra "+letterOf(i);
     if(/^- Classificação de Marsh-Oberhuber \(1999\): 1\./m.test(c)) out.push({conf:false, msg:rot+": Marsh 1 não é específico de doença celíaca; use só com doença celíaca comprovada (sem isso, descreva como linfocitose intraepitelial)."});
     if(RE_MARSH.test(c.split("\n").find(l=>RE_MARSH.test(l))||"") && /^- Orientação dos fragmentos: Inadequada/m.test(c)) out.push({conf:false, msg:rot+": Marsh-Oberhuber com fragmentos de orientação inadequada; a graduação fica prejudicada."});
@@ -1980,7 +2043,7 @@ function renderCrit(){
       c.stack.itens.forEach(([label,text])=>mkb(opts, label, b=>{ const i=sel.indexOf(text); if(i>=0){ sel.splice(i,1); b.className=""; } else { sel.push(text); b.className="on"; } }));
       mkb(opts, "inserir linha", ()=>{ if(!sel.length){ toast("Marque ao menos um critério"); return; }
         const ord=c.stack.itens.map(x=>x[1]).filter(t=>sel.includes(t)), j=juntar(ord);
-        appendLine(c.stack.pre+j.charAt(0).toUpperCase()+j.slice(1)+"."); toast("Linha inserida"); }, "go");
+        appendLine(c.stack.pre+j.charAt(0).toUpperCase()+j.slice(1)+(c.stack.pos||"")+"."); toast("Linha inserida"); }, "go");
     }
     if(c.combo){
       const sel=c.combo.grupos.map(()=>null), bts=c.combo.grupos.map(()=>[]);
