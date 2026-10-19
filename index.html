@@ -571,7 +571,12 @@ const SEED_SITES = {
       {g:"Agregados linfoides", opt:[["Presentes","- Agregados linfoides: Presentes."],["Ausentes","- Agregados linfoides: Não identificados."]]},
       {g:"Parasitos", opt:[["Não identificados","- Parasitos: Não identificados."],["Identificados","- Parasitos: Identificados."]]},
       {g:"Linfangiectasias", opt:[["Não identificadas","- Linfangiectasias: Não identificadas."],["Identificadas","- Linfangiectasias: Identificadas."]]},
-      {g:"Marsh-Oberhuber (1999)", opt:[
+      {g:"Orientação dos fragmentos", dica:"A graduação de Marsh-Oberhuber só vale com orientação adequada; recomendam-se pelo menos 4 biópsias do duodeno distal e 1 do bulbo (ESPGHAN 2020).",
+        opt:[["Adequada","- Orientação dos fragmentos: Adequada."],["Inadequada","- Orientação dos fragmentos: Inadequada (avaliação da arquitetura e graduação de Marsh-Oberhuber prejudicadas [@husby20])."]]},
+      {g:"Relação vilosidade/cripta", opt:[["Preservada (3:1 ou mais)","- Relação vilosidade/cripta: Preservada (3:1 ou mais [@villanacci20])."],
+        ["Reduzida (menor que 3:1)","- Relação vilosidade/cripta: Reduzida (menor que 3:1 [@villanacci20])."],
+        ["Menor que 2:1","- Relação vilosidade/cripta: Menor que 2:1 (indicativa de lesão mucosa [@husby20])."]]},
+      {g:"Marsh-Oberhuber (1999)", dica:"Marsh 1 (linfocitose com vilosidades normais) não é específico de doença celíaca: só se aplica com doença celíaca comprovada; sem isso, descrever como linfocitose intraepitelial (Lauwers 2015, ESsCD 2019). Ao escolher o Marsh, a linha de Corazza-Villanacci entra sozinha.", opt:[
         ["0","- Classificação de Marsh-Oberhuber (1999): 0."],["1","- Classificação de Marsh-Oberhuber (1999): 1."],
         ["2","- Classificação de Marsh-Oberhuber (1999): 2."],["3A","- Classificação de Marsh-Oberhuber (1999): 3A."],
         ["3B","- Classificação de Marsh-Oberhuber (1999): 3B."],["3C","- Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo)."]]}
@@ -793,13 +798,15 @@ SEED_SITES.gastrica.presets.forEach(p=>{
   if(m && i>=0) p.bullets[i]=LINHA_ATIV.gastrica[["LEVE","MODERADA","ACENTUADA"].indexOf(m[1])+1];
 });
 // agregados linfoides (estômago e íleo), metaplasia foveolar gástrica e atrofia vilositária (duodeno e íleo), grau da duodenite (Whitehead 1975)
+const RE_MARSH=/^- Classificação de Marsh-Oberhuber \(1999\): (0|1|2|3A|3B|3C)\b/, RE_CORAZZA=/^- Classificação de Corazza-Villanacci \(2007\): /;
+const CORAZZA = {A:"A (não atrófica)", B1:"B1 (atrófica, relação vilosidade/cripta menor que 3:1, vilosidades ainda identificáveis)", B2:"B2 (atrófica, vilosidades não identificáveis)"};
 const OPT_AGREG = {g:"Agregados linfoides", opt:[["Presentes","- Agregados linfoides: Presentes."],["Ausentes","- Agregados linfoides: Não identificados."]]};
 const OPT_MET_FOV = {g:"Metaplasia foveolar gástrica", dica:"Grau qualitativo (não há escala publicada conferida; Whitehead 1975 registra a metaplasia gástrica superficial só como presente ou ausente).",
   opt:[["Não identificada","- Metaplasia foveolar gástrica: Não identificada."],["Leve","- Metaplasia foveolar gástrica: Presente, leve."],
     ["Moderada","- Metaplasia foveolar gástrica: Presente, moderada."],["Acentuada","- Metaplasia foveolar gástrica: Presente, acentuada."]]};
-const OPT_ATR_VIL = {g:"Atrofia vilositária", dica:"Leve, moderada e acentuada = atrofia parcial, subtotal e total (Marsh-Oberhuber 3A, 3B e 3C).",
-  opt:[["Não identificada","- Atrofia vilositária: Não identificada."],["Leve (parcial, 3A)","- Atrofia vilositária: Presente, leve (atrofia parcial; Marsh-Oberhuber 3A [@oberhuber])."],
-    ["Moderada (subtotal, 3B)","- Atrofia vilositária: Presente, moderada (atrofia subtotal; Marsh-Oberhuber 3B [@oberhuber])."],["Acentuada (total, 3C)","- Atrofia vilositária: Presente, acentuada (atrofia total; Marsh-Oberhuber 3C [@oberhuber])."]]};
+const OPT_ATR_VIL = {g:"Atrofia vilositária", dica:"Oberhuber 1999: leve = encurtamento leve a moderado (3A); moderada = só restos curtos, em tenda (3B); acentuada = mucosa plana, sem vilosidades (3C). O termo \"subtotal\" não é usado.",
+  opt:[["Não identificada","- Atrofia vilositária: Não identificada."],["Leve (3A)","- Atrofia vilositária: Presente, leve (encurtamento leve a moderado das vilosidades; Marsh-Oberhuber 3A [@oberhuber])."],
+    ["Moderada (3B)","- Atrofia vilositária: Presente, moderada (apenas restos curtos de vilosidades; Marsh-Oberhuber 3B [@oberhuber])."],["Acentuada (3C)","- Atrofia vilositária: Presente, acentuada (mucosa plana, sem vilosidades; Marsh-Oberhuber 3C [@oberhuber])."]]};
 const LINHA_WH = {LEVE:"Grau da duodenite: Leve (aumento da celularidade da lâmina própria, com epitélio superficial e arquitetura preservados [@whitehead]).",
   MODERADA:"Grau da duodenite: Moderado (aumento da celularidade da lâmina própria e alteração do epitélio superficial [@whitehead]).",
   ACENTUADA:"Grau da duodenite: Acentuado (erosão do epitélio superficial, com perda das vilosidades [@whitehead])."};
@@ -811,6 +818,8 @@ insereApos(SEED_SITES.ileo.criterios, "Hiperplasia folicular linfoide", [OPT_AGR
 insereApos(SEED_SITES.ileo.criterios, "Arquitetura", [OPT_ATR_VIL, OPT_MET_FOV]);
 insereApos(SEED_SITES.duodeno.criterios, "Arquitetura vilositária", [OPT_ATR_VIL, OPT_MET_FOV]);
 SEED_SITES.duodeno.criterios.unshift(OPT_WH);
+SEED_SITES.duodeno.presets.forEach(p=>{ const i=p.bullets.findIndex(b=>RE_MARSH.test("- "+b)); if(i<0) return;
+  const k=corazzaDoMarsh(("- "+p.bullets[i]).match(RE_MARSH)[1]); if(k) p.bullets.splice(i+1, 0, linhaCorazza(k).slice(2)); });
 
 // Pólipos (nomenclatura: OMS 6ª ed. e capítulos de pólipos lidos; ver catálogo de títulos)
 SEED_SITES.polipo = {
@@ -1041,12 +1050,14 @@ const NOTAS_PADRAO = [
   {tag:"Pólipo hamartomatoso", texto:"Pólipo hamartomatoso: recomenda-se correlação com o número e a localização dos pólipos e com a história familiar, para avaliação de síndrome de polipose."},
   {tag:"Granulomas", texto:"Não foram identificados granulomas em nenhuma das amostras examinadas."},
   {tag:"Displasia", texto:"Não foi identificada displasia em nenhuma das amostras examinadas."},
-  {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides e supercrescimento bacteriano [@lauwers15,smyrk17]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
-  {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica [@smyrk17]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
+  {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
+  {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
 ];
 
 /* ============================ REFERÊNCIAS CITÁVEIS (marca [@chave] no texto vira [n]) ============================ */
 const CITE = {
+  corazza07:"Corazza GR, Villanacci V, Zambelli C, Milione M, Luinetti O, Vindigni C, et al. Comparison of the interobserver reproducibility with different histologic criteria used in celiac disease. Clin Gastroenterol Hepatol. 2007;5(7):838-43. doi:10.1016/j.cgh.2007.03.019.",
+  villanacci20:"Villanacci V, Vanoli A, Leoncini G, Arpa G, Salviato T, Bonetti LR, et al. Celiac disease: histology-differential diagnosis-complications. A practical approach. Pathologica. 2020;112(3):186-196. doi:10.32074/1591-951X-157.",
   husby20:"Husby S, Koletzko S, Korponay-Szabó I, Kurppa K, Mearin ML, Ribes-Koninckx C, et al. European Society Paediatric Gastroenterology, Hepatology and Nutrition Guidelines for Diagnosing Coeliac Disease 2020. J Pediatr Gastroenterol Nutr. 2020;70(1):141-156. doi:10.1097/MPG.0000000000002497.",
   lauwers15:"Lauwers GY, Fasano A, Brown IS. Duodenal lymphocytosis with no or minimal enteropathy: much ado about nothing? Mod Pathol. 2015;28 Suppl 1:S22-9. doi:10.1038/modpathol.2014.135.",
   smyrk17:"Smyrk TC. Practical Approach to the Flattened Duodenal Biopsy. Surg Pathol Clin. 2017;10(4):823-839. doi:10.1016/j.path.2017.07.004.",
@@ -1108,8 +1119,8 @@ function notaEosConsenso(sitios){
   const ns=Object.keys(EOS_SEG_NOME).filter(k=>sitios.includes(k)).map(k=>EOS_SEG_NOME[k]);
   return "Não há consenso sobre o número normal de eosinófilos na mucosa "+juntar(ns)+"; os valores variam com o segmento, a população e a área do campo microscópico [@pap,deb,iwa].";
 }
-const NOTA_LINF_DUO="a duodenite de padrão linfocítico pode ocorrer na doença celíaca e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides e supercrescimento bacteriano [@lauwers15,smyrk17]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20].";
-const NOTA_CELIACA="a associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica [@smyrk17]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20].";
+const NOTA_LINF_DUO="a duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20].";
+const NOTA_CELIACA="a associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20].";
 // duodeno: linfocitose (ou título de padrão linfocítico) com atrofia vilositária -> favorece celíaca; sem atrofia -> padrão linfocítico inespecífico
 function notaCeliaca(corpo){
   const c=corpo||"", lie=/^- Linfocitose intraepitelial: Presente/m.test(c), linf=/DE PADRÃO LINFOCÍTICO/.test(c);
@@ -1266,7 +1277,7 @@ function vr(text){
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
-  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- Amostra (exígua|superficial), /];
+  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- Amostra (exígua|superficial), /, /^- Classificação de Marsh-Oberhuber \(1999\): /];
 function setLinha(line){
   const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [];
   let start=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
@@ -1569,6 +1580,19 @@ function gasTextos(site, seg){
     if(!vistos.has(q.titulo)){ vistos.add(q.titulo); out.push(q); } });
   return out.sort((a,b)=>a.i-b.i);
 }
+// duodeno: Corazza-Villanacci (2007) preenchida a partir do Marsh-Oberhuber: 1 e 2 -> A; 3A e 3B -> B1; 3C -> B2; 0 -> sem linha
+function corazzaDoMarsh(m){ return m==="0" ? null : (m==="1"||m==="2") ? "A" : m==="3C" ? "B2" : "B1"; }
+function linhaCorazza(k){ return "- Classificação de Corazza-Villanacci (2007): "+CORAZZA[k]+" [@corazza07]."; }
+function corazzaSinc(){
+  const ta=$("corpo"), ls=ta.value.split("\n"); let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  const im=ls.findIndex((l,i)=>i>st && RE_MARSH.test(l)); if(im<0) return;
+  const k=corazzaDoMarsh(ls[im].match(RE_MARSH)[1]), ic=ls.findIndex((l,i)=>i>st && RE_CORAZZA.test(l));
+  if(ic>=0) ls.splice(ic,1);
+  const j=ls.findIndex((l,i)=>i>st && RE_MARSH.test(l));
+  if(k) ls.splice(j+1, 0, linhaCorazza(k));
+  ta.value=ls.join("\n");
+}
+
 // duodeno: grau da duodenite (Whitehead 1975) no título, logo depois de "DUODENITE CRÔNICA"
 function titleSetGrauDuo(t, grau){
   if(!/DUODENITE CRÔNICA/.test(t)) return t;
@@ -1592,6 +1616,7 @@ function sincAposLinha(line){
   else if(/^- Displasia: /.test(line)) editTitle(t=>titleSetDisplasia(t, line));
   else if(site==="gastrica" && RE_GAS_AM.test(line)){ const g=Object.values(GAS_SEG).find(x=>"- "+x.am===line); editTitle(t=>gasTitulo(t, g)); }
   else if(/^- Grau da duodenite: /.test(line)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(line)));
+  else if(RE_MARSH.test(line)) corazzaSinc();
 }
 // título -> linha de neutrófilos do bloco
 function tituloParaLinha(site){
@@ -1608,6 +1633,7 @@ function ressincEditor(){
   if(site==="hirschsprung"){ if(hsBloco(ta.value).tits.join("\n")!==hsPrev) hsTitParaLinhas(); hsSinc(); }
   const tit=ultimoTitulo(ta.value);
   if(site==="gastrica" && tit && tit!==prevTit){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
+  if(site==="duodeno") corazzaSinc();
   if(site==="duodeno" && /DUODENITE CRÔNICA/.test(tit)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(ta.value.split("\n").slice(ta.value.split("\n").lastIndexOf(tit)).join("\n"))));
   if(tit && tit!==prevTit) tituloParaLinha(site);
   else { const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
@@ -1830,6 +1856,10 @@ function alertas(){
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
   WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
+  WORK.samples.forEach((s,i)=>{ if(s.site!=="duodeno") return; const c=s.corpo||"", rot="Amostra "+letterOf(i);
+    if(/^- Classificação de Marsh-Oberhuber \(1999\): 1\./m.test(c)) out.push({conf:false, msg:rot+": Marsh 1 não é específico de doença celíaca; use só com doença celíaca comprovada (sem isso, descreva como linfocitose intraepitelial)."});
+    if(RE_MARSH.test(c.split("\n").find(l=>RE_MARSH.test(l))||"") && /^- Orientação dos fragmentos: Inadequada/m.test(c)) out.push({conf:false, msg:rot+": Marsh-Oberhuber com fragmentos de orientação inadequada; a graduação fica prejudicada."});
+  });
   WORK.samples.forEach((s,i)=>{ if(!MUC_SITIO[s.site]) return; const c=tiraMarcas(s.corpo||"");
     [["exígua",/^- EXÍGUOS? FRAGMENTOS? DE /m,/^- Amostra exígua/m],["superficial",/^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /m,/^- Amostra superficial/m]].forEach(([nome,rt,rl])=>{
       if(rt.test(c)!==rl.test(c)) out.push({conf:false, msg:"Amostra "+letterOf(i)+": título e linha de amostra "+nome+" não batem; confira."}); }); });

@@ -766,7 +766,7 @@ eq(t.notaCeliaca("- DUODENITE CRÔNICA DE PADRÃO LINFOCÍTICO, INATIVA (VIDE NO
 eq(t.notaCeliaca(t.presetText(D.presets[0])), null, "duodeno normal: sem nota");
 t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Mucosa duodenal (2ª porção)", corpo: celCorpo, site: "duodeno", seg: "2ª porção" });
 let lc = t.buildLaudo();
-ok(/favorece doença celíaca, embora não seja específica \[\d+\]; a confirmação requer correlação com sorologia/.test(lc) && lc.includes(t.CITE.smyrk17) && lc.includes(t.CITE.husby20) && !/\[@/.test(lc), "nota de celíaca no laudo, com referências numeradas");
+ok(/favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, .* devem ser afastadas \[\d+(?:,\d+)?\]; a confirmação requer correlação com sorologia/.test(lc) && lc.includes(t.CITE.smyrk17) && lc.includes(t.CITE.husby20) && !/\[@/.test(lc), "nota de celíaca no laudo, com referências numeradas");
 ok(t.LIB.notas.some(n => n.tag === "Celíaca") && t.LIB.notas.some(n => n.tag === "Duodenite linfocítica"), "notas de celíaca na biblioteca");
 // agregados, metaplasia foveolar e atrofia vilositária
 for (const [nome, site] of [["estômago", G], ["íleo", I]]) ok(site.criterios.some(c => c.g === "Agregados linfoides"), "agregados linfoides: " + nome);
@@ -780,6 +780,43 @@ const mfo = D.criterios.find(c => c.g === "Metaplasia foveolar gástrica").opt, 
 t.appendLine(mfo[1][1]); t.appendLine(mfo[3][1]); t.appendLine(avo[2][1]); t.appendLine(avo[0][1]);
 eq(els.corpo.value, "- DUODENITE CRÔNICA INATIVA:\n" + mfo[3][1] + "\n" + avo[0][1], "metaplasia foveolar e atrofia trocam sem duplicar");
 for (const k of ["gastrica", "duodeno", "ileo"]) for (const p of t.SEED_SITES[k].presets) eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância: " + p.titulo.slice(0, 40));
+
+// 19. v3.6 (validado): Oberhuber, notas revistas, Marsh 1, orientação, relação vilosidade/cripta, Corazza-Villanacci
+({ t, els } = boot({}));
+const D2 = t.SEED_SITES.duodeno;
+const av2 = D2.criterios.find(c => c.g === "Atrofia vilositária").opt;
+ok(!JSON.stringify(av2).includes("subtotal") && /mucosa plana, sem vilosidades; Marsh-Oberhuber 3C/.test(av2[3][1]) && /apenas restos curtos de vilosidades; Marsh-Oberhuber 3B/.test(av2[2][1]), "atrofia nos termos de Oberhuber, sem subtotal");
+ok(/10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária \[@smyrk17\]/.test(t.NOTA_LINF_DUO) && /giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal \[@lauwers15\]/.test(t.NOTA_LINF_DUO), "nota do padrão linfocítico revista");
+ok(/imunodeficiência comum variável, enteropatia autoimune e medicamentos \(anti-inflamatórios não esteroides, olmesartana\), devem ser afastadas \[@smyrk17,villanacci20\]/.test(t.NOTA_CELIACA), "nota de celíaca com diferenciais");
+ok(t.LIB.notas.find(n => n.tag === "Celíaca").texto.includes("olmesartana") && t.LIB.notas.find(n => n.tag === "Duodenite linfocítica").texto.includes("10% a 20%"), "biblioteca igual às notas automáticas");
+for (const g of ["Orientação dos fragmentos", "Relação vilosidade/cripta"]) ok(D2.criterios.some(c => c.g === g), "grupo novo: " + g);
+ok(/Marsh 1 .* não é específico/.test(D2.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").dica), "dica do Marsh 1");
+// Corazza-Villanacci pelo Marsh
+const mo = D2.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").opt;
+els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.corpo.value = "- DUODENITE CRÔNICA INATIVA:\n- Agregados linfoides: Presentes.";
+const cz = () => els.corpo.value.split("\n").filter(l => /Corazza-Villanacci/.test(l));
+t.appendLine(mo[5][1]);
+eq(cz().join(), "- Classificação de Corazza-Villanacci (2007): B2 (atrófica, vilosidades não identificáveis) [@corazza07].", "3C -> B2");
+ok(els.corpo.value.indexOf("Corazza") > els.corpo.value.indexOf("Marsh-Oberhuber"), "Corazza logo depois do Marsh");
+t.appendLine(mo[3][1]); eq(cz().length, 1, "troca sem duplicar"); ok(/: B1 /.test(cz()[0]), "3A -> B1");
+t.appendLine(mo[4][1]); ok(/: B1 /.test(cz()[0]), "3B -> B1");
+t.appendLine(mo[2][1]); ok(/: A \(não atrófica\)/.test(cz()[0]), "2 -> A");
+t.appendLine(mo[1][1]); ok(/: A \(não atrófica\)/.test(cz()[0]), "1 -> A");
+t.appendLine(mo[0][1]); eq(cz().length, 0, "0 -> sem Corazza");
+ok(!/CORAZZA|B1|B2/.test(els.corpo.value.split("\n")[0]), "Corazza não vai ao título");
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("(1999): 0.", "(1999): 3C (tipo destrutivo)."); els.corpo.onchange();
+ok(cz().length === 1 && /: B2 /.test(cz()[0]), "Marsh editado à mão atualiza Corazza");
+const dLp = D2.presets.find(p => /PADRÃO LINFOCÍTICO, EM ATIVIDADE/.test(p.titulo));
+ok(dLp.bullets.some(b => /^Classificação de Corazza-Villanacci \(2007\): B2/.test(b)), "texto pronto com Corazza");
+ok(!D2.presets.filter(p => p.bullets.some(b => /Marsh-Oberhuber \(1999\): 0\./.test(b))).some(p => p.bullets.some(b => /Corazza/.test(b))), "Marsh 0 sem Corazza nos textos prontos");
+// alertas
+t.WORK.samples.length = 0;
+t.WORK.samples.push({ nome: "Duodeno", site: "duodeno", seg: "2ª porção", corpo: "- DUODENITE CRÔNICA INATIVA:\n- Classificação de Marsh-Oberhuber (1999): 1.\n- Classificação de Corazza-Villanacci (2007): A (não atrófica) [@corazza07].\n- Orientação dos fragmentos: Inadequada (avaliação da arquitetura e graduação de Marsh-Oberhuber prejudicadas [@husby20])." });
+const al = t.alertas().map(a => a.msg).join(" | ");
+ok(/Marsh 1 não é específico/.test(al) && /orientação inadequada/.test(al), "alertas: Marsh 1 e orientação inadequada");
+const lz = t.buildLaudo();
+ok(lz.includes(t.CITE.corazza07) && lz.includes(t.CITE.husby20) && !/\[@/.test(lz), "refs de Corazza e Husby numeradas");
+for (const p of D2.presets) eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância: " + p.titulo.slice(0, 40));
 
 console.log(`OK — ${n} asserts`);
 
