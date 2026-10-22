@@ -407,7 +407,8 @@ const SEED_SITES = {
       {g:"Neutrófilos / erosão / ulceração", opt:[
         ["Ausentes","- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."],
         ["Presentes","- Presença de exocitose de neutrófilos."]]},
-      {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."]],
+      {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."],
+          ["Não identificada (Alcian blue/PAS)","- Metaplasia intestinal: Não identificada (confirmado com coloração histoquímica especial Alcian blue pH 2,5/PAS sem diastase)."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
           monta:x=>"- Metaplasia intestinal: Presente"+(x[0]?", "+x[0]:"")+(x[1]?", "+x[1]:"")+"."}},
       {g:"Descamação superficial (padrão de esofagite dissecante)", dica:"Dois tons + descamação/flaking com clivagem + paraqueratose = critérios de esofagite dissecante superficial (Rubrecht 2025; Hart 2015): o título muda. Com menos itens, fica como achado inespecífico, em qualquer título. Epitélio destacado sem necrose, inflamação ou paraqueratose pode ser artefato do procedimento; paraqueratose fina, de poucas camadas, aparece também sobre estenoses (Carmack 2009).",
@@ -418,7 +419,9 @@ const SEED_SITES = {
           ["paraqueratose","paraqueratose proeminente (de várias camadas celulares)"],["bolhas","bolhas intraepiteliais"],
           ["clivagem do conjuntivo","clivagem do tecido conjuntivo"],["inflamação mínima","inflamação mínima ou ausente"]]}},
       {g:"Lâmina própria superficial", opt:[
-        ["Representada","- Lâmina própria superficial: Representada."],["Não representada","- Lâmina própria superficial: Não representada."]]},
+        ["Representada","- Lâmina própria superficial: Representada."],["Representada, com glândulas tipo cárdia","- Lâmina própria superficial: Representada, apresentando glândulas mucinosas tipo cárdia."],
+        ["Não representada","- Lâmina própria superficial: Não representada."]]},
+      {g:"Fibrose de lâmina própria", opt:[["Não identificada","- Fibrose de lâmina própria: Não identificada."],["Presente","- Fibrose de lâmina própria: Presente."]]},
       {g:"Infiltrado inflamatório na lâmina própria", opt:[
         ["Presente","- Infiltrado inflamatório em lâmina própria: Presente."],["Ausente","- Infiltrado inflamatório em lâmina própria: Ausente."]]},
       {g:"Lâmina própria (frase única)", opt:[
@@ -443,6 +446,18 @@ const SEED_SITES = {
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa.","Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
+      P("MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
+        "Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa."]),
+      P("MUCOSA GÁSTRICA DE PADRÃO CÁRDIA APRESENTANDO",[
+        "Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
+        "Pesquisa para H. pylori: Negativa."]),
       P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
         "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
@@ -500,7 +515,7 @@ const SEED_SITES = {
         ["Antral","- Amostragem: Mucosa gástrica de padrão antral."],
         ["Oxíntico (corpo/fundo)","- Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo)."],
         ["Misto oxínt./mucinoso","- Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso."],
-        ["Transição corpo-antro","- Amostragem: Mucosa gástrica de transição corpo-antro."]]},
+        ["Transição corpo-antro","- Amostragem: Mucosa gástrica de transição corpo-antro."],["Cárdia","- Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas)."]]},
       {g:"Celularidade mononuclear (lâmina própria)", opt:[
         ["Habitual","- Celularidade habitual de leucócitos mononucleares em lâmina própria."],
         ["Levemente aumentada","- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria."],
@@ -854,6 +869,10 @@ insereApos(SEED_SITES.ileo.criterios, "Hiperplasia folicular linfoide", [OPT_AGR
 insereApos(SEED_SITES.ileo.criterios, "Arquitetura", [OPT_ATR_VIL, OPT_MET_FOV]);
 insereApos(SEED_SITES.duodeno.criterios, "Arquitetura vilositária", [OPT_ATR_VIL, OPT_MET_FOV]);
 SEED_SITES.duodeno.criterios.unshift(OPT_WH);
+// o grau de Whitehead vem embutido nos textos prontos de duodenite (inespecífica: leve; padrão linfocítico: moderado) e vai ao título
+SEED_SITES.duodeno.presets.forEach(p=>{ if(!/^DUODENITE CRÔNICA/.test(p.titulo) || p.bullets.some(b=>/^Grau da duodenite/.test(b))) return;
+  const g=/PADRÃO LINFOCÍTICO/.test(p.titulo) ? "MODERADA" : "LEVE", i=p.bullets.findIndex(b=>/^Arquitetura/.test(b));
+  p.bullets.splice(i+1, 0, LINHA_WH[g]); p.titulo=titleSetGrauDuo("- "+p.titulo+":", g).slice(2,-1); });
 SEED_SITES.duodeno.presets.forEach(p=>{ const i=p.bullets.findIndex(b=>RE_MARSH.test("- "+b)); if(i<0) return;
   const k=corazzaDoMarsh(("- "+p.bullets[i]).match(RE_MARSH)[1]); if(k) p.bullets.splice(i+1, 0, linhaCorazza(k).slice(2)); });
 
@@ -929,7 +948,7 @@ const HS_L = {
   margS:"Margem proximal: Sem achados de zona de transição (aganglionose parcial circunferencial, hipoganglionose mioentérica ou hipertrofia de nervos submucosos [@veras]).",
   margPre:"Margem proximal: Achados de zona de transição presentes: "
 };
-const ESO_NOME = {"":"Esôfago", "Terço proximal":"Esôfago proximal", "Terço distal":"Esôfago distal"};
+const ESO_NOME = {"":"Esôfago", "Terço proximal":"Esôfago proximal", "Terço distal":"Esôfago distal", "Transição esôfago-gástrica":"Transição esofagogástrica"};
 const ILEO_NOME = {"Íleo terminal":"Mucosa de íleo terminal","Íleo (neoterminal)":"Mucosa de íleo neoterminal","Bolsa ileal":"Mucosa de bolsa ileal"};
 const HS_NOME = {"Congelação / nivelamento":"Biópsias de nivelamento (congelação)","Peça de abaixamento":"Produto de abaixamento de retossigmoide","Rebiopsia / reoperação":"Biópsia retal pós-abaixamento"};
 const HS_AMOSTRAGEM = ["Fragmentos examinados: 3.","Examinados 10 níveis de corte.","Bloco esgotado: Sim."];
@@ -1217,7 +1236,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.8.1";
+const APP_VERSION="3.9.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1323,10 +1342,107 @@ function renderLegacyBanner(){
 let toastT;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1700); }
 
+/* ============================ TRANSIÇÃO ESOFAGOGÁSTRICA: porções esofágica e gástrica no mesmo bloco ============================ */
+// "- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:" + "- MUCOSA ESOFÁGICA: …:" e "- MUCOSA GÁSTRICA: …:", cada uma com seus achados.
+// Na porção gástrica, as regras usam o estômago (segmento "Cárdia"); os vínculos título <-> achados agem só no subtítulo da porção.
+const TEG_SEG="Transição esôfago-gástrica", TEG_MAE="- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:", RE_TEG_MAE=/^- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA/;
+const TEG_PRE={eso:"- MUCOSA ESOFÁGICA: ", gas:"- MUCOSA GÁSTRICA: "}, TEG_MUC={eso:"MUCOSA ESOFÁGICA", gas:"MUCOSA GÁSTRICA"}, TEG_NOME={eso:"porção esofágica", gas:"porção gástrica"};
+let porcaoAtiva="eso";
+function isTEG(){ return $("fSitio").value==="esofago" && $("fSeg").value===TEG_SEG; }
+function siteAtivo(){ return isTEG() && porcaoAtiva==="gas" ? "gastrica" : $("fSitio").value; }
+function segAtivo(){ return isTEG() && porcaoAtiva==="gas" ? "Cárdia" : $("fSeg").value; }
+// porções de um texto: [{p, ini (subtítulo), fim (exclusivo)}]
+function porcoesIdx(ls){
+  const out=[]; ls.forEach((l,i)=>{ const m=l.match(/^- MUCOSA (ESOFÁGICA|GÁSTRICA): /); if(m && lineKind(l)==="b") out.push({p:m[1]==="ESOFÁGICA"?"eso":"gas", ini:i}); });
+  out.forEach(o=>{ o.fim=ls.length; for(let j=o.ini+1;j<ls.length;j++) if(lineKind(ls[j])==="b"){ o.fim=j; break; } });
+  return out;
+}
+// trecho em edição: a porção escolhida (na transição) ou, como sempre, do último título ao fim
+function blocoAtual(ls){
+  if(isTEG()){ const o=porcoesIdx(ls).find(x=>x.p===porcaoAtiva); if(o) return {st:o.ini, fim:o.fim, teg:true}; }
+  let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  return {st, fim:ls.length};
+}
+// subtítulo da porção <-> título "normal" que as regras de título conhecem
+function toSub(inner, p){
+  const M=TEG_MUC[p]; let x=inner.trim().replace(/^- /,"").replace(/:$/,"");
+  if(x.startsWith(M+" ")) x=x.slice(M.length+1).replace(/^DE (PADRÃO [^,]+?) (SEM|APRESENTANDO)/, "$1, $2");
+  return TEG_PRE[p]+x+":";
+}
+function fromSub(sub, p){
+  const M=TEG_MUC[p]; let x=sub.trim().slice(TEG_PRE[p].length).replace(/:$/,"");
+  if(/^(SEM |APRESENTANDO|PADRÃO )/.test(x)) x=M+" "+x.replace(/^(PADRÃO [^,]+), (SEM|APRESENTANDO)/, "DE $1 $2");
+  return "- "+x+":";
+}
+// garante o título-mãe e a porção (esofágica logo após o título-mãe; gástrica no fim)
+function ensurePorcao(p){
+  const ta=$("corpo"); let ls=ta.value.trim() ? ta.value.split("\n") : [];
+  if(!ls.some(l=>RE_TEG_MAE.test(l))) ls.unshift(TEG_MAE);
+  if(!porcoesIdx(ls).some(o=>o.p===p)){
+    const sub=TEG_PRE[p]+"APRESENTANDO:";
+    if(p==="eso"){ const g=porcoesIdx(ls).find(o=>o.p==="gas"); ls.splice(g ? g.ini : ls.length, 0, sub); }
+    else ls.push(sub);
+  }
+  ta.value=ls.join("\n");
+}
+// texto pronto numa porção: substitui a porção inteira
+function inserePorcao(p, preset){
+  const keep=porcaoAtiva; porcaoAtiva=p;
+  ensurePorcao(p);
+  const ta=$("corpo"), ls=ta.value.split("\n"), o=porcoesIdx(ls).find(x=>x.p===p);
+  const bloco=[toSub("- "+preset.titulo+":", p)].concat((preset.bullets||[]).map(b=>vr("- "+b)));
+  ls.splice(o.ini, o.fim-o.ini, ...bloco);
+  ta.value=ls.join("\n"); prevTit=ultimoTitulo(ta.value);
+  if(keep!==p) renderCrit();
+}
+// porção gástrica exígua/superficial: subtítulo e linha de amostragem do modelo do Pedro
+const TEG_AM={exsup:{t:"REPRESENTAÇÃO EXÍGUA E SUPERFICIAL", l:"- Amostragem: Mucosa gástrica superficial, com representação mínima de glândulas foveolares e presença de glândulas mucinosas (padrão cárdia)."},
+  exigua:{t:"REPRESENTAÇÃO EXÍGUA", l:"- "+AM_LINHA.exigua}, superficial:{t:"REPRESENTAÇÃO SUPERFICIAL", l:"- "+AM_LINHA.superficial}};
+function subSetAmostraTEG(sub, tipo){
+  let x=sub.trim().slice(TEG_PRE.gas.length).replace(/:$/,"")
+    .replace(/^REPRESENTAÇÃO (?:EXÍGUA E SUPERFICIAL|EXÍGUA|SUPERFICIAL), APRESENTANDO OS SEGUINTES ACHADOS HISTOLÓGICOS(?: \(VIDE NOTAS\))?/, "")
+    .replace(/^REPRESENTAÇÃO (?:EXÍGUA E SUPERFICIAL|EXÍGUA|SUPERFICIAL), APRESENTANDO /, "");
+  if(!tipo) return TEG_PRE.gas+(x||"APRESENTANDO")+":";
+  const normal=!x || /^(SEM |APRESENTANDO$|PADRÃO [^,]+, (SEM|APRESENTANDO))/.test(x);
+  return TEG_PRE.gas+TEG_AM[tipo].t+", APRESENTANDO "+(normal ? "OS SEGUINTES ACHADOS HISTOLÓGICOS (VIDE NOTAS)" : x)+":";
+}
+function amostraModTEG(tipo){
+  ensurePorcao("gas");
+  const ta=$("corpo"), ls=ta.value.split("\n"), o=porcoesIdx(ls).find(x=>x.p==="gas");
+  for(let i=o.fim-1;i>o.ini;i--) if(/^- Amostra (exígua|superficial), /.test(ls[i]) || ls[i]===TEG_AM.exsup.l) ls.splice(i,1);
+  ls[o.ini]=subSetAmostraTEG(ls[o.ini], tipo);
+  ta.value=ls.join("\n");
+  if(tipo) appendLine(TEG_AM[tipo].l);
+  prevTit=ultimoTitulo(ta.value);
+  return true;
+}
+// amostras do laudo desdobradas em porções (para notas e alertas)
+function unidades(){
+  const out=[];
+  WORK.samples.forEach((s,i)=>{
+    const L_=letterOf(i), ls=(s.corpo||"").split("\n"), ps=s.site==="esofago" ? porcoesIdx(ls) : [];
+    if(!ps.length){ out.push({rot:L_, site:s.site, seg:s.seg, corpo:s.corpo||"", dech:s.dech, s}); return; }
+    ps.forEach(o=>out.push({rot:L_+" ("+TEG_NOME[o.p]+")", site:o.p==="gas"?"gastrica":"esofago", seg:o.p==="gas"?"Cárdia":s.seg, corpo:ls.slice(o.ini,o.fim).join("\n"), dech:s.dech, s, teg:true}));
+  });
+  return out;
+}
+function ressincTEG(){
+  const ta=$("corpo"), keep=porcaoAtiva;
+  porcoesIdx(ta.value.split("\n")).map(o=>o.p).forEach(p=>{
+    porcaoAtiva=p;
+    const ls=ta.value.split("\n"), b=blocoAtual(ls), site=siteAtivo(), seg=segAtivo();
+    for(let i=b.st+1;i<b.fim;i++) ls[i]=fraseLie(fraseEos(ls[i], site, seg), site);
+    ta.value=ls.join("\n");
+    eosSinc(); if(site==="esofago") edsSinc();
+    const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l)));
+  });
+  porcaoAtiva=keep;
+}
+
 /* ============================ EDITOR / INSERÇÃO ============================ */
 // toda linha que entra no editor passa por aqui: contagens ganham o valor de referência do sítio
 function vr(text){
-  const site=$("fSitio").value, seg=$("fSeg").value;
+  const site=siteAtivo(), seg=segAtivo();
   if(site==="colon" && !eosKey(site,seg) && /\d+ eosinófilos?\/campo/.test(text)) toast("Escolha o segmento do cólon para sair o valor de referência");
   return text.split("\n").map(l=>comVR(fraseLie(fraseEos(l, site, seg), site), site, seg)).join("\n");
 }
@@ -1334,17 +1450,20 @@ function vr(text){
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
   /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- Amostra (exígua|superficial), /, /^- Classificação de Marsh-Oberhuber \(1999\): /];
 function setLinha(line){
-  const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [];
-  let start=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
+  const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [], b=blocoAtual(ls), start=b.st;
   const lab=line.match(/^- ([^:(]{3,45}): /), fam=FAMILIAS.find(f=>f.test(line));
-  const j = (lab||fam) ? ls.findIndex((l,i)=>i>start && (fam ? fam.test(l) : l.startsWith("- "+lab[1]+": "))) : -1;
+  const j = (lab||fam) ? ls.findIndex((l,i)=>i>start && i<b.fim && (fam ? fam.test(l) : l.startsWith("- "+lab[1]+": "))) : -1;
   if(j>=0){ ls[j]=line; ta.value=ls.join("\n"); return true; }
   return false;
 }
 function appendLine(line){
   line=vr(line);
   const ta=$("corpo");
-  if(!setLinha(line)){ let v=ta.value; if(v && !v.endsWith("\n")) v+="\n"; ta.value = v + line; }
+  if(isTEG()) ensurePorcao(porcaoAtiva);
+  if(!setLinha(line)){
+    const ls=ta.value ? ta.value.split("\n") : [], b=blocoAtual(ls);
+    if(b.teg){ let k=b.fim; while(k>b.st+1 && !ls[k-1].trim()) k--; ls.splice(k, 0, line); ta.value=ls.join("\n"); }
+    else { let v=ta.value; if(v && !v.endsWith("\n")) v+="\n"; ta.value = v + line; } }
   sincAposLinha(line);
   prevTit=ultimoTitulo(ta.value);
   ta.focus(); ta.scrollTop = ta.scrollHeight;
@@ -1589,9 +1708,8 @@ function titleSetDisplasia(title, linha){
 let prevTit="";
 function ultimoTitulo(txt){ const ls=(txt||"").split("\n"); for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b") return ls[i].trim(); return ""; }
 function linhaNeutroDoBloco(){
-  const ls=$("corpo").value.split("\n"); let start=-1;
-  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ start=i; break; }
-  return ls.find((l,i)=>i>start && RE_NEUTRO.test(l)) || null;
+  const ls=$("corpo").value.split("\n"), b=blocoAtual(ls);
+  return ls.find((l,i)=>i>b.st && i<b.fim && RE_NEUTRO.test(l)) || null;
 }
 // amostra exígua/superficial: prefixo do título (padrão "EXÍGUO FRAGMENTO DE MUCOSA … APRESENTANDO …") e linha de amostragem
 const RE_AM_PRE=/^(EXÍGUOS? FRAGMENTOS? DE |FRAGMENTOS? SUPERFICIA(?:L|IS) DE )/;
@@ -1602,7 +1720,8 @@ function titleSetAmostra(title, tipo, site){
   return "- "+t+":";
 }
 function amostraMod(tipo){
-  const ta=$("corpo"), site=$("fSitio").value;
+  if(isTEG() && porcaoAtiva==="gas") return amostraModTEG(tipo);
+  const ta=$("corpo"), site=siteAtivo();
   if(tipo) appendLine("- "+AM_LINHA[tipo]);
   else { const ls=ta.value.split("\n"); let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
     const j=ls.findIndex((l,i)=>i>st && /^- Amostra (exígua|superficial), /.test(l)); if(j>=0){ ls.splice(j,1); ta.value=ls.join("\n"); } }
@@ -1616,11 +1735,12 @@ const GAS_SEG = {
   "Antro":{tit:"EM MUCOSA DE ANTRO", am:"Amostragem: Mucosa gástrica de padrão antral.", norm:"MUCOSA GÁSTRICA DE PADRÃO ANTRAL", re:/EM MUCOSA DE ANTRO|DE PADRÃO ANTRAL/},
   "Corpo/fundo (oxíntico)":{tit:"EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO)", am:"Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).", norm:"MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO", re:/OXÍNTICA \(|DE PADRÃO OXÍNTICO/},
   "Transição corpo-antro":{tit:"EM MUCOSA DE TRANSIÇÃO CORPO-ANTRO", am:"Amostragem: Mucosa gástrica de transição corpo-antro.", norm:"MUCOSA GÁSTRICA DE TRANSIÇÃO CORPO-ANTRO", re:/TRANSIÇÃO CORPO-ANTRO/},
+  "Cárdia":{tit:"EM MUCOSA DE PADRÃO CÁRDIA", am:"Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas).", norm:"MUCOSA GÁSTRICA DE PADRÃO CÁRDIA", re:/PADRÃO CÁRDIA/},
   "Misto oxíntico/mucinoso":{tit:"EM MUCOSA DE PADRÃO MISTO OXÍNTICO/MUCINOSO", am:"Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso.", norm:"MUCOSA GÁSTRICA DE PADRÃO MISTO OXÍNTICO/MUCINOSO", re:/MISTO OXÍNTICO\/MUCINOSO/}
 };
-const RE_GAS_TIT=/EM MUCOSA (?:DE ANTRO|DE PADRÃO OXÍNTICO \(CORPO\/FUNDO\)|OXÍNTICA \((?:PADRÃO )?CORPO\/FUNDO\)|DE TRANSIÇÃO CORPO-ANTRO|DE PADRÃO MISTO OXÍNTICO\/MUCINOSO)/;
-const RE_GAS_NORM=/^(- (?:(?:EXÍGUO FRAGMENTO|FRAGMENTO SUPERFICIAL) DE )?)MUCOSA GÁSTRICA DE (?:PADRÃO ANTRAL|PADRÃO OXÍNTICO|TRANSIÇÃO CORPO-ANTRO|PADRÃO MISTO OXÍNTICO\/MUCINOSO)/;
-const RE_GAS_AM=/^- Amostragem: Mucosa gástrica de (?:padrão antral|padrão oxíntico \(corpo\/fundo\)|transição corpo-antro|padrão misto oxíntico\/mucinoso)\.$/;
+const RE_GAS_TIT=/EM MUCOSA (?:DE ANTRO|DE PADRÃO OXÍNTICO \(CORPO\/FUNDO\)|OXÍNTICA \((?:PADRÃO )?CORPO\/FUNDO\)|DE TRANSIÇÃO CORPO-ANTRO|DE PADRÃO MISTO OXÍNTICO\/MUCINOSO|DE PADRÃO CÁRDIA)/;
+const RE_GAS_NORM=/^(- (?:(?:EXÍGUO FRAGMENTO|FRAGMENTO SUPERFICIAL) DE )?)MUCOSA GÁSTRICA DE (?:PADRÃO ANTRAL|PADRÃO OXÍNTICO|TRANSIÇÃO CORPO-ANTRO|PADRÃO MISTO OXÍNTICO\/MUCINOSO|PADRÃO CÁRDIA)/;
+const RE_GAS_AM=/^- Amostragem: Mucosa gástrica de (?:padrão antral|padrão oxíntico \(corpo\/fundo\)|transição corpo-antro|padrão misto oxíntico\/mucinoso|padrão cárdia \(glândulas mucinosas\))\.$/;
 function gasTitulo(t, g){ return t.replace(RE_GAS_TIT, g.tit).replace(RE_GAS_NORM, (x,pre)=>pre+g.norm); }
 function adaptaGas(txt, seg){
   const g=GAS_SEG[seg]; if(!g) return txt;
@@ -1639,7 +1759,7 @@ function gasTextos(site, seg){
 function corazzaDoMarsh(m){ return m==="0" ? null : (m==="1"||m==="2") ? "A" : m==="3C" ? "B2" : "B1"; }
 function linhaCorazza(k){ return "- Classificação de Corazza-Villanacci (2007): "+CORAZZA[k]+" [@corazza07]."; }
 function corazzaSinc(){
-  const ta=$("corpo"), ls=ta.value.split("\n"); let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  const ta=$("corpo"), ls=ta.value.split("\n"), st=blocoAtual(ls).st;
   const im=ls.findIndex((l,i)=>i>st && RE_MARSH.test(l)); if(im<0) return;
   const k=corazzaDoMarsh(ls[im].match(RE_MARSH)[1]), ic=ls.findIndex((l,i)=>i>st && RE_CORAZZA.test(l));
   if(ic>=0) ls.splice(ic,1);
@@ -1677,10 +1797,9 @@ function titleSetEos(title, est){
   return t;
 }
 function eosSinc(){
-  const ta=$("corpo"), site=$("fSitio").value, ls=ta.value.split("\n"); let st=-1;
-  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  const ta=$("corpo"), site=siteAtivo(), ls=ta.value.split("\n"), b=blocoAtual(ls), st=b.st;
   if(st<0) return;
-  const est=eosEstado(ls.slice(st+1).join("\n"), site, $("fSeg").value);
+  const est=eosEstado(ls.slice(st+1, b.fim).join("\n"), site, segAtivo());
   editTitle(t=>titleSetEos(t, est));
 }
 
@@ -1704,16 +1823,15 @@ function titleSetEds(title, est){
   return titleSetTrecho(title, RE_T_EDS_TR, "", false);
 }
 function edsSinc(){
-  const ta=$("corpo"), ls=ta.value.split("\n"); let st=-1;
-  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
+  const ta=$("corpo"), ls=ta.value.split("\n"), b=blocoAtual(ls), st=b.st;
   if(st<0) return;
-  const est=edsEstado(ls.slice(st+1).join("\n"));
+  const est=edsEstado(ls.slice(st+1, b.fim).join("\n"));
   editTitle(t=>titleSetEds(t, est));
 }
 
 // critério clicado -> título (e, no H. pylori, linha de atividade coerente com o título)
 function sincAposLinha(line){
-  const site=$("fSitio").value;
+  const site=siteAtivo();
   if(site==="hirschsprung"){ hsSinc(); return; }
   if(RE_NEUTRO.test(line)) editTitle(t=>tituloComAtiv(t, grauDaLinha(line)));
   else if(/^- Pesquisa para H\. pylori: /.test(line)){
@@ -1741,6 +1859,7 @@ function ressincEditor(){
   const ta=$("corpo"), site=$("fSitio").value, seg=$("fSeg").value;
   ta.value=ta.value.split("\n").map(l=>fraseLie(fraseEos(l, site, seg), site)).join("\n");
   corrigeCampo("corpo");
+  if(isTEG() && porcoesIdx(ta.value.split("\n")).length){ ressincTEG(); prevTit=ultimoTitulo(ta.value); return; }
   if(site==="hirschsprung"){ if(hsBloco(ta.value).tits.join("\n")!==hsPrev) hsTitParaLinhas(); hsSinc(); }
   const tit=ultimoTitulo(ta.value);
   if(site==="gastrica" && tit && tit!==prevTit){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
@@ -1900,16 +2019,17 @@ function dechLines(n, cripta, viral){
 }
 // último título (linha em negrito) do editor
 function editTitle(fn){
-  const ta=$("corpo"), ls=ta.value.split("\n");
-  for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ ls[i]=fn(ls[i].trim()); ta.value=ls.join("\n"); return true; }
-  return false;
+  const ta=$("corpo"), ls=ta.value.split("\n"), b=blocoAtual(ls);
+  if(b.st<0) return false;
+  ls[b.st] = b.teg ? toSub(fn(fromSub(ls[b.st], porcaoAtiva)), porcaoAtiva) : fn(ls[b.st].trim());
+  ta.value=ls.join("\n"); return true;
 }
 // notas automáticas (contagens e DECH), lidas do texto das amostras salvas; amostras com a mesma conclusão saem juntas
 function autoNotas(){
   const grupos=[], extra=[], consenso=[];
   const add=(letra, corpo)=>{ const g=grupos.find(x=>x.corpo===corpo); if(g) g.letras.push(letra); else grupos.push({letras:[letra], corpo}); };
-  WORK.samples.forEach((s,i)=>{
-    const L_=letterOf(i);
+  unidades().forEach(s=>{
+    const L_=s.rot;
     if(s.site){
       const c=contagens(s), k=eosKey(s.site, s.seg);
       if(k && c.eos!==undefined){ add(L_, eosNota(k, c.eos)); if(EOS_SEG_NOME[s.site] && !consenso.includes(s.site)) consenso.push(s.site); }
@@ -1924,8 +2044,8 @@ function autoNotas(){
       add(L_, NOTA_EOS_QUAL);
     }
     if(MUC_SITIO[s.site]){
-      if(/^- Amostra exígua/m.test(s.corpo||"")) add(L_, NOTA_EXIGUA);
-      if(/^- (Amostra superficial|Amostragem: Mucosa gástrica superficial)/m.test(s.corpo||"")) add(L_, NOTA_SUPERF);
+      if(/^- Amostra exígua|REPRESENTAÇÃO EXÍGUA/m.test(s.corpo||"")) add(L_, NOTA_EXIGUA);
+      if(/^- (Amostra superficial|Amostragem: Mucosa gástrica superficial)|REPRESENTAÇÃO (?:EXÍGUA E )?SUPERFICIAL/m.test(s.corpo||"")) add(L_, NOTA_SUPERF);
     }
     if(s.dech){ if(s.dech.viral && !extra.includes(NOTA_VIRAL)) extra.push(NOTA_VIRAL); if(!extra.includes(NOTA_DECH)) extra.push(NOTA_DECH); }
   });
@@ -1973,20 +2093,20 @@ function alertas(){
     if(dech && dech.manual && dech.manual!==dech.sug)
       out.push({conf:true, msg:rot+": categoria de DECH escolhida ("+dech.manual+") difere da sugerida pelos achados ("+dech.sug+")."});
   };
-  WORK.samples.forEach((s,i)=>check("Amostra "+letterOf(i), s.corpo, s.dech));
-  WORK.samples.forEach((s,i)=>{ const c=s.corpo||"", tit=c.split("\n").filter(l=>lineKind(l)==="b").pop()||"";
+  unidades().forEach(u=>check("Amostra "+u.rot, u.corpo, u.dech));
+  unidades().forEach(s=>{ const c=s.corpo||"", tit=c.split("\n").filter(l=>lineKind(l)==="b").pop()||"", rotU="Amostra "+s.rot;
     if(!tit || !s.site) return;
     const est=eosEstado(c, s.site, s.seg);
     if(s.site==="esofago"){ const ed=edsEstado(c), tEds=RE_T_EDS_FULL.test(tit) || RE_T_EDS_TR.test(tit);
-      if(tEds && ed!=="suficiente") out.push({conf:false, msg:"Amostra "+letterOf(i)+": o título fala em esofagite dissecante superficial, mas a linha de descamação não tem os 3 critérios (dois tons, descamação com clivagem, paraqueratose)."});
-      if(!tEds && ed==="suficiente") out.push({conf:false, msg:"Amostra "+letterOf(i)+": a linha de descamação tem os critérios de esofagite dissecante superficial e o título não os menciona; confira o título."}); }
-    if(est && !RE_T_EOS.test(tit)) out.push({conf:false, msg:"Amostra "+letterOf(i)+": há "+(RE_EOS_ASSOC_POS.test(c) ? "achados eosinofílicos associados" : "contagem de eosinófilos acima do limiar")+" e o título não indica o padrão eosinofílico; confira o título."});
+      if(tEds && ed!=="suficiente") out.push({conf:false, msg:rotU+": o título fala em esofagite dissecante superficial, mas a linha de descamação não tem os 3 critérios (dois tons, descamação com clivagem, paraqueratose)."});
+      if(!tEds && ed==="suficiente") out.push({conf:false, msg:rotU+": a linha de descamação tem os critérios de esofagite dissecante superficial e o título não os menciona; confira o título."}); }
+    if(est && !RE_T_EOS.test(tit)) out.push({conf:false, msg:rotU+": há "+(RE_EOS_ASSOC_POS.test(c) ? "achados eosinofílicos associados" : "contagem de eosinófilos acima do limiar")+" e o título não indica o padrão eosinofílico; confira o título."});
   });
   WORK.samples.forEach((s,i)=>{ if(s.site!=="duodeno") return; const c=s.corpo||"", rot="Amostra "+letterOf(i);
     if(/^- Classificação de Marsh-Oberhuber \(1999\): 1\./m.test(c)) out.push({conf:false, msg:rot+": Marsh 1 não é específico de doença celíaca; use só com doença celíaca comprovada (sem isso, descreva como linfocitose intraepitelial)."});
     if(RE_MARSH.test(c.split("\n").find(l=>RE_MARSH.test(l))||"") && /^- Orientação dos fragmentos: Inadequada/m.test(c)) out.push({conf:false, msg:rot+": Marsh-Oberhuber com fragmentos de orientação inadequada; a graduação fica prejudicada."});
   });
-  WORK.samples.forEach((s,i)=>{ if(!MUC_SITIO[s.site]) return; const c=tiraMarcas(s.corpo||"");
+  WORK.samples.forEach((s,i)=>{ if(!MUC_SITIO[s.site] || porcoesIdx((s.corpo||"").split("\n")).length) return; const c=tiraMarcas(s.corpo||"");
     [["exígua",/^- EXÍGUOS? FRAGMENTOS? DE /m,/^- Amostra exígua/m],["superficial",/^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /m,/^- Amostra superficial/m]].forEach(([nome,rt,rl])=>{
       if(rt.test(c)!==rl.test(c)) out.push({conf:false, msg:"Amostra "+letterOf(i)+": título e linha de amostra "+nome+" não batem; confira."}); }); });
   WORK.samples.forEach((s,i)=>{ if(s.site==="hirschsprung") hsAlertas("Amostra "+letterOf(i), s.corpo, s.seg).forEach(a=>out.push(a)); });
@@ -2066,6 +2186,16 @@ function renderSeg(){
 }
 function renderPresets(){
   const site=currentSite(); const box=$("presetBox"); box.innerHTML="";
+  if(isTEG()){
+    [["eso","Porção esofágica",site.presets],["gas","Porção gástrica",gasTextos(siteById("gastrica"), "Cárdia")]].forEach(([p,rotulo,lista])=>{
+      const h=document.createElement("p"); h.className="hint"; h.textContent=rotulo+" (o clique substitui esta porção no bloco da transição)"; box.appendChild(h);
+      lista.forEach(pr=>{ const b=document.createElement("button"); b.type="button"; b.className="preset";
+        b.innerHTML=`<b>${fmtInline(toSub("- "+pr.titulo+":", p).slice(2,-1))}</b><span>${(pr.bullets||[]).length} itens · ${rotulo.toLowerCase()}</span>`;
+        b.onclick=()=>{ inserePorcao(p, pr); toast(rotulo+" inserida"); };
+        box.appendChild(b); });
+    });
+    return;
+  }
   const lista = site.id==="hirschsprung" ? hsTextos(site, $("fSeg").value) : site.id==="gastrica" ? gasTextos(site, $("fSeg").value) : site.presets;
   if(!lista.length){ box.innerHTML='<p class="hint">Nenhum diagnóstico pronto para este sítio.</p>'; return; }
   lista.forEach(p=>{
@@ -2077,8 +2207,15 @@ function renderPresets(){
 }
 function juntar(a){ return a.length<2 ? a.join("") : a.slice(0,-1).join(", ")+" e "+a[a.length-1]; }
 function renderCrit(){
-  const site=currentSite();
+  const teg=isTEG(), site=teg && porcaoAtiva==="gas" ? siteById("gastrica") : currentSite();
   const box=$("critBox"); box.innerHTML="";
+  if(teg){
+    const sel=document.createElement("div"); sel.className="opts"; sel.id="fPorcao";
+    const lab=document.createElement("span"); lab.className="glabel"; lab.textContent="Porção:"; sel.appendChild(lab);
+    [["eso","esofágica"],["gas","gástrica"]].forEach(([p,r])=>{ const b=document.createElement("button"); b.type="button"; b.textContent=r; b.id="porcao_"+p;
+      if(porcaoAtiva===p) b.className="on"; b.onclick=()=>{ porcaoAtiva=p; renderCrit(); }; sel.appendChild(b); });
+    box.appendChild(sel);
+  }
   const grupos=(site.id==="hirschsprung" ? hsGrupos(site, $("fSeg").value) : (site.criterios||[])).slice();
   if(["ileo","colon","reto"].includes(site.id)) grupos.unshift({g:"Atividade: criptas com criptite ou abscesso", ativ:true, dica:"Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada. Insere a linha e ajusta o título."});
   if(MUC_SITIO[site.id]) grupos.push({g:"Amostra (modificador)", amostra:true, dica:"Exígua ou superficial: insere a linha, ajusta o início do título e gera a nota de viés amostral. Adequada desfaz."});
@@ -2116,7 +2253,7 @@ function renderCrit(){
       });
       mkb(opts, "inserir linha", ()=>{ appendLine(c.combo.monta(sel)); const d=c.combo.depois && c.combo.depois(sel); if(d) appendLine(d); toast("Linha inserida"); }, "go");
     }
-    if(c.amostra) [["Exígua","exigua"],["Superficial","superficial"],["Adequada",null]].forEach(([label,tipo])=>mkb(opts, label, ()=>{
+    if(c.amostra) (teg && porcaoAtiva==="gas" ? [["Exígua e superficial","exsup"]] : []).concat([["Exígua","exigua"],["Superficial","superficial"],["Adequada",null]]).forEach(([label,tipo])=>mkb(opts, label, ()=>{
       toast(amostraMod(tipo) ? "Amostra: "+label.toLowerCase() : "Sem título no editor: só a linha foi ajustada"); }));
     if(c.ativ){
       const mkn=()=>{ const w=document.createElement("span"); w.className="num"; const i=document.createElement("input"); i.type="number"; i.min="0"; i.placeholder="nº"; w.appendChild(i); opts.appendChild(w); return i; };
@@ -2332,7 +2469,7 @@ $("btnLimparTudo").onclick=()=>{
 /* ============================ EVENTOS ============================ */
 $("fSitio").onchange=onSiteChange;
 $("fSeg").onchange=()=>{ applyDefaultName(); const st=$("fSitio").value;
-  if(st==="hirschsprung"){ renderPresets(); renderCrit(); }
+  if(st==="hirschsprung" || st==="esofago"){ porcaoAtiva="eso"; renderPresets(); renderCrit(); }
   if(st==="gastrica"){ renderPresets(); const ta=$("corpo"), n=adaptaGas(ta.value, $("fSeg").value); if(n!==ta.value){ ta.value=n; prevTit=ultimoTitulo(n); toast("Texto ajustado ao segmento"); } } };
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
 [["nb_eso","Esôfago"],["nb_esoprox","Esôfago proximal"],["nb_esodist","Esôfago distal"]].forEach(([id,n])=>{ $(id).onclick=()=>{ $("fNome").value=n; }; });

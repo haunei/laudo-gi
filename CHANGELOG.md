@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.9.0 — 2026-10-22
+- Transição esofagogástrica com porções separadas: "MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:" + "MUCOSA ESOFÁGICA: …" e "MUCOSA GÁSTRICA: …", cada uma com seus achados. Na coluna Amostra, textos prontos do esôfago e do estômago por porção (o clique substitui a porção); na coluna Achados, seletor de porção; valores de referência, vínculos título↔achados, notas ("Amostra A (porção gástrica): …") e alertas por porção.
+- Porção gástrica exígua e superficial (subtítulo e amostragem do modelo do Pedro), exígua ou superficial isoladas, com as notas de viés amostral.
+- Estômago: padrão cárdia (amostragem, textos prontos de normalidade, segmento "Cárdia" ajusta título e linha).
+- Esôfago: lâmina própria com glândulas mucinosas tipo cárdia, metaplasia intestinal não identificada confirmada por Alcian blue pH 2,5/PAS sem diastase, fibrose de lâmina própria. Nome padrão "Transição esofagogástrica".
+- Duodeno: grau de Whitehead embutido nos textos prontos de duodenite (inespecífica leve; padrão linfocítico moderado) e no título.
+
 ## v3.8.1 — 2026-10-22
 - Notas na redação validada pelo Pedro: "em atividade" nas notas de contagem de eosinófilos (esôfago e demais sítios); acima do limiar, "achado histológico compatível com … em atividade; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias"; descamação inespecífica curta ("…são inespecíficos e podem ocorrer em diversas esofagites"); Hirschsprung (calretinina preservada sem gânglios e calretinina ausente) mais curtas. As notas de EDS, bolhas, achados eosinofílicos associados, padrão linfocítico duodenal e celíaca ficaram como estavam (não validadas).
 
