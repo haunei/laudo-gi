@@ -1914,7 +1914,7 @@ function tituloParaLinha(site){
   const gl=grauDaLinha(atual);
   if(g==="INATIVA"){ if(gl!=="INATIVA"){ const n=linhaAtiv(site, "INATIVA", tit); if(n) setLinha("- "+n); } return; }
   if(gl==="INATIVA"){
-    // esôfago e duodeno (só presença): a linha passa a "presente"; sítio graduado: o título fica "EM ATIVIDADE" até o grau ser escolhido nos achados
+    // esôfago e duodeno (só presença): a linha passa a "presente"; sítio graduado (edição à mão já bloqueada em bloqueiaAtiv): o título fica "EM ATIVIDADE" até o grau ser escolhido nos achados
     const n=["esofago","duodeno"].includes(site) ? linhaAtiv(site, "EM ATIVIDADE", tit) : null;
     if(n) setLinha("- "+n); else editTitle(t=>tituloComAtiv(t, "EM ATIVIDADE"));
     return;
@@ -1923,14 +1923,16 @@ function tituloParaLinha(site){
 }
 // sítios com linha de neutrófilos nos achados
 const SITIOS_NEUTRO=["esofago","gastrica","duodeno","ileo","colon","reto"];
-// título editado para EM ATIVIDADE sem linha de neutrófilos no trecho: a edição do título é desfeita até a linha existir
+// título editado para EM ATIVIDADE sem linha de neutrófilos no trecho (ou, em sítio graduado, com linha de ausência): a edição do título é desfeita até o achado existir
 let bloqueouAtiv=false;
 function bloqueiaAtiv(antes){
   const site=siteAtivo(), tit=tituloAtivo(), g=grauDoTitulo(tit), ta=$("corpo"), ls=ta.value.split("\n"), b=blocoAtual(ls);
-  if(!antes || !g || g==="INATIVA" || !SITIOS_NEUTRO.includes(site) || linhaNeutroDoBloco()) return false;
+  const l=linhaNeutroDoBloco(), aus=!!l && grauDaLinha(l)==="INATIVA" && !["esofago","duodeno"].includes(site);
+  if(!antes || !g || g==="INATIVA" || !SITIOS_NEUTRO.includes(site) || (l && !aus)) return false;
   if(g===grauDoTitulo(b.teg ? fromSub(antes, porcaoAtiva) : antes)) return false;
   ls[b.st]=antes; ta.value=ls.join("\n"); bloqueouAtiv=true;
-  toast("Título não alterado: não há linha de neutrófilos nos achados. Inclua a linha (com o grau) antes de pôr EM ATIVIDADE.");
+  toast(aus ? "Título não alterado: a linha de neutrófilos diz ausência. Escolha o grau nos achados antes de pôr EM ATIVIDADE."
+    : "Título não alterado: não há linha de neutrófilos nos achados. Inclua a linha (com o grau) antes de pôr EM ATIVIDADE.");
   return true;
 }
 // título editado à mão -> achados: só o item do título que mudou na edição vai para os achados
