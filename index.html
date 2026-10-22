@@ -1435,7 +1435,7 @@ function inserePorcao(p, preset){
   const ta=$("corpo"), ls=ta.value.split("\n"), o=porcoesIdx(ls).find(x=>x.p===p);
   const bloco=[toSub("- "+preset.titulo+":", p)].concat((preset.bullets||[]).map(b=>vr("- "+b)));
   ls.splice(o.ini, o.fim-o.ini, ...bloco);
-  ta.value=ls.join("\n"); prevTit=ultimoTitulo(ta.value); tegSnap();
+  ta.value=ls.join("\n"); prevTit=ultimoTitulo(ta.value); snapEditor();
   if(keep!==p) renderCrit();
 }
 // porção gástrica exígua/superficial: subtítulo e linha de amostragem do modelo do Pedro
@@ -1456,7 +1456,7 @@ function amostraModTEG(tipo){
   ls[o.ini]=subSetAmostraTEG(ls[o.ini], tipo);
   ta.value=ls.join("\n");
   if(tipo) appendLine(TEG_AM[tipo].l);
-  prevTit=ultimoTitulo(ta.value); tegSnap();
+  prevTit=ultimoTitulo(ta.value); snapEditor();
   return true;
 }
 // amostras do laudo desdobradas em porções (para notas e alertas)
@@ -1469,9 +1469,20 @@ function unidades(){
   });
   return out;
 }
-// subtítulos das porções no último sincronismo (para saber qual foi editado à mão)
-let tegPrev={};
-function tegSnap(){ const ls=$("corpo").value.split("\n"); tegPrev={}; porcoesIdx(ls).forEach(o=>{ tegPrev[o.p]=ls[o.ini]; }); }
+// subtítulos das porções e linhas de Marsh/atrofia/arquitetura no último sincronismo (para saber o que foi editado à mão)
+let tegPrev={}, duoPrev=null;
+function snapEditor(){
+  const ls=$("corpo").value.split("\n"); tegPrev={}; porcoesIdx(ls).forEach(o=>{ tegPrev[o.p]=ls[o.ini]; });
+  duoPrev={m:linhaDoBloco(RE_MARSH), atr:linhaDoBloco(/^- Atrofia vilositária: /), arq:linhaDoBloco(/^- Arquitetura/)};
+}
+// duodeno: a linha editada à mão (Marsh, ou atrofia/arquitetura) leva as outras junto
+function marshSincMao(){
+  if(!duoPrev) return;
+  const m=linhaDoBloco(RE_MARSH), atr=linhaDoBloco(/^- Atrofia vilositária: /), arq=linhaDoBloco(/^- Arquitetura/);
+  if(m && m!==duoPrev.m) marshParaAchados(m.match(RE_MARSH)[1]);
+  else if(atr && atr!==duoPrev.atr) achadosParaMarsh(atr);
+  else if(arq && arq!==duoPrev.arq) achadosParaMarsh(arq);
+}
 function ressincTEG(){
   const ta=$("corpo"), keep=porcaoAtiva;
   porcoesIdx(ta.value.split("\n")).map(o=>o.p).forEach(p=>{
@@ -1479,10 +1490,11 @@ function ressincTEG(){
     const ls=ta.value.split("\n"), b=blocoAtual(ls), site=siteAtivo(), seg=segAtivo(), antes=tegPrev[p], mudou=antes!==undefined && ls[b.st]!==antes;
     for(let i=b.st+1;i<b.fim;i++) ls[i]=fraseLie(fraseEos(ls[i], site, seg), site);
     ta.value=ls.join("\n");
+    if(mudou && bloqueiaAtiv(antes)) mudou=false;
     if(mudou) tituloParaAchados(antes);
     else { eosSinc(); if(site==="esofago") edsSinc(); const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l))); }
   });
-  porcaoAtiva=keep; tegSnap();
+  porcaoAtiva=keep; snapEditor();
 }
 
 /* ============================ EDITOR / INSERÇÃO ============================ */
@@ -1511,13 +1523,13 @@ function appendLine(line){
     if(b.teg){ let k=b.fim; while(k>b.st+1 && !ls[k-1].trim()) k--; ls.splice(k, 0, line); ta.value=ls.join("\n"); }
     else { let v=ta.value; if(v && !v.endsWith("\n")) v+="\n"; ta.value = v + line; } }
   sincAposLinha(line);
-  prevTit=ultimoTitulo(ta.value); tegSnap();
+  prevTit=ultimoTitulo(ta.value); snapEditor();
   ta.focus(); ta.scrollTop = ta.scrollHeight;
 }
 function appendBlock(block){
   const ta=$("corpo"); let v=ta.value.trim();
   ta.value = v ? v+"\n \n"+vr(block) : vr(block);
-  prevTit=ultimoTitulo(ta.value); hsPrev=hsBloco(ta.value).tits.join("\n");
+  prevTit=ultimoTitulo(ta.value); hsPrev=hsBloco(ta.value).tits.join("\n"); snapEditor();
   ta.focus(); ta.scrollTop = ta.scrollHeight;
 }
 
@@ -1772,7 +1784,7 @@ function amostraMod(tipo){
   else { const ls=ta.value.split("\n"); let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
     const j=ls.findIndex((l,i)=>i>st && /^- Amostra (exígua|superficial), /.test(l)); if(j>=0){ ls.splice(j,1); ta.value=ls.join("\n"); } }
   const ok=editTitle(t=>titleSetAmostra(t, tipo, site));
-  prevTit=ultimoTitulo(ta.value);
+  prevTit=ultimoTitulo(ta.value); snapEditor();
   return ok;
 }
 
@@ -1909,6 +1921,18 @@ function tituloParaLinha(site){
   }
   if(gl!==g) editTitle(t=>tituloComAtiv(t, gl));
 }
+// sítios com linha de neutrófilos nos achados
+const SITIOS_NEUTRO=["esofago","gastrica","duodeno","ileo","colon","reto"];
+// título editado para EM ATIVIDADE sem linha de neutrófilos no trecho: a edição do título é desfeita até a linha existir
+let bloqueouAtiv=false;
+function bloqueiaAtiv(antes){
+  const site=siteAtivo(), tit=tituloAtivo(), g=grauDoTitulo(tit), ta=$("corpo"), ls=ta.value.split("\n"), b=blocoAtual(ls);
+  if(!antes || !g || g==="INATIVA" || !SITIOS_NEUTRO.includes(site) || linhaNeutroDoBloco()) return false;
+  if(g===grauDoTitulo(b.teg ? fromSub(antes, porcaoAtiva) : antes)) return false;
+  ls[b.st]=antes; ta.value=ls.join("\n"); bloqueouAtiv=true;
+  toast("Título não alterado: não há linha de neutrófilos nos achados. Inclua a linha (com o grau) antes de pôr EM ATIVIDADE.");
+  return true;
+}
 // título editado à mão -> achados: só o item do título que mudou na edição vai para os achados
 const L_EDS_COMPLETA="- Achados de descamação superficial: Aspecto em dois tons (núcleos picnóticos e necróticos na zona superficial, sobre zona basal de aspecto normal), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial, paraqueratose proeminente (de várias camadas celulares) [@carmack09,hart15,rubrecht25].";
 function itensTitulo(tit, raw, teg){
@@ -1949,9 +1973,10 @@ function ressincEditor(){
   corrigeCampo("corpo");
   if(isTEG() && porcoesIdx(ta.value.split("\n")).length){ ressincTEG(); prevTit=ultimoTitulo(ta.value); return; }
   if(site==="hirschsprung"){ if(hsBloco(ta.value).tits.join("\n")!==hsPrev) hsTitParaLinhas(); hsSinc(); }
-  const tit=ultimoTitulo(ta.value), mudou=!!tit && tit!==prevTit;
+  let tit=ultimoTitulo(ta.value), mudou=!!tit && tit!==prevTit;
+  if(mudou && bloqueiaAtiv(prevTit)){ tit=ultimoTitulo(ta.value); mudou=false; }
   if(site==="gastrica" && mudou){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
-  if(site==="duodeno") corazzaSinc();
+  if(site==="duodeno"){ marshSincMao(); corazzaSinc(); }
   if(mudou) tituloParaAchados(prevTit);
   else {
     if(EOS_ASSOC[site] || ["duodeno","ileo","reto"].includes(site)) eosSinc();
@@ -1959,7 +1984,7 @@ function ressincEditor(){
     if(site==="duodeno" && /DUODENITE CRÔNICA/.test(tit)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(ta.value.split("\n").slice(ta.value.split("\n").lastIndexOf(tit)).join("\n"))));
     const l=linhaNeutroDoBloco(); if(l) editTitle(t=>tituloComAtiv(t, grauDaLinha(l)));
   }
-  prevTit=ultimoTitulo(ta.value);
+  prevTit=ultimoTitulo(ta.value); snapEditor();
 }
 
 /* ============================ CONTAGENS / DECH / ATIVIDADE (regras) ============================ */
@@ -2192,6 +2217,9 @@ function alertas(){
     if(s.site==="esofago"){ const ed=edsEstado(c), tEds=RE_T_EDS_FULL.test(tit) || RE_T_EDS_TR.test(tit);
       if(tEds && ed!=="suficiente") out.push({conf:false, msg:rotU+": o título fala em esofagite dissecante superficial, mas a linha de descamação não tem os 3 critérios (dois tons, descamação com clivagem, paraqueratose)."});
       if(!tEds && ed==="suficiente") out.push({conf:false, msg:rotU+": a linha de descamação tem os critérios de esofagite dissecante superficial e o título não os menciona; confira o título."}); }
+    const gT=grauDoTitulo(tit);
+    if(gT && gT!=="INATIVA" && SITIOS_NEUTRO.includes(s.site) && !c.split("\n").some(l=>RE_NEUTRO.test(l)))
+      out.push({conf:true, msg:rotU+": o título diz EM ATIVIDADE, mas não há linha de neutrófilos nos achados; inclua a linha (com o grau)."});
     if(!est && RE_T_EOS.test(tit)) out.push({conf:false, msg:rotU+": o título indica padrão eosinofílico, mas a contagem e os achados associados não sustentam; confira."});
     if(est && !RE_T_EOS.test(tit)) out.push({conf:false, msg:rotU+": há "+(RE_EOS_ASSOC_POS.test(c) ? "achados eosinofílicos associados" : "contagem de eosinófilos acima do limiar")+" e o título não indica o padrão eosinofílico; confira o título."});
   });
@@ -2379,7 +2407,7 @@ function nextLetter(){ return letterOf(WORK.samples.length); }
 function resetEditor(){
   editIndex=-1;
   draft={ dech:null }; dechUI={ ...DECH_UI0 };
-  $("corpo").value=""; prevTit=""; tegSnap();
+  $("corpo").value=""; prevTit=""; snapEditor();
   $("fLetra").value = nextLetter();
   $("fSitio").selectedIndex=0; onSiteChange();
   $("btnSalvar").textContent="✓ Salvar amostra (empilhar)";
@@ -2397,7 +2425,7 @@ $("btnSalvar").onclick=()=>{
   saveNow(); resetEditor(); renderAll();
 };
 $("btnCancelEdit").onclick=()=>{ resetEditor(); };
-$("btnLimparEditor").onclick=()=>{ $("corpo").value=""; prevTit=""; tegSnap(); $("corpo").focus(); };
+$("btnLimparEditor").onclick=()=>{ $("corpo").value=""; prevTit=""; snapEditor(); $("corpo").focus(); };
 
 /* ============================ LISTA / MONTAGEM ============================ */
 function renderSampleList(){
@@ -2424,7 +2452,7 @@ function editSample(i){
   editIndex=i; const s=WORK.samples[i];
   draft={ dech:s.dech||null };
   if(s.site && siteById(s.site)){ $("fSitio").value=s.site; onSiteChange(); $("fSeg").value=s.seg||""; }
-  $("fNome").value=s.nome; $("corpo").value=s.corpo; prevTit=ultimoTitulo(s.corpo); tegSnap(); $("fLetra").value=letterOf(i);
+  $("fNome").value=s.nome; $("corpo").value=s.corpo; prevTit=ultimoTitulo(s.corpo); snapEditor(); $("fLetra").value=letterOf(i);
   $("btnSalvar").textContent="✓ Atualizar amostra "+letterOf(i);
   $("btnCancelEdit").style.display="inline-block";
   window.scrollTo({top:0,behavior:"smooth"}); toast("Editando "+letterOf(i));
@@ -2563,7 +2591,7 @@ $("btnLimparTudo").onclick=()=>{
 $("fSitio").onchange=onSiteChange;
 $("fSeg").onchange=()=>{ applyDefaultName(); const st=$("fSitio").value;
   if(st==="hirschsprung" || st==="esofago"){ porcaoAtiva="eso"; renderPresets(); renderCrit(); }
-  if(st==="gastrica"){ renderPresets(); const ta=$("corpo"), n=adaptaGas(ta.value, $("fSeg").value); if(n!==ta.value){ ta.value=n; prevTit=ultimoTitulo(n); toast("Texto ajustado ao segmento"); } } };
+  if(st==="gastrica"){ renderPresets(); const ta=$("corpo"), n=adaptaGas(ta.value, $("fSeg").value); if(n!==ta.value){ ta.value=n; prevTit=ultimoTitulo(n); snapEditor(); toast("Texto ajustado ao segmento"); } } };
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
 [["nb_eso","Esôfago"],["nb_esoprox","Esôfago proximal"],["nb_esodist","Esôfago distal"]].forEach(([id,n])=>{ $(id).onclick=()=>{ $("fNome").value=n; }; });
 $("fPrefixoSel").onchange=()=>{ const v=$("fPrefixoSel").value, outro=v==="__outro";
@@ -2579,8 +2607,8 @@ $("corpo").onchange=ressincEditor;
     if(!r){ toast("Selecione um trecho no editor"); return; }
     ta.value=r.text; ta.focus(); ta.setSelectionRange(r.a, r.b); }; });
 $("tb_sync").onmousedown=e=>e.preventDefault();
-$("tb_sync").onclick=()=>{ ressincEditor(); $("corpo").focus(); toast("Título e achados sincronizados"); };
-$("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); hsPrev=hsBloco($("corpo").value).tits.join("\n"); tegSnap(); };
+$("tb_sync").onclick=()=>{ bloqueouAtiv=false; ressincEditor(); $("corpo").focus(); if(!bloqueouAtiv) toast("Título e achados sincronizados"); };
+$("corpo").onfocus=()=>{ prevTit=ultimoTitulo($("corpo").value); hsPrev=hsBloco($("corpo").value).tits.join("\n"); snapEditor(); };
 function aplicaTema(t){ t = t==="claro" ? "claro" : "escuro"; if(document.documentElement) document.documentElement.setAttribute("data-tema", t); $("temaSel").value=t; return t; }
 $("temaSel").onchange=()=>{ store(LS_TEMA, aplicaTema($("temaSel").value)); };
 $("dechDet").ontoggle=()=>{ store(LS_DECH_ABERTO, !!$("dechDet").open); };

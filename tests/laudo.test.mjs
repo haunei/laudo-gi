@@ -1153,6 +1153,28 @@ ok(ls10.slice(iG10).includes("- Amostragem: Mucosa gástrica superficial, com re
 eq(ls10.filter(l => /^- Amostragem:/.test(l)).length, 1, "transição: amostragem trocada, não duplicada");
 ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA EM ATIVIDADE:/.test(ls10[1]), "transição: subtítulo esofágico intacto");
 
+// 26. v3.10: título EM ATIVIDADE sem linha de neutrófilos é bloqueado; Marsh/atrofia/arquitetura editadas à mão sincronizam no ⟳
+({ t, els } = boot({}));
+const edita2 = (de, para) => { els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(de, para); els.corpo.onchange(); };
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco";
+els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Arquitetura das criptas preservada."; els.corpo.onfocus();
+edita2("INATIVA", "EM ATIVIDADE LEVE");
+ok(els.corpo.value.startsWith("- COLITE CRÔNICA INATIVA:"), "sem linha de neutrófilos: título EM ATIVIDADE é desfeito");
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: "- COLITE CRÔNICA EM ATIVIDADE LEVE:\n- Arquitetura das criptas preservada.", site: "colon", seg: "Ceco" });
+ok(t.alertas().some(a => /o título diz EM ATIVIDADE, mas não há linha de neutrófilos/.test(a.msg)), "alerta: título em atividade sem linha de neutrófilos");
+t.appendLine(t.SEED_SITES.colon.criterios.find(c => c.g === "Infiltrado neutrofílico").opt[1][1]);
+ok(/^- COLITE CRÔNICA EM ATIVIDADE LEVE:/.test(els.corpo.value), "com a linha incluída, o título passa a EM ATIVIDADE pelo achado");
+// Marsh à mão -> arquitetura e atrofia; atrofia à mão -> Marsh
+const DU2 = t.SEED_SITES.duodeno, mar2 = g => DU2.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").opt.find(o => o[0] === g)[1];
+els.fSitio.value = "duodeno"; els.fSeg.value = "";
+els.corpo.value = t.presetText(DU2.presets.find(p => /PADRÃO LINFOCÍTICO/.test(p.titulo))); els.corpo.onfocus();
+t.appendLine(mar2("3A"));
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(mar2("3A"), "- Classificação de Marsh-Oberhuber (1999): 3C."); els.tb_sync.onclick();
+ok(els.corpo.value.includes("- Arquitetura alterada: Atrofia vilositária total (mucosa plana), acompanhada de criptas hipertróficas.") && els.corpo.value.includes("- Atrofia vilositária: Presente, acentuada"), "Marsh editado à mão + ⟳ -> arquitetura e atrofia");
+ok(/Corazza-Villanacci \(2007\): B2/.test(els.corpo.value), "Marsh editado à mão + ⟳ -> Corazza B2");
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(/- Atrofia vilositária: [^\n]*/, DU2.criterios.find(c => c.g === "Atrofia vilositária").opt[2][1]); els.tb_sync.onclick();
+ok(els.corpo.value.includes(mar2("3B")) && !els.corpo.value.includes("Marsh-Oberhuber (1999): 3C"), "atrofia editada à mão + ⟳ -> Marsh 3B");
+
 console.log(`OK — ${n} asserts`);
 
 
