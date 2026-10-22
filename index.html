@@ -1088,7 +1088,7 @@ const NOTAS_PADRAO = [
   {tag:"Granulomas", texto:"Não foram identificados granulomas em nenhuma das amostras examinadas."},
   {tag:"Displasia", texto:"Não foi identificada displasia em nenhuma das amostras examinadas."},
   {tag:"EDS", texto:"Os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21]."},
-  {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09]; epitélio escamoso destacado, sem necrose, inflamação ou paraqueratose, pode corresponder a artefato do procedimento e não é, por si só, diagnóstico [@carmack09]."},
+  {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25]."},
   {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
   {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
 ];
@@ -1181,7 +1181,7 @@ function notaCeliaca(corpo){
 const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
 const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
 const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
-const NOTA_DESC_INESP="os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial (aspecto em dois tons, descamação com clivagem e paraqueratose), são inespecíficos e podem ocorrer em outras esofagites, como esofagite eosinofílica, doença do refluxo, lesão por medicamentos e candidíase [@rubrecht25,carmack09]; epitélio escamoso destacado, sem necrose, inflamação ou paraqueratose, pode corresponder a artefato do procedimento e não é, por si só, diagnóstico [@carmack09].";
+const NOTA_DESC_INESP="os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25].";
 const NOTA_EDS_BOLHA="bolhas e clivagem intraepitelial proeminentes exigem exclusão de dermatoses vesicobolhosas (síndrome de Stevens-Johnson, pênfigo, penfigoide), por imunofluorescência e correlação clínica [@carmack09].";
 const NOTA_EXIGUA="o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral.";
 const NOTA_SUPERF="o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral.";
@@ -1217,7 +1217,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.8.0";
+const APP_VERSION="3.8.1";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1417,8 +1417,8 @@ const HS_NOTA = {
   inad:"amostra inadequada para pesquisa de células ganglionares; recomenda-se nova biópsia, a 2 cm ou mais da linha pectínea e com submucosa representada [@ernica].",
   gangCorr:"células ganglionares presentes, com inervação mucosa reduzida à calretinina e/ou nervos submucosos hipertróficos: os achados podem corresponder a zona de transição e pedem correlação clínica e radiológica [@veras].",
   gang:"a presença de células ganglionares desfavorece doença de Hirschsprung no nível biopsiado [@ernica]; aganglionose de segmento muito curto, distal ao nível da amostra, não é afastada apenas por esta biópsia.",
-  agang:"a ausência de células ganglionares, com ausência de inervação mucosa à calretinina, favorece doença de Hirschsprung; o diagnóstico e a extensão do segmento aganglionar dependem de correlação clínica, radiológica e do estudo intraoperatório.",
-  inconc:"ausência de células ganglionares com inervação mucosa imunorreativa para calretinina: achados conflitantes. A presença de neuritos imunorreativos não exclui aganglionose, em especial no segmento muito curto [@kapur14]; sugere-se nova biópsia, mais generosa em submucosa ou de espessura total.",
+  agang:"a ausência de células ganglionares, com ausência de inervação mucosa à calretinina, favorece doença de Hirschsprung; imprescindível correlação clínica, radiológica e com o estudo intraoperatório.",
+  inconc:"ausência de células ganglionares com inervação mucosa preservada à calretinina: achados conflitantes, que não excluem aganglionose de segmento muito curto [@kapur14]; sugere-se nova biópsia, mais generosa em submucosa ou de espessura total.",
   pend:"não foram identificadas células ganglionares; recomenda-se estudo complementar por calretinina, com controle interno positivo, antes de firmar o diagnóstico [@ernica].",
   duv:"células de identificação duvidosa; sugere-se confirmação imuno-histoquímica ou nova biópsia.",
   misto:"células ganglionares presentes em apenas um dos plexos avaliados; sugere-se correlação clínica e, se necessário, nova amostragem."
@@ -1796,12 +1796,12 @@ function comVR(line, siteId, seg){
 function eosNota(key, n){
   const a="a contagem de eosinófilos ", st=eosEval(key,n);
   if(key==="esofago") return st==="compat"
-    ? a+"atinge o critério histológico de 15 por 0,3 mm² [@agree]: achado compatível com esofagite eosinofílica, na dependência de correlação clínica e da exclusão de causas secundárias de eosinofilia esofágica [@gio]."
-    : a+"está abaixo do critério histológico de 15 por 0,3 mm² [@agree]: o achado desfavorece esofagite eosinofílica.";
+    ? a+"atinge o critério histológico de 15 por 0,3 mm² [@agree]: achado histológico compatível com esofagite eosinofílica em atividade; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias [@gio]."
+    : a+"está abaixo do critério histológico de 15 por 0,3 mm² [@agree]: o achado desfavorece esofagite eosinofílica em atividade.";
   const v=EOS_VR[key];
-  if(st==="compat") return a+"atinge o limiar de consenso para "+v.rot+" [@pap]: achado compatível com doença gastrointestinal eosinofílica, na dependência de quadro clínico compatível e da exclusão de causas secundárias [@pap].";
+  if(st==="compat") return a+"atinge o limiar de consenso para "+v.rot+" [@pap]: achado histológico compatível com doença gastrointestinal eosinofílica em atividade neste sítio; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias [@pap].";
   if(st==="duv") return a+"está acima da faixa descrita em crianças sem doença [@deb], porém abaixo do limiar de consenso para "+v.rot+" [@pap]: não é possível afirmar, apenas pela histologia, se o valor é patológico.";
-  return a+"está abaixo do limiar de consenso para "+v.rot+" [@pap] e dentro da faixa descrita em crianças sem doença [@deb,iwa]: o achado desfavorece doença gastrointestinal eosinofílica neste sítio.";
+  return a+"está abaixo do limiar de consenso para "+v.rot+" [@pap] e dentro da faixa descrita em crianças sem doença [@deb,iwa]: o achado desfavorece doença gastrointestinal eosinofílica em atividade neste sítio.";
 }
 function lieEval(n){ return n>=30 ? "compat" : (n>=25 ? "duv" : "desf"); }
 function lieNota(n){

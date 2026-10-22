@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.8.1 — 2026-10-22
+- Notas na redação validada pelo Pedro: "em atividade" nas notas de contagem de eosinófilos (esôfago e demais sítios); acima do limiar, "achado histológico compatível com … em atividade; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias"; descamação inespecífica curta ("…são inespecíficos e podem ocorrer em diversas esofagites"); Hirschsprung (calretinina preservada sem gânglios e calretinina ausente) mais curtas. As notas de EDS, bolhas, achados eosinofílicos associados, padrão linfocítico duodenal e celíaca ficaram como estavam (não validadas).
+
 ## v3.8.0 — 2026-10-19
 - Materiais: o início da frase vira uma lista com todas as opções visíveis (antes o navegador escondia as que não batiam com o texto já escrito), com "Biópsia colonoscópica de:" nova e "Outro…" para texto livre; rascunho com texto fora da lista abre em "Outro…".
 - Esôfago: nome padrão pelo segmento ("Esôfago", "Esôfago proximal", "Esôfago distal"; médio e transição esôfago-gástrica como antes) e três botões rápidos sob o nome; os três nomes também no autocompletar.

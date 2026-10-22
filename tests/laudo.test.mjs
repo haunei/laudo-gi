@@ -577,7 +577,7 @@ eq(t.alertas().length, 4, "alertas: amostragem incompleta, trissomia 21, nervo a
 t.WORK.samples[0].corpo = agCorpo.replace(HL.calA, HL.calP);
 ok(t.alertas().some(a => /não corresponde aos achados/.test(a.msg)), "alerta quando o título salvo diverge dos achados");
 lh = laudoDe(pr("Células ganglionares ausentes, calretinina preservada"));
-ok(/calretinina: achados conflitantes/.test(lh) && lh.includes(t.CITE.kapur14), "nota e referência do achado conflitante");
+ok(/calretinina: achados conflitantes, que não excluem aganglionose de segmento muito curto/.test(lh) && lh.includes(t.CITE.kapur14), "nota e referência do achado conflitante");
 ok(/recomenda-se estudo complementar por calretinina/.test(laudoDe(pr("Células ganglionares ausentes, calretinina não realizada"))), "nota do estudo pendente");
 ok(/podem corresponder a zona de transição/.test(laudoDe(pr("Células ganglionares presentes, com achados a correlacionar"))), "nota dos achados a correlacionar");
 ok(/amostra inadequada para pesquisa de células ganglionares/.test(laudoDe(pr("Amostra inadequada"))), "nota da amostra inadequada");
@@ -881,7 +881,7 @@ t.WORK.samples.push({ nome: "Esôfago distal", corpo: eoeMicro, site: "esofago",
 const l21 = t.buildLaudo();
 ok(/- Amostras A e B: microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites \[\d+\]\./.test(l21), "nota da EoE com microabscesso, amostras juntas");
 ok(/- Amostras A, B e C: os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente/.test(l21), "nota dos achados qualitativos, amostras juntas");
-ok(/achado compatível com esofagite eosinofílica, na dependência de correlação clínica e da exclusão de causas secundárias de eosinofilia esofágica \[\d+\]/.test(l21), "nota de contagem do esôfago revista");
+ok(/achado histológico compatível com esofagite eosinofílica em atividade; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias \[\d+\]/.test(l21), "nota de contagem do esôfago revista (v3.8.1)");
 ok(l21.includes(t.CITE.campora22) && l21.includes(t.CITE.gio) && !/\[@/.test(l21), "referências Campora e Giordano numeradas");
 ok(!t.alertas().some(a => /padrão eosinofílico/.test(a.msg)), "títulos coerentes: sem alerta de padrão eosinofílico");
 t.WORK.samples.push({ nome: "Ceco", corpo: "- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Achados eosinofílicos associados: Criptite eosinofílica [@campora22].", site: "colon", seg: "Ceco" });
@@ -950,7 +950,7 @@ t.WORK.samples.push({ nome: "Esôfago distal", corpo: t.presetText(pEds), site: 
   { nome: "Esôfago", corpo: "- ESOFAGITE CRÔNICA INATIVA:\n" + L1, site: "esofago", seg: "" });
 const l22 = t.buildLaudo();
 ok(/- Amostras A e B: os achados histológicos \(aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose\) são compatíveis com esofagite dissecante superficial \[[\d,-]+\]; o diagnóstico requer correlação com o achado endoscópico/.test(l22), "nota de EDS, amostras juntas");
-ok(/- Amostra C: os achados de descamação superficial descritos, sem o conjunto de critérios de esofagite dissecante superficial/.test(l22), "nota de achado inespecífico");
+ok(/- Amostra C: os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites \[\d+,\d+\]\./.test(l22), "nota de achado inespecífico");
 ok(["carmack09", "hart15", "rubrecht25", "ebigbo21"].every(k => l22.includes(t.CITE[k])) && !/\[@/.test(l22), "4 referências de EDS numeradas");
 ok(!t.alertas().some(a => /dissecante/.test(a.msg)), "títulos coerentes: sem alerta");
 t.WORK.samples[2].corpo = "- ESOFAGITE CRÔNICA INATIVA, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):\n" + L1;
@@ -968,13 +968,22 @@ ok(!pEoE2.bullets.some(b => /^Presença de áreas de descamação superficial/.t
 t.WORK.samples.length = 0;
 t.WORK.samples.push({ nome: "Esôfago", corpo: t.presetText(pEoE2), site: "esofago", seg: "" });
 let l22b = t.buildLaudo();
-ok(/não é, por si só, diagnóstico \[\d+\]/.test(l22b), "nota inespecífica fala do artefato do procedimento");
+ok(/inespecíficos e podem ocorrer em diversas esofagites/.test(l22b), "nota inespecífica na redação do Pedro");
 const pEds2 = t.SEED_SITES.esofago.presets.find(p => /^ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE/.test(p.titulo));
 ok(/núcleos picnóticos e necróticos na zona superficial/.test(pEds2.bullets[0]) && /paraqueratose proeminente/.test(pEds2.bullets[0]), "texto pronto com as definições dos artigos");
 t.WORK.samples[0] = { nome: "Esôfago", corpo: t.presetText(pEds2).replace("paraqueratose proeminente", "bolhas intraepiteliais, paraqueratose proeminente"), site: "esofago", seg: "" };
 l22b = t.buildLaudo();
 ok(/sem achado endoscópico característico, o diagnóstico deve permanecer descritivo/.test(l22b) && /o achado endoscópico clássico nem sempre está presente/.test(l22b), "nota de EDS: diagnóstico descritivo sem endoscopia e ressalva pediátrica");
 ok(/dermatoses vesicobolhosas \(síndrome de Stevens-Johnson, pênfigo, penfigoide\), por imunofluorescência/.test(l22b), "bolhas: nota de dermatoses vesicobolhosas");
+
+// 23. v3.8.1: notas na redação validada pelo Pedro
+({ t, els } = boot({}));
+ok(/desfavorece esofagite eosinofílica em atividade\.$/.test(t.eosNota("esofago", 2)), "esôfago abaixo: em atividade");
+ok(/achado histológico compatível com esofagite eosinofílica em atividade; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias \[@gio\]\.$/.test(t.eosNota("esofago", 20)), "esôfago atinge: redação validada");
+ok(/desfavorece doença gastrointestinal eosinofílica em atividade neste sítio\.$/.test(t.eosNota("duodeno", 4)), "duodeno abaixo: em atividade");
+ok(/achado histológico compatível com doença gastrointestinal eosinofílica em atividade neste sítio; imprescindível correlação clínica-laboratorial-endoscópica e exclusão de causas secundárias \[@pap\]\.$/.test(t.eosNota("duodeno", 60)), "duodeno atinge: redação validada");
+eq(t.LIB.notas.find(n => n.tag === "Descamação inespecífica").texto, "Os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25].", "biblioteca: descamação na redação dele");
+ok(/síndrome de Stevens-Johnson, pênfigo, penfigoide/.test(html) && /olmesartana/.test(html) && /giardíase/.test(html), "notas não validadas ficaram como antes (bolhas, celíaca, padrão linfocítico)");
 
 console.log(`OK — ${n} asserts`);
 
