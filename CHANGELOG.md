@@ -1,5 +1,13 @@
 # Changelog
 
+## v3.10.0 — 2026-10-22
+- Sincronia título ↔ achados nos dois sentidos, em todos os sítios (e em cada porção da transição): editar o título à mão leva aos achados só o item que mudou; marcar ou editar um achado continua levando ao título.
+  - Atividade: o título decide presença/ausência; o grau vem sempre do achado. INATIVA → linha de ausência; EM ATIVIDADE com linha ausente → esôfago e duodeno ganham a linha "presente"; estômago, íleo, cólon e reto ficam "EM ATIVIDADE" sem grau, com alerta para escolher o grau nos achados. Grau diferente no título volta ao grau da linha.
+  - H. pylori (positiva/negativa), metaplasia intestinal (tipo e grau), displasia, grau de Whitehead, amostra exígua/superficial (inclusive "REPRESENTAÇÃO EXÍGUA E SUPERFICIAL" da porção gástrica) e esofagite dissecante superficial (linha completa de descamação) pelo título. Antral/oxíntica: o achado de amostragem muda o título e o título muda o achado.
+- Marsh-Oberhuber → arquitetura e atrofia vilositária (0/1 preservada; 2 hiperplasia de criptas; 3A/3B/3C atrofia leve/moderada/total); atrofia ou arquitetura clicadas → Marsh (0 ou 1 pela linfocitose presente), com Corazza-Villanacci junto.
+- Eosinófilos: o título diz sempre "DE PADRÃO EOSINOFÍLICO" (também no esôfago com 15/0,3 mm² ou mais); "compatível com esofagite eosinofílica em atividade" fica na nota. Texto pronto da EoE renomeado. Alerta novo quando o título indica padrão eosinofílico e contagem/achados não sustentam.
+- Whitehead leve: "aumento da celularidade da lâmina própria, sem alteração do epitélio superficial nem erosão".
+
 ## v3.9.0 — 2026-10-22
 - Transição esofagogástrica com porções separadas: "MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:" + "MUCOSA ESOFÁGICA: …" e "MUCOSA GÁSTRICA: …", cada uma com seus achados. Na coluna Amostra, textos prontos do esôfago e do estômago por porção (o clique substitui a porção); na coluna Achados, seletor de porção; valores de referência, vínculos título↔achados, notas ("Amostra A (porção gástrica): …") e alertas por porção.
 - Porção gástrica exígua e superficial (subtítulo e amostragem do modelo do Pedro), exígua ou superficial isoladas, com as notas de viés amostral.

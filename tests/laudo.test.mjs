@@ -305,9 +305,17 @@ ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCI
 els.corpo.onfocus();
 els.corpo.value = els.corpo.value.replace("EM ATIVIDADE MODERADA", "EM ATIVIDADE ACENTUADA");
 els.corpo.onchange();
-ok(els.corpo.value.includes(gNeutro[3][1]) && !els.corpo.value.includes(gNeutro[2][1]), "editor: mudar o título muda a linha de neutrófilos");
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:") && els.corpo.value.includes(gNeutro[2][1]), "editor: o grau no título volta ao grau da linha (o grau vem do achado)");
 els.corpo.onfocus();
-els.corpo.value = els.corpo.value.replace(gNeutro[3][1], gNeutro[1][1]);
+els.corpo.value = els.corpo.value.replace("EM ATIVIDADE MODERADA", "INATIVA");
+els.corpo.onchange();
+ok(els.corpo.value.includes(gNeutro[0][1]) && !els.corpo.value.includes(gNeutro[2][1]), "editor: título INATIVA muda a linha para ausência");
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace("INATIVA", "EM ATIVIDADE");
+els.corpo.onchange();
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE, ASSOCIADA A H. pylori:") && els.corpo.value.includes(gNeutro[0][1]), "editor: título EM ATIVIDADE no estômago espera o grau nos achados");
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace(gNeutro[0][1], gNeutro[1][1]);
 els.corpo.onchange();
 ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, ASSOCIADA A H. pylori:"), "editor: mudar a linha à mão muda o título");
 t.appendLine("- Pesquisa para H. pylori: Negativa.");
@@ -842,8 +850,8 @@ for (const k of ["esofago", "gastrica", "duodeno", "colon"]) ok(/\[@(gio|campora
 const TE = (tt, est) => t.titleSetEos(tt, est);
 eq(TE("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO:", "padrao"), "- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", "padrão eosinofílico entra no título");
 eq(TE("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", null), "- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO (VIDE NOTAS):", "e sai quando não há padrão");
-eq(TE("- ESOFAGITE CRÔNICA INATIVA:", "eoe"), "- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):", "esôfago: compatível com EoE");
-eq(TE("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):", "padrao"), "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", "esôfago: troca para padrão");
+eq(TE("- ESOFAGITE CRÔNICA INATIVA:", "eoe"), "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", "esôfago com 15 ou mais: título só diz padrão eosinofílico");
+eq(TE("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):", "padrao"), "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):", "esôfago: título antigo (compatível) troca para padrão");
 eq(TE("- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "padrao"), "- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "normalidade não muda");
 eq(TE("- COLITE CRÔNICA INATIVA:", undefined), "- COLITE CRÔNICA INATIVA:", "sem dado de eosinófilos não mexe");
 eq(TE("- COLITE CRÔNICA INATIVA (DECH POSSÍVEL – NIH/2014):", "padrao"), "- COLITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (DECH POSSÍVEL – NIH/2014) (VIDE NOTAS):", "preserva o sufixo DECH");
@@ -864,15 +872,15 @@ t.appendLine(ga.opt[0][1]);
 ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO (VIDE NOTAS):") && els.corpo.value.split("\n").filter(l => /^- Achados eosinofílicos associados/.test(l)).length === 1, "editor: \"Ausentes\" troca a linha e tira o padrão");
 els.fSitio.value = "esofago"; els.fSeg.value = ""; els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:";
 t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).");
-ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):"), "editor: esôfago 21 vira compatível com EoE");
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):"), "editor: esôfago 21 vira padrão eosinofílico no título");
 els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("até 21 eosinófilos", "até 3 eosinófilos"); els.corpo.onchange();
 ok(!/EOSINOF/.test(els.corpo.value.split("\n")[0]), "editor: contagem editada à mão abaixo do limiar tira o trecho");
 els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Presença de eosinófilos (até 90 eosinófilos/campo de grande aumento).";
-els.tb_sync.onclick();
+els.corpo.onfocus(); els.tb_sync.onclick();
 ok(/^- COLITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(els.corpo.value), "botão ⟳: cólon 90 ganha padrão eosinofílico");
 // texto pronto da EoE e notas
-const eoeP = t.SEED_SITES.esofago.presets.find(p => /COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA/.test(p.titulo));
-ok(eoeP && eoeP.bullets.some(b => /^Achados eosinofílicos associados: Não identificados/.test(b)) && !t.SEED_SITES.esofago.presets.some(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)"), "texto pronto da EoE coerente com a regra");
+const eoeP = t.SEED_SITES.esofago.presets.find(p => /^ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO/.test(p.titulo));
+ok(eoeP && eoeP.bullets.some(b => /^Achados eosinofílicos associados: Não identificados/.test(b)) && !t.SEED_SITES.esofago.presets.some(p => /COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA/.test(p.titulo)), "texto pronto da EoE coerente com a regra");
 eq(t.eosEstado(t.presetText(eoeP), "esofago", ""), "eoe", "texto pronto da EoE: estado eoe");
 t.WORK.samples.length = 0;
 const eoeMicro = t.presetText(eoeP).replace(/- Achados eosinofílicos associados: .*/, "- Achados eosinofílicos associados: Microabscessos eosinofílicos (agrupamentos de 4 ou mais eosinófilos, sem epitélio entre eles) [@gio].");
@@ -927,9 +935,9 @@ eq(t.edsEstado("- Achados de descamação superficial: Não identificados."), nu
 eq(t.edsEstado("- Ausência de hiperplasia da camada basal."), undefined, "sem linha");
 eq(t.titleSetEds("- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "suficiente"), "- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "normalidade vira título de EDS");
 eq(t.titleSetEds("- MUCOSA ESOFÁGICA APRESENTANDO:", "suficiente"), "- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "\"apresentando\" vira título de EDS");
-const tEoE = "- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VIDE NOTAS):";
+const tEoE = "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):";
 const tEoEeds = t.titleSetEds(tEoE, "suficiente");
-eq(tEoEeds, "- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "esofagite ganha o trecho de EDS");
+eq(tEoEeds, "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):", "esofagite ganha o trecho de EDS");
 eq(t.titleSetEds(tEoEeds, "inesp"), tEoE, "trecho sai quando os critérios caem");
 eq(t.titleSetEds(tEoE, "inesp"), tEoE, "inespecífico não muda o título");
 eq(t.lineKind(tEoEeds), "b", "título em negrito");
@@ -941,7 +949,7 @@ t.appendLine(L1);
 ok(els.corpo.value.split("\n").filter(l => /^- Achados de descamação/.test(l)).length === 1, "linha de descamação troca, não duplica");
 els.corpo.value = tEoE + "\n- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).";
 els.corpo.onfocus(); els.corpo.value += "\n" + L3; els.corpo.onchange();
-ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):"), "edição à mão: EoE ganha o trecho de EDS");
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):"), "edição à mão: EoE ganha o trecho de EDS");
 // texto pronto, notas, alertas
 const pEds = t.SEED_SITES.esofago.presets.find(p => /^ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE/.test(p.titulo));
 ok(pEds && t.edsEstado(t.presetText(pEds)) === "suficiente", "texto pronto de EDS coerente com a regra");
@@ -963,7 +971,7 @@ eq(t.concorda(gE.stack.pre + gE.stack.itens.map(i => i[1]).join(", ") + gE.stack
 
 // 22b. EDS revisto com os textos completos (Carmack 2009, Hart 2015, Rubrecht 2025)
 ({ t, els } = boot({}));
-const pEoE2 = t.SEED_SITES.esofago.presets.find(p => /COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA/.test(p.titulo));
+const pEoE2 = t.SEED_SITES.esofago.presets.find(p => /^ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO/.test(p.titulo));
 ok(!pEoE2.bullets.some(b => /^Presença de áreas de descamação superficial/.test(b)) && t.edsEstado(t.presetText(pEoE2)) === "inesp", "EoE: frase livre trocada pela linha padronizada (achado inespecífico)");
 t.WORK.samples.length = 0;
 t.WORK.samples.push({ nome: "Esôfago", corpo: t.presetText(pEoE2), site: "esofago", seg: "" });
@@ -1006,7 +1014,7 @@ ok(/eosinófilos\/campo de grande aumento; valor de referência: a partir de 15 
 t.porcaoAtivaSet("eso");
 t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).");
 lsT = els.corpo.value.split("\n");
-ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA \(VIDE NOTAS\):/.test(lsT[1]), "achado esofágico muda só o subtítulo esofágico");
+ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(lsT[1]), "achado esofágico muda só o subtítulo esofágico");
 ok(lsT.includes("- MUCOSA GÁSTRICA: PADRÃO CÁRDIA, SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:"), "subtítulo gástrico intacto");
 eq(lsT.filter(l => /eosinófilos\/campo/.test(l) && /Exocitose/.test(l)).length, 1, "linha esofágica trocada, não duplicada");
 t.porcaoAtivaSet("gas");
@@ -1014,7 +1022,7 @@ t.appendLine("- Pesquisa para H. pylori: Positiva (+1).");
 lsT = els.corpo.value.split("\n");
 const iG = lsT.findIndex(l => /^- MUCOSA GÁSTRICA/.test(l));
 ok(lsT.slice(iG).includes("- Pesquisa para H. pylori: Positiva (+1).") && !lsT.slice(iG).includes("- Pesquisa para H. pylori: Negativa."), "H. pylori trocado só na porção gástrica");
-ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL/.test(lsT[1]), "porção esofágica intacta");
+ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO/.test(lsT[1]), "porção esofágica intacta");
 // exígua e superficial na porção gástrica
 t.amostraMod("exsup");
 lsT = els.corpo.value.split("\n");
@@ -1047,6 +1055,103 @@ ok(ES.criterios.some(c => c.g === "Fibrose de lâmina própria"), "fibrose de l�
 for (const p of t.SEED_SITES.duodeno.presets.filter(p => /^DUODENITE CRÔNICA/.test(p.titulo))) {
   const g = p.bullets.find(b => /^Grau da duodenite/.test(b)); ok(!!g, "Whitehead embutido: " + p.titulo.slice(0, 50));
   eq(t.titleSetGrauDuo("- " + p.titulo + ":", t.grauDuoDaLinha("- " + g)), "- " + p.titulo + ":", "grau do título coerente: " + p.titulo.slice(0, 50)); }
+
+// 25. v3.10: título editado à mão -> achados; achados -> título; Marsh <-> arquitetura/atrofia
+({ t, els } = boot({}));
+const edita = (de, para) => { els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(de, para); els.corpo.onchange(); };
+const GS10 = t.SEED_SITES.gastrica, gN = GS10.criterios.find(c => c.g === "Infiltrado neutrofílico").opt;
+const pHp = GS10.presets.find(p => /COM PESQUISA PARA H\. pylori POSITIVA/.test(p.titulo));
+els.fSitio.value = "gastrica"; els.fSeg.value = ""; els.corpo.value = t.presetText(pHp); els.corpo.onfocus();
+// 1. atividade: presença pelo título, grau pelo achado
+edita("EM ATIVIDADE LEVE", "INATIVA");
+ok(els.corpo.value.includes(gN[0][1]) && !els.corpo.value.includes(gN[1][1]), "título INATIVA -> linha de ausência");
+edita("INATIVA", "EM ATIVIDADE MODERADA");
+ok(/^- GASTRITE CRÔNICA EM ATIVIDADE,/.test(els.corpo.value) && els.corpo.value.includes(gN[0][1]), "estômago: título em atividade sem linha -> espera o grau nos achados");
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value, site: "gastrica", seg: "" });
+ok(t.alertas().some(a => /o título diz EM ATIVIDADE, mas a linha de neutrófilos diz ausência/.test(a.msg)), "alerta: título em atividade com linha de ausência");
+t.appendLine(gN[2][1]);
+ok(/^- GASTRITE CRÔNICA EM ATIVIDADE MODERADA,/.test(els.corpo.value), "grau escolhido nos achados vai ao título");
+// 2. H. pylori pelo título; antral/oxíntica pelos achados
+edita(/,? COM PESQUISA PARA H\. pylori POSITIVA \(\+2\/\+3\)/, "");
+ok(els.corpo.value.includes("- Pesquisa para H. pylori: Negativa.") && !/Positiva/.test(els.corpo.value), "título sem H. pylori -> pesquisa negativa");
+edita("EM ATIVIDADE MODERADA", "EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori");
+ok(els.corpo.value.includes("- Pesquisa para H. pylori: Positiva.") && els.corpo.value.split("\n").filter(l => /^- Pesquisa para H\. pylori/.test(l)).length === 1, "título com H. pylori -> pesquisa positiva, sem duplicar");
+t.appendLine("- Amostragem: Mucosa gástrica de padrão antral.");
+ok(/EM MUCOSA DE ANTRO/.test(els.corpo.value.split("\n")[0]) && !/OXÍNTICA/.test(els.corpo.value.split("\n")[0]), "achado antral -> título antral");
+t.appendLine("- Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).");
+ok(/EM MUCOSA DE PADRÃO OXÍNTICO \(CORPO\/FUNDO\)/.test(els.corpo.value.split("\n")[0]), "achado oxíntico -> título oxíntico");
+edita("EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO)", "EM MUCOSA DE ANTRO");
+ok(els.corpo.value.includes("- Amostragem: Mucosa gástrica de padrão antral."), "título antral -> achado antral");
+// 3. metaplasia e displasia pelo título
+edita("ASSOCIADA A H. pylori", "ASSOCIADA A H. pylori, COM METAPLASIA INTESTINAL INCOMPLETA E MODERADA, SEM DISPLASIA");
+ok(els.corpo.value.includes("- Metaplasia intestinal: Presente, incompleta, moderada.") && !/Ausência de metaplasia intestinal/.test(els.corpo.value), "título com metaplasia -> linha de metaplasia");
+ok(els.corpo.value.includes("- Displasia: Não identificada."), "título sem displasia -> linha de displasia");
+edita("SEM DISPLASIA", "COM DISPLASIA DE BAIXO GRAU");
+ok(els.corpo.value.includes("- Displasia: Presente, de baixo grau.") && els.corpo.value.split("\n").filter(l => /^- Displasia/.test(l)).length === 1, "título com displasia de baixo grau -> linha");
+edita(", COM METAPLASIA INTESTINAL INCOMPLETA E MODERADA", "");
+ok(els.corpo.value.includes("- Metaplasia intestinal: Não identificada."), "metaplasia tirada do título -> não identificada");
+// 6. amostra exígua pelo título
+edita("- GASTRITE CRÔNICA", "- EXÍGUO FRAGMENTO DE MUCOSA GÁSTRICA APRESENTANDO GASTRITE CRÔNICA");
+ok(els.corpo.value.includes("- Amostra exígua, pouco representativa."), "título exíguo -> linha de amostra exígua");
+edita("- EXÍGUO FRAGMENTO DE MUCOSA GÁSTRICA APRESENTANDO GASTRITE CRÔNICA", "- GASTRITE CRÔNICA");
+ok(!/Amostra exígua/.test(els.corpo.value), "prefixo tirado -> linha sai");
+// edição de linha à mão continua levando ao título
+edita(gN[2][1], gN[3][1]);
+ok(/^- GASTRITE CRÔNICA EM ATIVIDADE ACENTUADA,/.test(els.corpo.value), "linha editada à mão -> grau do título");
+// 4/5. esôfago: presença/ausência, EDS
+els.fSitio.value = "esofago"; els.fSeg.value = "Terço distal";
+els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:\n- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."; els.corpo.onfocus();
+edita("INATIVA", "EM ATIVIDADE");
+ok(els.corpo.value.includes("- Presença de exocitose de neutrófilos, sem erosão ou ulceração."), "esôfago: título em atividade -> linha presente");
+edita("EM ATIVIDADE", "EM ATIVIDADE, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL");
+ok(t.edsEstado(els.corpo.value) === "suficiente" && els.corpo.value.split("\n").filter(l => /^- Achados de descamação/.test(l)).length === 1, "título com EDS -> linha completa de descamação");
+// 7. eosinófilos: título sempre "DE PADRÃO EOSINOFÍLICO"; alerta quando não sustentado
+els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):\n- Exocitose de eosinófilos (até 3 eosinófilos/campo de grande aumento).";
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value, site: "esofago", seg: "Terço distal" });
+ok(t.alertas().some(a => /o título indica padrão eosinofílico, mas a contagem/.test(a.msg)), "alerta: padrão eosinofílico sem contagem que sustente");
+els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:"; els.corpo.onfocus();
+t.appendLine("- Exocitose de eosinófilos (até 40 eosinófilos/campo de grande aumento).");
+ok(/^- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(els.corpo.value), "esôfago com 40: título diz padrão eosinofílico");
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value, site: "esofago", seg: "Terço distal" });
+ok(/achado histológico compatível com esofagite eosinofílica em atividade/.test(t.buildLaudo()), "nota diz compatível com EoE em atividade");
+// 8. duodeno: Whitehead pelo título (e a linha leve sem falar de arquitetura)
+const DU = t.SEED_SITES.duodeno, pDu = DU.presets.find(p => /^DUODENITE CRÔNICA LEVE, INATIVA$/.test(p.titulo)) || DU.presets.find(p => /^DUODENITE CRÔNICA LEVE/.test(p.titulo));
+els.fSitio.value = "duodeno"; els.fSeg.value = ""; els.corpo.value = t.presetText(pDu); els.corpo.onfocus();
+ok(els.corpo.value.includes("Grau da duodenite: Leve (aumento da celularidade da lâmina própria, sem alteração do epitélio superficial nem erosão"), "Whitehead leve: celularidade, epitélio e erosão");
+edita("DUODENITE CRÔNICA LEVE", "DUODENITE CRÔNICA MODERADA");
+ok(els.corpo.value.includes("- Grau da duodenite: Moderado") && els.corpo.value.split("\n").filter(l => /^- Grau da duodenite/.test(l)).length === 1, "título moderada -> linha de Whitehead moderada");
+edita("DUODENITE CRÔNICA MODERADA", "DUODENITE CRÔNICA");
+ok(!/Grau da duodenite/.test(els.corpo.value), "grau tirado do título -> linha sai");
+edita("INATIVA", "EM ATIVIDADE");
+ok(els.corpo.value.includes("- " + t.linhaAtiv("duodeno", "EM ATIVIDADE")), "duodeno: título em atividade -> linha presente");
+// Marsh <-> arquitetura e atrofia vilositária
+const marsh = g => DU.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").opt.find(o => o[0] === g)[1];
+t.appendLine(marsh("3B"));
+ok(els.corpo.value.includes("- Arquitetura alterada: Atrofia vilositária moderada, acompanhada de criptas hipertróficas.") && els.corpo.value.includes("- Atrofia vilositária: Presente, moderada"), "Marsh 3B -> arquitetura e atrofia moderada");
+ok(/Corazza-Villanacci \(2007\): B1/.test(els.corpo.value), "Marsh 3B -> Corazza B1");
+eq(els.corpo.value.split("\n").filter(l => /^- Arquitetura/.test(l)).length, 1, "arquitetura trocada, não duplicada");
+t.appendLine(DU.criterios.find(c => c.g === "Atrofia vilositária").opt[3][1]);
+ok(els.corpo.value.includes(marsh("3C")), "atrofia acentuada -> Marsh 3C");
+t.appendLine(marsh("2"));
+ok(els.corpo.value.includes("- Arquitetura alterada: Vilosidades preservadas, com hiperplasia das criptas.") && els.corpo.value.includes("- Atrofia vilositária: Não identificada."), "Marsh 2 -> hiperplasia de criptas sem atrofia");
+t.appendLine("- Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.");
+ok(els.corpo.value.includes(marsh(/Linfocitose intraepitelial: Presente/.test(els.corpo.value) ? "1" : "0")), "arquitetura preservada -> Marsh 0/1 pela linfocitose");
+// transição: título de cada porção -> achados da própria porção
+({ t, els } = boot({}));
+els.fSitio.value = "esofago"; els.fSeg.value = "Transição esôfago-gástrica"; els.fSeg.onchange(); els.corpo.value = "";
+t.inserePorcao("eso", t.SEED_SITES.esofago.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"));
+t.inserePorcao("gas", t.SEED_SITES.gastrica.presets.find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"));
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace("- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:", "- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA EM ATIVIDADE:"); els.corpo.onchange();
+let ls10 = els.corpo.value.split("\n"), iG10 = ls10.findIndex(l => /^- MUCOSA GÁSTRICA/.test(l));
+ok(ls10.slice(1, iG10).includes("- Presença de exocitose de neutrófilos, sem erosão ou ulceração."), "transição: subtítulo esofágico -> achado esofágico");
+ok(!ls10.slice(iG10).some(l => /exocitose de neutrófilos, sem erosão/.test(l)), "transição: porção gástrica intacta");
+els.corpo.onfocus();
+els.corpo.value = els.corpo.value.replace(/- MUCOSA GÁSTRICA: [^\n]*/, "- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA E SUPERFICIAL, APRESENTANDO OS SEGUINTES ACHADOS HISTOLÓGICOS (VIDE NOTAS):"); els.corpo.onchange();
+ls10 = els.corpo.value.split("\n"); iG10 = ls10.findIndex(l => /^- MUCOSA GÁSTRICA/.test(l));
+ok(ls10.slice(iG10).includes("- Amostragem: Mucosa gástrica superficial, com representação mínima de glândulas foveolares e presença de glândulas mucinosas (padrão cárdia)."), "transição: subtítulo gástrico exíguo e superficial -> linha de amostragem");
+eq(ls10.filter(l => /^- Amostragem:/.test(l)).length, 1, "transição: amostragem trocada, não duplicada");
+ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA EM ATIVIDADE:/.test(ls10[1]), "transição: subtítulo esofágico intacto");
 
 console.log(`OK — ${n} asserts`);
 
