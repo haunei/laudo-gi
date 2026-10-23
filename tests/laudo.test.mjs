@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -1009,7 +1009,8 @@ els.corpo.value = "";
 const pEsoT = ES.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"), pGasN = GS.presets.find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
 t.inserePorcao("eso", pEsoT); t.inserePorcao("gas", pGasN);
 let lsT = els.corpo.value.split("\n");
-eq(lsT[0], "- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:", "título-mãe");
+eq(lsT[0], "- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:", "título-mãe");
+eq(t.formataAmostra("- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:\n- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:\n- Parasitos: x.").split("\n")[0], "- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:", "grafia antiga do título-mãe sai na nova no laudo");
 eq(lsT.filter(l => /^- MUCOSA DE TRANSIÇÃO/.test(l)).length, 1, "título-mãe uma vez só");
 eq(lsT[1], "- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:", "subtítulo esofágico");
 ok(lsT.includes("- MUCOSA GÁSTRICA: PADRÃO CÁRDIA, SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:"), "subtítulo gástrico normal de cárdia");
@@ -1241,7 +1242,7 @@ ok(cT.includes("- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS SEG
 ok(!t.alertas().some(a => /não indica o padrão eosinofílico/.test(a.msg)), "sem o alerta da foto 1");
 // formato novo da transição no laudo
 const lT27 = t.buildLaudo().split("\n"), iA = lT27.indexOf("A) Transição esofagogástrica:");
-eq(lT27.slice(iA + 1, iA + 6).join("|"), "- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:|- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA.|- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS).| |- MICROSCOPIA:", "transição: diagnósticos no topo e microscopia");
+eq(lT27.slice(iA + 1, iA + 6).join("|"), "- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:|- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA.|- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS).| |- MICROSCOPIA:", "transição: diagnósticos no topo e microscopia");
 ok(lT27[iA + 6] === "- MUCOSA ESOFÁGICA:" && lT27.includes("- MUCOSA GÁSTRICA:") && lT27.indexOf("- MUCOSA GÁSTRICA:") > lT27.indexOf("- MUCOSA ESOFÁGICA:"), "transição: achados sob cada porção");
 ok(/^- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS SEGUINTES ACHADOS HISTOLÓGICOS/m.test(t.WORK.samples[0].corpo), "o editor (amostra salva) continua no formato de edição");
 // formato novo: título "APRESENTANDO"

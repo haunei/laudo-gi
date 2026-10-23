@@ -1385,9 +1385,9 @@ let toastT;
 function toast(msg){ const t=$("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"),1700); }
 
 /* ============================ TRANSIÇÃO ESOFAGOGÁSTRICA: porções esofágica e gástrica no mesmo bloco ============================ */
-// "- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:" + "- MUCOSA ESOFÁGICA: …:" e "- MUCOSA GÁSTRICA: …:", cada uma com seus achados.
+// "- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:" + "- MUCOSA ESOFÁGICA: …:" e "- MUCOSA GÁSTRICA: …:", cada uma com seus achados.
 // Na porção gástrica, as regras usam o estômago (segmento "Cárdia"); os vínculos título <-> achados agem só no subtítulo da porção.
-const TEG_SEG="Transição esôfago-gástrica", TEG_MAE="- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:", RE_TEG_MAE=/^- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA/;
+const TEG_SEG="Transição esôfago-gástrica", TEG_MAE="- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:", RE_TEG_MAE=/^- MUCOSA DE TRANSIÇÃO (?:ESOFAGOGÁSTRICA|ESÔFAGO-GÁSTRICA)/;
 const TEG_PRE={eso:"- MUCOSA ESOFÁGICA: ", gas:"- MUCOSA GÁSTRICA: "}, TEG_MUC={eso:"MUCOSA ESOFÁGICA", gas:"MUCOSA GÁSTRICA"}, TEG_NOME={eso:"porção esofágica", gas:"porção gástrica"};
 let porcaoAtiva="eso";
 function isTEG(){ return $("fSitio").value==="esofago" && $("fSeg").value===TEG_SEG; }
@@ -2606,7 +2606,7 @@ const MICRO="- MICROSCOPIA:";
 function formataAmostra(corpo){
   const ls=(corpo||"").split("\n"), ps=porcoesIdx(ls), limpa=a=>{ a=a.slice(); while(a.length && !a[0].trim()) a.shift(); while(a.length && !a[a.length-1].trim()) a.pop(); return a; };
   if(ps.length){
-    const mae=ls.find(l=>RE_TEG_MAE.test(l)), topo=(mae ? [mae.trim()] : []).concat(ps.map(o=>fechaTitulo(ls[o.ini]))), micro=[];
+    const mae=ls.find(l=>RE_TEG_MAE.test(l)), topo=(mae ? [TEG_MAE] : []).concat(ps.map(o=>fechaTitulo(ls[o.ini]))), micro=[];
     ps.forEach(o=>{ micro.push(TEG_PRE[o.p].trim()); micro.push(...limpa(ls.slice(o.ini+1, o.fim))); });
     return topo.join(L)+L+" "+L+MICRO+L+micro.join(L);
   }
