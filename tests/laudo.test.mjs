@@ -93,8 +93,8 @@ ok(rich.includes("font-size:8pt") && rich.includes("Arial"), "Arial 8pt");
 ok(rich.includes("text-align:justify") && rich.includes("line-height:1.15") && rich.includes("color:#000000"), "justificado, 1.15, preto");
 ok(rich.includes("<i>H. pylori</i>"), "H. pylori em itálico");
 const nBold = (rich.match(/font-weight:bold/g) || []).length;
-eq(nBold, lines.filter(l => t.lineKind(l) === "b").length, "negrito só nas linhas b");
-eq(nBold, 2, "só os 2 títulos");
+eq(nBold, lines.filter(l => t.lineKind(l) === "b" || (/^- .*\.$/.test(l) && !/[a-zà-ÿ]/.test(l.replace(/H\. pylori/g, "")))).length, "negrito só nos títulos");
+eq(nBold, 4, "os 2 títulos (fechados em '.') e os 2 '- MICROSCOPIA:'");
 
 // 6. Rascunho sobrevive ao reload
 t.saveNow();
@@ -440,7 +440,7 @@ eq(t.alertas().length, 1, "sem referências: alerta para nota que manda ver as r
 
 // 15. Hirschsprung: título descritivo em dois itens (mucosa + pesquisa de células ganglionares), texto <-> título, notas, alertas
 ({ t, els } = boot({}));
-const HL = t.HS_L, PQ = "PESQUISA PARA CÉLULAS GANGLIONARES: ", PN = " NOS PLEXOS NEURAIS ";
+const HL = t.HS_L, PQ = "PESQUISA PARA CÉLULAS GANGLIONARES: ", PN = " NO PLEXO NEURAL ", PN2 = " NOS PLEXOS NEURAIS ";
 const HE = (o) => t.hsEstado(Object.assign({ adeq: "ok", gang: null, nerv: false, cal: null, ctrl: false }, o));
 eq(HE({ adeq: "inad", gang: "nao" }), "inad", "linha 1: inadequada");
 eq(HE({ adeq: "inad", gang: "nao", cal: "pres" }), "inad", "linha 1: inadequada com calretinina preservada");
@@ -465,37 +465,41 @@ eq(t.hsTitMucosa(B(HL.muc)), "MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SI
 eq(t.hsTitMucosa(B("Mucosa de cólon sigmoide: Sem particularidades histológicas significativas.")), "MUCOSA DE CÓLON SIGMOIDE SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "mucosa de cólon sigmoide");
 eq(t.hsTitMucosa(B("Mucosa de cólon proximal: Com colite ativa.")), "MUCOSA DE CÓLON PROXIMAL COM COLITE ATIVA", "linha editada muda o título");
 eq(t.hsTitMucosa(B("Amostra inadequada: Mucosa escamosa.")), null, "sem linha de mucosa não há item 1");
+eq(t.hsTitMucosa(B(HL.adeqT)), "MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "biópsia: item 1 pela linha de adequação");
+eq(t.hsTitMucosa(B("Amostra adequada: Mucosa com arquitetura glandular preservada e hiperplasia folicular linfoide, submucosa representada [@ernica] apresentando vasocongestão, camada muscular própria representada.")), "MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "modelo do Pedro: arquitetura preservada dá sem particularidades");
+eq(t.hsTitMucosa(B("Amostra adequada: Mucosa de cólon sigmoide com colite ativa, submucosa representada [@ernica].")), "MUCOSA DE CÓLON SIGMOIDE COM COLITE ATIVA", "adequação com topografia e alteração");
 // título, item 2: presentes/ausentes e em que plexo
 const cal = B(HL.calA, HL.ctrlP);
 eq(t.hsTitGang(B(HL.subP)), PQ + "PRESENTES" + PN + "DA SUBMUCOSA", "submucosa presentes");
-eq(t.hsTitGang(B(HL.subP, HL.mpP)), PQ + "PRESENTES" + PN + "DA SUBMUCOSA E DA MUSCULAR PRÓPRIA", "os dois plexos presentes");
-eq(t.hsTitGang(B(HL.subA, HL.mpA) + "\n" + cal), PQ + "AUSENTES" + PN + "DA SUBMUCOSA E DA MUSCULAR PRÓPRIA", "os dois plexos ausentes, calretinina ausente com controle: sem ressalva");
+eq(t.hsTitGang(B(HL.subP, HL.mpP)), PQ + "PRESENTES" + PN2 + "DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA", "os dois plexos presentes");
+eq(t.hsTitGang(B(HL.subA, HL.mpA) + "\n" + cal), PQ + "AUSENTES" + PN2 + "DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA", "os dois plexos ausentes, calretinina ausente com controle: sem ressalva");
 eq(t.hsTitGang(B(HL.subA) + "\n" + cal), PQ + "AUSENTES" + PN + "DA SUBMUCOSA", "submucosa ausentes");
-eq(t.hsTitGang(B(HL.mpP, HL.mpN.replace("muscular própria", "submucosa"))), PQ + "PRESENTES" + PN + "DA MUSCULAR PRÓPRIA", "só muscular própria");
-eq(t.hsTitGang(B(HL.subA, HL.mpP)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA E PRESENTES NOS DA MUSCULAR PRÓPRIA (VIDE NOTA)", "plexos divergentes");
-eq(t.hsTitGang(B(HL.subD)), PQ + "DUVIDOSA" + PN + "DA SUBMUCOSA (VIDE NOTA)", "duvidosas");
-eq(t.hsTitGang(B(HL.subA)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA)", "ausentes sem calretinina: ressalva");
-eq(t.hsTitGang(B(HL.subA, HL.calP)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA)", "ausentes com calretinina preservada: ressalva");
-eq(t.hsTitGang(B(HL.subP, HL.nervP)), PQ + "PRESENTES" + PN + "DA SUBMUCOSA (VIDE NOTA)", "presentes com nervos hipertróficos: ressalva");
-eq(t.hsTitGang(B("Amostra inadequada: Submucosa insuficiente.", HL.subA)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA)", "amostra inadequada: ressalva");
+eq(t.hsTitGang(B(HL.mpP, HL.mpN.replace("camada muscular própria", "submucosa"))), PQ + "PRESENTES" + PN + "DA CAMADA MUSCULAR PRÓPRIA", "só muscular própria");
+eq(t.hsTitGang(B(HL.subA, HL.mpP)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA E PRESENTES NO PLEXO NEURAL DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS)", "plexos divergentes");
+eq(t.hsTitGang(B(HL.subD)), PQ + "DUVIDOSA" + PN + "DA SUBMUCOSA (VIDE NOTAS)", "duvidosas");
+eq(t.hsTitGang(B(HL.subA)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS)", "ausentes sem calretinina: ressalva");
+eq(t.hsTitGang(B(HL.subA, HL.calP)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS)", "ausentes com calretinina preservada: ressalva");
+eq(t.hsTitGang(B(HL.subP, HL.nervP)), PQ + "PRESENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS)", "presentes com nervos hipertróficos: ressalva");
+eq(t.hsTitGang(B("Amostra inadequada: Submucosa insuficiente.", HL.subA)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS)", "amostra inadequada: ressalva");
 eq(t.hsTitGang(B(HL.mpN)), null, "plexo não amostrado não gera título");
-eq(t.hsTitGang(B(HL.mpCong), true), "PESQUISA PARA CÉLULAS GANGLIONARES (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO): PRESENTES" + PN + "DA MUSCULAR PRÓPRIA", "congelação presentes");
-eq(t.hsTitGang(B(HL.mpA), true), "PESQUISA PARA CÉLULAS GANGLIONARES (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO): AUSENTES" + PN + "DA MUSCULAR PRÓPRIA", "congelação ausentes, sem ressalva");
+eq(t.hsTitGang(B(HL.mpCong), true), "PESQUISA PARA CÉLULAS GANGLIONARES (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO): PRESENTES" + PN + "DA CAMADA MUSCULAR PRÓPRIA", "congelação presentes");
+eq(t.hsTitGang(B(HL.mpA), true), "PESQUISA PARA CÉLULAS GANGLIONARES (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO): AUSENTES" + PN + "DA CAMADA MUSCULAR PRÓPRIA", "congelação ausentes, sem ressalva");
 eq(t.hsTitGang(B("Nível da amostra: Acima da anastomose.", HL.subA)), PQ + "AUSENTES" + PN + "DA SUBMUCOSA", "rebiopsia: sem ressalva automática");
-eq(t.hsTitGang(B("Células ganglionares submucosas: Não identificadas.", "Gânglios mioentéricos: Presentes.")), PQ + "AUSENTES" + PN + "DA SUBMUCOSA E PRESENTES NOS DA MUSCULAR PRÓPRIA (VIDE NOTA)", "linhas da v3.3 continuam lidas");
-const PC = PQ + "AUSENTES" + PN + "DA SUBMUCOSA E DA MUSCULAR PRÓPRIA NO SEGMENTO DISTAL DE ";
+eq(t.hsTitGang(B("Células ganglionares submucosas: Não identificadas.", "Gânglios mioentéricos: Presentes.")), PQ + "AUSENTES" + PN + "DA SUBMUCOSA E PRESENTES NO PLEXO NEURAL DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS)", "linhas da v3.3 continuam lidas");
+const PC = PQ + "AUSENTES" + PN2 + "DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA NO SEGMENTO DISTAL DE ";
 const peca = "- Segmento aganglionar: 8 cm.\n";
 eq(t.hsTitGang(peca + "- " + HL.margS), PC + "8 CM; PRESENTES NA MARGEM PROXIMAL", "peça com margem livre");
-eq(t.hsTitGang(peca + "- Margem proximal: Achados de zona de transição presentes: Hipoganglionose mioentérica (1/8 ou mais da circunferência)."), PC + "PELO MENOS 8 CM; MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO (VIDE NOTA)", "peça com zona de transição na margem");
-eq(t.hsTitGang(peca + "- Margem proximal: Aganglionar."), PC + "PELO MENOS 8 CM; AUSENTES NA MARGEM PROXIMAL (VIDE NOTA)", "peça com margem aganglionar");
+eq(t.hsTitGang(peca + "- Margem proximal: Achados de zona de transição presentes: Hipoganglionose mioentérica (1/8 ou mais da circunferência)."), PC + "PELO MENOS 8 CM; MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO (VIDE NOTAS)", "peça com zona de transição na margem");
+eq(t.hsTitGang(peca + "- Margem proximal: Aganglionar."), PC + "PELO MENOS 8 CM; AUSENTES NA MARGEM PROXIMAL (VIDE NOTAS)", "peça com margem aganglionar");
 eq(t.hsTitGang(peca), null, "peça sem dado de margem: sem título automático");
 // textos prontos
 const hsSite = t.SEED_SITES.hirschsprung;
 eq(hsSite.segmentos.length, 5, "tipos de espécime");
 for (const p of hsSite.presets) {
   const corpo = t.presetText(p), tl = corpo.split("\n").filter(l => t.lineKind(l) === "b");
-  ok(p.rot && tl.length >= 1 && tl.length <= 2 && tl.every(l => /^- (MUCOSA |PESQUISA PARA CÉLULAS GANGLIONARES)/.test(l)), "texto pronto com título descritivo: " + p.rot);
-  ok(/^- PESQUISA PARA CÉLULAS GANGLIONARES/.test(tl[tl.length - 1]) && corpo.startsWith(tl.join("\n") + "\n- "), "pesquisa é o último item do título, com os subitens abaixo: " + p.rot);
+  ok(p.rot && tl.length >= 1 && tl.length <= 3 && tl.every(l => /^- (MUCOSA |PESQUISA PARA CÉLULAS GANGLIONARES|FILETES NEURAIS SUBMUCOSOS HIPERTRÓFICOS)/.test(l)), "texto pronto com título descritivo: " + p.rot);
+  ok(/^- (PESQUISA PARA CÉLULAS GANGLIONARES|FILETES NEURAIS)/.test(tl[tl.length - 1]) && corpo.startsWith(tl.join("\n") + "\n- "), "pesquisa (ou filetes) por último no título, com os subitens abaixo: " + p.rot);
+  ok(!/^- (Biópsia retal por sucção|Mucosa retal: )/m.test(corpo) || p.esp[0] >= 3, "biópsia sem a linha do tipo e sem a linha da mucosa: " + p.rot);
   eq(t.concorda(corpo).trocas.length, 0, "corretor de concordância não mexe: " + p.rot);
   ok(!/DOENÇA DE HIRSCHSPRUNG|AGANGLIONOSE|INCONCLUSIVA|INADEQUADA/.test(tl.join(" ")), "título sem diagnóstico: " + p.rot);
 }
@@ -507,45 +511,44 @@ ok(pPeca.includes(PC + "8 CM; PRESENTES NA MARGEM PROXIMAL:"), "peça: título p
 els.fSitio.value = "hirschsprung"; els.fSeg.value = "Biópsia retal por sucção"; els.corpo.value = "";
 const hc = (g, i) => hsSite.criterios.find(c => c.g === g).opt[i][1];
 const tit = () => els.corpo.value.split("\n").filter(l => t.lineKind(l) === "b");
+const mucFx = i => hsSite.criterios.find(c => c.g === "Mucosa").fx[i][1]();
 t.appendLine(hc("Biópsia: adequação", 0));
-eq(tit().length, 0, "sem mucosa nem células ganglionares ainda não há título");
-t.appendLine(hc("Mucosa", 0));
-eq(tit().join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "linha da mucosa cria o item 1");
-t.appendLine(hc("Células ganglionares: plexo da submucosa", 2));
-eq(tit().join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:|- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA):", "item 2 entra depois do 1");
+eq(tit().join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "linha de adequação cria o item 1");
+t.appendLine(hc("Células ganglionares — plexo da submucosa", 2));
+eq(tit().join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:|- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS):", "item 2 entra depois do 1");
 ok(els.corpo.value.startsWith(tit().join("\n") + "\n- Amostra adequada"), "os dois itens no topo, subitens abaixo");
 t.appendLine(hc("Calretinina", 3)); t.appendLine(hc("Calretinina: controle interno positivo", 0));
 eq(tit()[1], "- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA:", "calretinina ausente com controle: sai a ressalva");
 t.appendLine(hc("Calretinina", 0));
-eq(tit()[1], "- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA):", "calretinina preservada: volta a ressalva");
+eq(tit()[1], "- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS):", "calretinina preservada: volta a ressalva");
 eq(els.corpo.value.split("\n").filter(l => /^- Calretinina: /.test(l)).length, 1, "linha da calretinina é trocada, não duplicada");
-t.appendLine(hc("Células ganglionares: plexo da submucosa", 0));
+t.appendLine(hc("Células ganglionares — plexo da submucosa", 0));
 eq(tit()[1], "- " + PQ + "PRESENTES" + PN + "DA SUBMUCOSA:", "presentes");
 eq(els.corpo.value.split("\n").filter(l => /^- Plexo da submucosa: /.test(l)).length, 1, "linha do plexo é trocada, não duplicada");
-t.appendLine(hc("Mucosa", 1));
+mucFx(1);
 eq(tit()[0], "- MUCOSA DE CÓLON SIGMOIDE SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "trocar o tipo de mucosa troca o item 1");
-eq(els.corpo.value.split("\n").filter(l => /^- Mucosa /.test(l)).length, 1, "linha da mucosa é trocada, não duplicada");
+ok(els.corpo.value.split("\n").filter(l => /^- Amostra adequada: Mucosa de cólon sigmoide com /.test(l)).length === 1 && !/^- Mucosa /m.test(els.corpo.value), "topografia entra na linha de adequação, sem linha de mucosa");
 eq(tit().length, 2, "continuam dois itens de título");
 // editor: linha editada à mão -> título
 els.corpo.onfocus();
-els.corpo.value = els.corpo.value.replace("- Mucosa de cólon sigmoide: Sem particularidades histológicas significativas.", "- Mucosa de cólon sigmoide: Com colite ativa.").replace(HL.subP, HL.subA);
+els.corpo.value = els.corpo.value.replace("Mucosa de cólon sigmoide com arquitetura glandular preservada", "Mucosa de cólon sigmoide com colite ativa").replace(HL.subP, HL.subA);
 els.corpo.onchange();
-eq(tit().join("|"), "- MUCOSA DE CÓLON SIGMOIDE COM COLITE ATIVA:|- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA):", "linhas editadas à mão mudam os dois itens");
+eq(tit().join("|"), "- MUCOSA DE CÓLON SIGMOIDE COM COLITE ATIVA:|- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS):", "linhas editadas à mão mudam os dois itens");
 // editor: título editado à mão -> linhas
 els.corpo.onfocus();
-els.corpo.value = els.corpo.value.replace("MUCOSA DE CÓLON SIGMOIDE COM COLITE ATIVA", "MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS").replace("AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTA)", "PRESENTES" + PN + "DA SUBMUCOSA E DA MUSCULAR PRÓPRIA");
+els.corpo.value = els.corpo.value.replace("MUCOSA DE CÓLON SIGMOIDE COM COLITE ATIVA", "MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS").replace("AUSENTES" + PN + "DA SUBMUCOSA (VIDE NOTAS)", "PRESENTES" + PN2 + "DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA");
 els.corpo.onchange();
-ok(els.corpo.value.includes("\n- " + HL.muc) && !/cólon sigmoide/.test(els.corpo.value), "título da mucosa editado ajusta a linha");
+ok(els.corpo.value.includes("\n- " + HL.adeqS) && !/cólon sigmoide/.test(els.corpo.value), "título da mucosa editado ajusta a linha de adequação");
 ok(els.corpo.value.includes("\n- " + HL.subP) && els.corpo.value.includes("\n- " + HL.mpP), "título da pesquisa editado ajusta e cria as linhas dos plexos");
-eq(tit().join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:|- " + PQ + "PRESENTES" + PN + "DA SUBMUCOSA E DA MUSCULAR PRÓPRIA:", "título fica como foi digitado");
+eq(tit().join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:|- " + PQ + "PRESENTES" + PN2 + "DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA:", "título fica como foi digitado");
 els.corpo.onfocus();
-els.corpo.value = els.corpo.value.replace(" E DA MUSCULAR PRÓPRIA:", ":");
+els.corpo.value = els.corpo.value.replace(" E DA CAMADA MUSCULAR PRÓPRIA:", ":");
 els.corpo.onchange();
-ok(!/Plexo da muscular própria/.test(els.corpo.value) && tit()[1] === "- " + PQ + "PRESENTES" + PN + "DA SUBMUCOSA:", "tirar o plexo do título tira a linha");
+ok(!/Plexo da camada muscular própria/.test(els.corpo.value) && tit()[1] === "- " + PQ + "PRESENTES" + PN + "DA SUBMUCOSA:", "tirar o plexo do título tira a linha");
 els.corpo.onfocus();
 els.corpo.value = els.corpo.value.replace("PRESENTES" + PN, "NEGATIVA" + PN);
 els.corpo.onchange();
-ok(els.corpo.value.includes("\n- " + HL.subA) && /AUSENTES NOS PLEXOS NEURAIS DA SUBMUCOSA/.test(tit()[1]), "\"negativa\" digitada no título vira ausentes na linha e no título");
+ok(els.corpo.value.includes("\n- " + HL.subA) && /AUSENTES NO PLEXO NEURAL DA SUBMUCOSA/.test(tit()[1]), "\"negativa\" digitada no título vira ausentes na linha e no título");
 // título antigo (v3.3) é convertido ao editar
 els.corpo.value = "- AGANGLIONOSE EM BIÓPSIA RETAL, COMPATÍVEL COM DOENÇA DE HIRSCHSPRUNG:\n- Células ganglionares submucosas: Não identificadas.\n- " + HL.calA + "\n- " + HL.ctrlP;
 els.corpo.onfocus(); els.corpo.onchange();
@@ -565,7 +568,7 @@ els.corpo.onchange();
 ok(els.corpo.value.includes("\n- Segmento aganglionar: 6 cm."), "peça: comprimento editado no título vai para a linha");
 els.fSeg.value = "Congelação / nivelamento"; els.corpo.value = "";
 t.appendLine(hc("Congelação: biópsia de nivelamento", 1));
-eq(tit().join("|"), "- PESQUISA PARA CÉLULAS GANGLIONARES (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO): AUSENTES" + PN + "DA MUSCULAR PRÓPRIA:", "congelação: um item, sem mucosa");
+eq(tit().join("|"), "- PESQUISA PARA CÉLULAS GANGLIONARES (EXAME INTRAOPERATÓRIO POR CONGELAÇÃO): AUSENTES" + PN + "DA CAMADA MUSCULAR PRÓPRIA:", "congelação: um item, sem mucosa");
 for (const l of tit().concat(["- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:"])) eq(t.lineKind(l), "b", "título em negrito");
 // notas, referências e alertas no laudo
 const pr = (rot) => t.presetText(hsSite.presets.find(p => p.rot === rot));
@@ -577,7 +580,7 @@ eq(t.alertas().length, 0, "presentes: sem alerta");
 const agCorpo = pr("Células ganglionares ausentes, calretinina ausente");
 lh = laudoDe(agCorpo);
 ok(lh.includes("- Amostra A: a ausência de células ganglionares, com ausência de inervação mucosa à calretinina, favorece doença de Hirschsprung;"), "nota: ausentes + calretinina ausente favorece");
-ok(lh.includes(t.CITE.ernica) && lh.includes(t.CITE.veras) && !/\[@/.test(lh), "referências de Hirschsprung numeradas");
+ok(lh.includes(t.CITE.ernica) && !/\[@/.test(lh), "referências de Hirschsprung numeradas");
 ok(!/COMPATÍVEL COM DOENÇA DE HIRSCHSPRUNG|AGANGLIONOSE EM BIÓPSIA/.test(lh), "laudo sem título diagnóstico");
 eq(t.alertas().length, 0, "ausentes com amostragem informada: sem alerta");
 t.WORK.samples[0].corpo = agCorpo.split("\n").filter(l => !/níveis de corte/.test(l)).join("\n") + "\n- Contexto informado: trissomia 21.\n- Contexto informado: idade maior que 1 ano.\n- Nível informado: 1 cm acima da linha pectínea.";
@@ -589,14 +592,14 @@ ok(/calretinina: achados conflitantes, que não excluem aganglionose de segmento
 ok(/recomenda-se estudo complementar por calretinina/.test(laudoDe(pr("Células ganglionares ausentes, calretinina não realizada"))), "nota do estudo pendente");
 ok(/podem corresponder a zona de transição/.test(laudoDe(pr("Células ganglionares presentes, com achados a correlacionar"))), "nota dos achados a correlacionar");
 ok(/amostra inadequada para pesquisa de células ganglionares/.test(laudoDe(pr("Amostra inadequada"))), "nota da amostra inadequada");
-ok(/apenas um dos plexos avaliados/.test(laudoDe(B("X:", HL.subA, HL.mpP).replace("- X:", "- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA E PRESENTES NOS DA MUSCULAR PRÓPRIA (VIDE NOTA):"))), "nota dos plexos divergentes");
-for (const p of hsSite.presets.filter(p => p.esp[0] < 2)) { const l = laudoDe(t.presetText(p)); eq(/\(VIDE NOTA\)/.test(l), !/^Células ganglionares (presentes|ausentes, calretinina ausente)$/.test(p.rot), "\"vide nota\" só quando há ressalva: " + p.rot); ok(/\nNOTAS:\n- Amostra A: /.test(l), "toda biópsia tem nota de interpretação: " + p.rot); eq(t.alertas().length, 0, "texto pronto sem alerta: " + p.rot); }
+ok(/apenas um dos plexos avaliados/.test(laudoDe(B("X:", HL.subA, HL.mpP).replace("- X:", "- " + PQ + "AUSENTES" + PN + "DA SUBMUCOSA E PRESENTES NO PLEXO NEURAL DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS):"))), "nota dos plexos divergentes");
+for (const p of hsSite.presets.filter(p => p.esp[0] < 2)) { const l = laudoDe(t.presetText(p)); eq(/\(VIDE NOTAS\)/.test(l), p.rot !== "Células ganglionares presentes", "\"vide notas\" só quando há ressalva ou filetes hipertróficos: " + p.rot); ok(/\nNOTAS:\n- Amostra A: /.test(l), "toda biópsia tem nota de interpretação: " + p.rot); eq(t.alertas().length, 0, "texto pronto sem alerta: " + p.rot); }
 lh = laudoDe(pPeca, "Peça de abaixamento");
 ok(lh.includes("- Amostra A: os achados são compatíveis com doença de Hirschsprung, com segmento aganglionar de 8 cm e margem proximal sem achados de zona de transição"), "peça: doença de Hirschsprung vai para a nota");
 eq(t.alertas().length, 0, "peça de praxe: sem alerta");
 t.WORK.samples[0].corpo = pPeca.replace(HL.camMp, "Muscular própria: Hipertrofia da camada circular.");
 ok(t.alertas().some(a => /camada da parede com alteração/.test(a.msg)), "peça: camada alterada gera alerta para conferir o título");
-lh = laudoDe(pPeca.replace("- " + HL.margS, "- Margem proximal: Achados de zona de transição presentes: Hipoganglionose mioentérica (1/8 ou mais da circunferência).").replace("DE 8 CM; PRESENTES NA MARGEM PROXIMAL", "DE PELO MENOS 8 CM; MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO (VIDE NOTA)"), "Peça de abaixamento");
+lh = laudoDe(pPeca.replace("- " + HL.margS, "- Margem proximal: Achados de zona de transição presentes: Hipoganglionose mioentérica (1/8 ou mais da circunferência).").replace("DE 8 CM; PRESENTES NA MARGEM PROXIMAL", "DE PELO MENOS 8 CM; MARGEM PROXIMAL COM ACHADOS DE ZONA DE TRANSIÇÃO (VIDE NOTAS)"), "Peça de abaixamento");
 ok(/o comprimento informado do segmento aganglionar é um mínimo/.test(lh) && lh.includes(t.CITE.kapur25), "nota da margem com zona de transição");
 eq(t.alertas().length, 0, "peça com zona de transição e título coerente: sem alerta");
 ok(!/\nNOTAS:/.test(laudoDe(t.presetText(hsSite.presets.find(p => p.esp[0] === 2)), "Congelação / nivelamento")) && t.alertas().length === 0, "congelação: sem nota automática e sem alerta");
@@ -618,8 +621,8 @@ eq(hsSite.segmentos.reduce((n2, sg) => n2 + (sg === "Biópsia retal incisional (
 const gr = (seg) => t.hsGrupos(hsSite, seg).map(c => c.g);
 ok(hsSite.criterios.every(c => Array.isArray(c.esp) && c.esp.length), "todo grupo tem tipo de espécime");
 eq(gr("").length, hsSite.criterios.length, "sem tipo escolhido: todos os grupos");
-ok(gr("Biópsia retal por sucção").every(g => !/^(Peça|Reoperação|Congelação|Margem|Células ganglionares: plexo da muscular)/.test(g)) && gr("Biópsia retal por sucção").some(g => /^Calretinina$/.test(g)) && gr("Biópsia retal por sucção").includes("Mucosa"), "sucção: só grupos da biópsia, com mucosa e plexo da submucosa");
-ok(gr("Biópsia retal incisional (espessura total)").includes("Células ganglionares: plexo da muscular própria"), "incisional: inclui plexo da muscular própria");
+ok(gr("Biópsia retal por sucção").every(g => !/^(Peça|Reoperação|Congelação|Margem|Biópsia: tipo)/.test(g)) && gr("Biópsia retal por sucção").includes("Células ganglionares — plexo da camada muscular própria") && gr("Biópsia retal por sucção").some(g => /^Calretinina$/.test(g)) && gr("Biópsia retal por sucção").includes("Mucosa"), "sucção: só grupos da biópsia, com mucosa e plexo da submucosa");
+ok(gr("Biópsia retal incisional (espessura total)").includes("Células ganglionares — plexo da camada muscular própria"), "incisional: inclui plexo da camada muscular própria");
 eq(gr("Congelação / nivelamento").join(" | "), hsSite.criterios.filter(c => /^(Congelação|Margem proximal)/.test(c.g)).map(c => c.g).join(" | "), "congelação: nivelamento e margem");
 ok(gr("Peça de abaixamento").every(g => /^(Peça|Margem proximal|Outras alterações|Mucosa)/.test(g)) && gr("Peça de abaixamento").includes("Peça: camadas da parede") && gr("Peça de abaixamento").some(g => /segmento aganglionar/.test(g)), "peça: grupos da peça, com camadas");
 ok(gr("Rebiopsia / reoperação").some(g => /^Reoperação: técnica prévia/.test(g)) && gr("Rebiopsia / reoperação").some(g => /^Células ganglionares/.test(g)) && !gr("Rebiopsia / reoperação").some(g => /^Peça/.test(g)), "rebiopsia: grupos próprios");
@@ -747,7 +750,7 @@ ok(G.presets.find(p => /LINFOCITÁRIO/.test(p.titulo)).bullets.some(b => /modera
 // duodeno: criptite, título linfocítico e variante inativa
 eq(t.LINHA_ATIV.duodeno.length, 3, "duodeno: ausente, sem criptite, com criptite");
 ok(D.criterios.find(c => c.g === "Infiltrado neutrofílico").opt.map(o => o[0]).join() === "Ausente,Presente, sem criptite,Presente, com criptite", "achados de neutrófilos do duodeno");
-const dL = D.presets.find(p => p.titulo === "DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, EM ATIVIDADE (VIDE NOTAS)"), dLi = D.presets.find(p => p.titulo === "DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, INATIVA (VIDE NOTAS)");
+const dL = D.presets.find(p => p.titulo === "DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, COM ATROFIA VILOSITÁRIA MODERADA (MARSH-OBERHUBER 3B; CORAZZA-VILLANACCI B1), EM ATIVIDADE (VIDE NOTAS)"), dLi = D.presets.find(p => p.titulo === "DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, COM ATROFIA VILOSITÁRIA MODERADA (MARSH-OBERHUBER 3B; CORAZZA-VILLANACCI B1), INATIVA (VIDE NOTAS)");
 ok(dL && dLi, "duodenite linfocítica em atividade e inativa");
 ok(!D.presets.some(p => /DUODENITE.*(VILOSIDADES|CRIPTAS)/.test(p.titulo)), "sem vilosidades e criptas no título");
 ok(dL.bullets.some(b => /neutrofílico em lâmina própria, sem criptite/.test(b)) && dLi.bullets.some(b => /^Ausência de infiltrado inflamatório neutrofílico/.test(b)), "linhas de atividade dos dois");
@@ -755,22 +758,22 @@ for (const k of Object.keys(t.SEED_SITES)) if (k !== "esofago") for (const p of 
   if (/^Presença de infiltrado inflamatório neutrofílico/.test(b)) ok(/criptite/.test(b), "linha de neutrófilos diz se há criptite: " + k + " / " + p.titulo.slice(0, 40));
 els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.corpo.value = t.presetText(dLi);
 t.appendLine(t.LINHA_ATIV.duodeno.map(x => "- " + x)[2]);
-ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, EM ATIVIDADE (VIDE NOTAS):"), "criptite presente: em atividade (grau Whitehead embutido)");
+ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, COM ATROFIA VILOSITÁRIA MODERADA (MARSH-OBERHUBER 3B; CORAZZA-VILLANACCI B1), EM ATIVIDADE (VIDE NOTAS):"), "criptite presente: em atividade (grau Whitehead embutido)");
 // grau Whitehead
 const wh = D.criterios.find(c => /Whitehead/.test(c.g));
 ok(wh && wh.opt.every(o => /\[@whitehead\]/.test(o[1])), "grupo Whitehead com critério e referência");
 t.appendLine(wh.opt[1][1]);
-ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, EM ATIVIDADE (VIDE NOTAS):"), "grau Whitehead entra no título");
+ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, COM ATROFIA VILOSITÁRIA MODERADA (MARSH-OBERHUBER 3B; CORAZZA-VILLANACCI B1), EM ATIVIDADE (VIDE NOTAS):"), "grau Whitehead entra no título");
 t.appendLine(wh.opt[2][1]);
 ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA ACENTUADA DE PADRÃO LINFOCÍTICO,") && els.corpo.value.split("\n").filter(l => /^- Grau da duodenite/.test(l)).length === 1, "troca de grau sem duplicar");
 els.corpo.onfocus(); els.corpo.value = els.corpo.value.split("\n").filter(l => !/^- Grau da duodenite/.test(l)).join("\n"); els.corpo.onchange();
-ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA DE PADRÃO LINFOCÍTICO, EM ATIVIDADE (VIDE NOTAS):"), "linha retirada: grau sai do título");
+ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA DE PADRÃO LINFOCÍTICO, COM ATROFIA VILOSITÁRIA MODERADA (MARSH-OBERHUBER 3B; CORAZZA-VILLANACCI B1), EM ATIVIDADE (VIDE NOTAS):"), "linha retirada: grau sai do título");
 eq(t.titleSetGrauDuo("- DUODENITE CRÔNICA INATIVA:", "LEVE"), "- DUODENITE CRÔNICA LEVE, INATIVA:", "grau antes da atividade, com vírgula");
 eq(t.titleSetGrauDuo("- DUODENITE CRÔNICA LEVE, INATIVA:", null), "- DUODENITE CRÔNICA INATIVA:", "e sai sem deixar vírgula");
 eq(t.titleSetGrauDuo("- GASTRITE CRÔNICA INATIVA:", "LEVE"), "- GASTRITE CRÔNICA INATIVA:", "só em duodenite");
 // notas de celíaca
 const celCorpo = t.presetText(dL);
-eq(t.notaCeliaca(celCorpo), t.NOTA_CELIACA, "linfocitose + Marsh 3C: favorece celíaca");
+eq(t.notaCeliaca(celCorpo), t.NOTA_CELIACA, "linfocitose + Marsh 3B: favorece celíaca");
 eq(t.notaCeliaca("- DUODENITE CRÔNICA DE PADRÃO LINFOCÍTICO, INATIVA (VIDE NOTAS):\n- Linfocitose intraepitelial: Presente (exocitose de aproximadamente 35 linfócitos/100 enterócitos nas pontas das vilosidades).\n- Classificação de Marsh-Oberhuber (1999): 1."), t.NOTA_LINF_DUO, "linfocitose sem atrofia: padrão linfocítico inespecífico");
 eq(t.notaCeliaca(t.presetText(D.presets[0])), null, "duodeno normal: sem nota");
 t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Mucosa duodenal (2ª porção)", corpo: celCorpo, site: "duodeno", seg: "2ª porção" });
@@ -779,26 +782,28 @@ ok(/favorece doença celíaca, embora não seja específica: outras causas de at
 ok(t.LIB.notas.some(n => n.tag === "Celíaca") && t.LIB.notas.some(n => n.tag === "Duodenite linfocítica"), "notas de celíaca na biblioteca");
 // agregados, metaplasia foveolar e atrofia vilositária
 for (const [nome, site] of [["estômago", G], ["íleo", I]]) ok(site.criterios.some(c => c.g === "Agregados linfoides"), "agregados linfoides: " + nome);
-for (const [nome, site] of [["duodeno", D], ["íleo", I]]) {
-  const mf = site.criterios.find(c => c.g === "Metaplasia foveolar gástrica"), av = site.criterios.find(c => c.g === "Atrofia vilositária");
-  ok(mf && mf.opt.length === 4 && av && av.opt.length === 4, "metaplasia foveolar e atrofia vilositária: " + nome);
-  ok(av.opt.slice(1).every(o => /Marsh-Oberhuber 3[ABC] \[@oberhuber\]/.test(o[1])), "atrofia com Marsh-Oberhuber e referência: " + nome);
-}
+{ const mf = I.criterios.find(c => c.g === "Metaplasia foveolar gástrica"), av = I.criterios.find(c => c.g === "Atrofia vilositária");
+  ok(mf && mf.opt.length === 4 && av && av.opt.length === 4, "metaplasia foveolar e atrofia vilositária: íleo");
+  ok(av.opt.slice(1).every(o => /Marsh-Oberhuber 3[ABC] \[@oberhuber\]/.test(o[1])), "atrofia com Marsh-Oberhuber e referência: íleo"); }
+const avD = D.criterios.find(c => c.g === "Atrofia vilositária (Marsh-Oberhuber / Corazza-Villanacci)");
+ok(D.criterios.find(c => c.g === "Metaplasia foveolar gástrica").opt.length === 4 && avD && avD.opt.length === 6, "duodeno: metaplasia foveolar e linha única de atrofia");
 els.fSitio.value = "duodeno"; els.corpo.value = "- DUODENITE CRÔNICA INATIVA:";
-const mfo = D.criterios.find(c => c.g === "Metaplasia foveolar gástrica").opt, avo = D.criterios.find(c => c.g === "Atrofia vilositária").opt;
-t.appendLine(mfo[1][1]); t.appendLine(mfo[3][1]); t.appendLine(avo[2][1]); t.appendLine(avo[0][1]);
-eq(els.corpo.value, "- DUODENITE CRÔNICA INATIVA:\n" + mfo[3][1] + "\n" + avo[0][1], "metaplasia foveolar e atrofia trocam sem duplicar");
+const mfo = D.criterios.find(c => c.g === "Metaplasia foveolar gástrica").opt, avo = avD.opt;
+t.appendLine(mfo[1][1]); t.appendLine(mfo[3][1]); t.appendLine(avo[4][1]);
+ok(els.corpo.value.startsWith("- DUODENITE CRÔNICA, COM ATROFIA VILOSITÁRIA MODERADA, INATIVA:"), "atrofia sem Marsh: título só com a atrofia");
+t.appendLine(avo[0][1]);
+eq(els.corpo.value, "- DUODENITE CRÔNICA INATIVA:\n" + avo[0][1] + "\n" + mfo[3][1], "metaplasia foveolar e atrofia trocam sem duplicar; atrofia logo abaixo do título");
 for (const k of ["gastrica", "duodeno", "ileo"]) for (const p of t.SEED_SITES[k].presets) eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância: " + p.titulo.slice(0, 40));
 
 // 19. v3.6 (validado): Oberhuber, notas revistas, Marsh 1, orientação, relação vilosidade/cripta, Corazza-Villanacci
 ({ t, els } = boot({}));
 const D2 = t.SEED_SITES.duodeno;
-const av2 = D2.criterios.find(c => c.g === "Atrofia vilositária").opt;
+const av2 = t.SEED_SITES.ileo.criterios.find(c => c.g === "Atrofia vilositária").opt;
 ok(!JSON.stringify(av2).includes("subtotal") && /mucosa plana, sem vilosidades; Marsh-Oberhuber 3C/.test(av2[3][1]) && /apenas restos curtos de vilosidades; Marsh-Oberhuber 3B/.test(av2[2][1]), "atrofia nos termos de Oberhuber, sem subtotal");
 ok(/10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária \[@smyrk17\]/.test(t.NOTA_LINF_DUO) && /giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal \[@lauwers15\]/.test(t.NOTA_LINF_DUO), "nota do padrão linfocítico revista");
 ok(/imunodeficiência comum variável, enteropatia autoimune e medicamentos \(anti-inflamatórios não esteroides, olmesartana\), devem ser afastadas \[@smyrk17,villanacci20\]/.test(t.NOTA_CELIACA), "nota de celíaca com diferenciais");
 ok(t.LIB.notas.find(n => n.tag === "Celíaca").texto.includes("olmesartana") && t.LIB.notas.find(n => n.tag === "Duodenite linfocítica").texto.includes("10% a 20%"), "biblioteca igual às notas automáticas");
-for (const g of ["Orientação dos fragmentos", "Relação vilosidade/cripta"]) ok(D2.criterios.some(c => c.g === g), "grupo novo: " + g);
+ok(D2.criterios.some(c => c.g === "Orientação dos fragmentos") && !D2.criterios.some(c => /^(Relação vilosidade\/cripta|Arquitetura vilositária)$/.test(c.g)), "orientação; relação V/C e arquitetura entram na linha única de atrofia");
 ok(/Marsh 1 .* não é específico/.test(D2.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").dica), "dica do Marsh 1");
 // Corazza-Villanacci pelo Marsh
 const mo = D2.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").opt;
@@ -806,17 +811,18 @@ els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.corpo.value =
 const cz = () => els.corpo.value.split("\n").filter(l => /Corazza-Villanacci/.test(l));
 t.appendLine(mo[5][1]);
 eq(cz().join(), "- Classificação de Corazza-Villanacci (2007): B2 (atrófica, vilosidades não identificáveis) [@corazza07].", "3C -> B2");
+eq(els.corpo.value.split("\n")[0], "- DUODENITE CRÔNICA, COM ATROFIA VILOSITÁRIA ACENTUADA (MARSH-OBERHUBER 3C; CORAZZA-VILLANACCI B2), INATIVA:", "3C -> título com atrofia e classificações");
 ok(els.corpo.value.indexOf("Corazza") > els.corpo.value.indexOf("Marsh-Oberhuber"), "Corazza logo depois do Marsh");
 t.appendLine(mo[3][1]); eq(cz().length, 1, "troca sem duplicar"); ok(/: B1 /.test(cz()[0]), "3A -> B1");
 t.appendLine(mo[4][1]); ok(/: B1 /.test(cz()[0]), "3B -> B1");
 t.appendLine(mo[2][1]); ok(/: A \(não atrófica\)/.test(cz()[0]), "2 -> A");
 t.appendLine(mo[1][1]); ok(/: A \(não atrófica\)/.test(cz()[0]), "1 -> A");
 t.appendLine(mo[0][1]); eq(cz().length, 0, "0 -> sem Corazza");
-ok(!/CORAZZA|B1|B2/.test(els.corpo.value.split("\n")[0]), "Corazza não vai ao título");
+ok(!/CORAZZA|MARSH|ATROFIA/.test(els.corpo.value.split("\n")[0]), "Marsh 0: título sem atrofia nem classificações");
 els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("(1999): 0.", "(1999): 3C (tipo destrutivo)."); els.corpo.onchange();
 ok(cz().length === 1 && /: B2 /.test(cz()[0]), "Marsh editado à mão atualiza Corazza");
-const dLp = D2.presets.find(p => /PADRÃO LINFOCÍTICO, EM ATIVIDADE/.test(p.titulo));
-ok(dLp.bullets.some(b => /^Classificação de Corazza-Villanacci \(2007\): B2/.test(b)), "texto pronto com Corazza");
+const dLp = D2.presets.find(p => /PADRÃO LINFOCÍTICO.*EM ATIVIDADE/.test(p.titulo));
+ok(dLp.bullets.some(b => /^Classificação de Corazza-Villanacci \(2007\): B1/.test(b)), "texto pronto com Corazza");
 ok(!D2.presets.filter(p => p.bullets.some(b => /Marsh-Oberhuber \(1999\): 0\./.test(b))).some(p => p.bullets.some(b => /Corazza/.test(b))), "Marsh 0 sem Corazza nos textos prontos");
 // alertas
 t.WORK.samples.length = 0;
@@ -1127,14 +1133,15 @@ ok(els.corpo.value.includes("- " + t.linhaAtiv("duodeno", "EM ATIVIDADE")), "duo
 // Marsh <-> arquitetura e atrofia vilositária
 const marsh = g => DU.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").opt.find(o => o[0] === g)[1];
 t.appendLine(marsh("3B"));
-ok(els.corpo.value.includes("- Arquitetura alterada: Atrofia vilositária moderada, acompanhada de criptas hipertróficas.") && els.corpo.value.includes("- Atrofia vilositária: Presente, moderada"), "Marsh 3B -> arquitetura e atrofia moderada");
+const ATR = DU.criterios.find(c => c.g === "Atrofia vilositária (Marsh-Oberhuber / Corazza-Villanacci)").opt;
+ok(els.corpo.value.includes(ATR[4][1]) && !/^- Arquitetura/m.test(els.corpo.value), "Marsh 3B -> linha única de atrofia moderada");
 ok(/Corazza-Villanacci \(2007\): B1/.test(els.corpo.value), "Marsh 3B -> Corazza B1");
-eq(els.corpo.value.split("\n").filter(l => /^- Arquitetura/.test(l)).length, 1, "arquitetura trocada, não duplicada");
-t.appendLine(DU.criterios.find(c => c.g === "Atrofia vilositária").opt[3][1]);
+eq(els.corpo.value.split("\n").filter(l => /^- (Atrofia vilositária|Arquitetura)/.test(l)).length, 1, "uma linha de atrofia só");
+t.appendLine(ATR[5][1]);
 ok(els.corpo.value.includes(marsh("3C")), "atrofia acentuada -> Marsh 3C");
 t.appendLine(marsh("2"));
-ok(els.corpo.value.includes("- Arquitetura alterada: Vilosidades preservadas, com hiperplasia das criptas.") && els.corpo.value.includes("- Atrofia vilositária: Não identificada."), "Marsh 2 -> hiperplasia de criptas sem atrofia");
-t.appendLine("- Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.");
+ok(els.corpo.value.includes(ATR[1][1]), "Marsh 2 -> hiperplasia de criptas sem atrofia");
+t.appendLine(ATR[0][1]);
 ok(els.corpo.value.includes(marsh(/Linfocitose intraepitelial: Presente/.test(els.corpo.value) ? "1" : "0")), "arquitetura preservada -> Marsh 0/1 pela linfocitose");
 // transição: título de cada porção -> achados da própria porção
 ({ t, els } = boot({}));
@@ -1179,10 +1186,87 @@ els.fSitio.value = "duodeno"; els.fSeg.value = "";
 els.corpo.value = t.presetText(DU2.presets.find(p => /PADRÃO LINFOCÍTICO/.test(p.titulo))); els.corpo.onfocus();
 t.appendLine(mar2("3A"));
 els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(mar2("3A"), "- Classificação de Marsh-Oberhuber (1999): 3C."); els.tb_sync.onclick();
-ok(els.corpo.value.includes("- Arquitetura alterada: Atrofia vilositária total (mucosa plana), acompanhada de criptas hipertróficas.") && els.corpo.value.includes("- Atrofia vilositária: Presente, acentuada"), "Marsh editado à mão + ⟳ -> arquitetura e atrofia");
+ok(els.corpo.value.includes("- Atrofia vilositária: Presente, acentuada (mucosa plana, sem vilosidades identificáveis), acompanhada de criptas hipertróficas."), "Marsh editado à mão + ⟳ -> linha de atrofia");
 ok(/Corazza-Villanacci \(2007\): B2/.test(els.corpo.value), "Marsh editado à mão + ⟳ -> Corazza B2");
-els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(/- Atrofia vilositária: [^\n]*/, DU2.criterios.find(c => c.g === "Atrofia vilositária").opt[2][1]); els.tb_sync.onclick();
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(/- Atrofia vilositária: [^\n]*/, DU2.criterios.find(c => c.g === "Atrofia vilositária (Marsh-Oberhuber / Corazza-Villanacci)").opt[4][1]); els.tb_sync.onclick();
 ok(els.corpo.value.includes(mar2("3B")) && !els.corpo.value.includes("Marsh-Oberhuber (1999): 3C"), "atrofia editada à mão + ⟳ -> Marsh 3B");
+
+// 27. v3.11: correção no editor ao salvar, duodeno sincronizado (atrofia <-> Marsh <-> Corazza <-> título), Hirschsprung no modelo do Pedro, formato novo do laudo
+({ t, els } = boot({}));
+const salva = () => { const n0 = t.WORK.samples.length; els.btnSalvar.onclick(); return t.WORK.samples.length > n0; };
+// duodeno: o texto pronto de padrão linfocítico é o modelo do Pedro
+const DUO = t.SEED_SITES.duodeno, pLin = DUO.presets.find(p => /PADRÃO LINFOCÍTICO.*EM ATIVIDADE/.test(p.titulo));
+const corpoLin = t.presetText(pLin), lsLin = corpoLin.split("\n");
+eq(lsLin[0], "- DUODENITE CRÔNICA MODERADA DE PADRÃO LINFOCÍTICO, COM ATROFIA VILOSITÁRIA MODERADA (MARSH-OBERHUBER 3B; CORAZZA-VILLANACCI B1), EM ATIVIDADE (VIDE NOTAS):", "modelo: título com atrofia e as duas classificações");
+eq(lsLin[1], "- Atrofia vilositária: Presente, moderada (apenas restos curtos de vilosidades, ainda identificáveis; relação vilosidade/cripta menor que 3:1), acompanhada de criptas hipertróficas.", "modelo: linha de atrofia logo abaixo do título");
+ok(/^- Grau da duodenite: Moderado/.test(lsLin[2]) && lsLin.includes("- Hiperplasia folicular linfoide: Presente."), "modelo: Whitehead depois da atrofia; hiperplasia folicular linfoide");
+eq(lsLin.slice(-2).join("|"), "- Classificação de Marsh-Oberhuber (1999): 3B.|- Classificação de Corazza-Villanacci (2007): B1 (atrófica, relação vilosidade/cripta menor que 3:1, vilosidades ainda identificáveis) [@corazza07].", "modelo: Marsh e Corazza por último");
+ok(!/^- (Arquitetura|Relação vilosidade)/m.test(DUO.presets.map(t.presetText).join("\n")), "textos prontos do duodeno sem as linhas antigas");
+// título editado -> linha, Marsh, Corazza
+els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.corpo.value = corpoLin; els.corpo.onfocus();
+const ed27 = (de, para) => { els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace(de, para); els.corpo.onchange(); };
+const linha0 = () => els.corpo.value.split("\n")[0];
+ed27("COM ATROFIA VILOSITÁRIA MODERADA", "COM ATROFIA VILOSITÁRIA ACENTUADA");
+ok(/COM ATROFIA VILOSITÁRIA ACENTUADA \(MARSH-OBERHUBER 3C; CORAZZA-VILLANACCI B2\)/.test(linha0()) && els.corpo.value.includes("- Atrofia vilositária: Presente, acentuada") && els.corpo.value.includes("Marsh-Oberhuber (1999): 3C") && /Corazza-Villanacci \(2007\): B2/.test(els.corpo.value), "atrofia no título -> linha, Marsh e Corazza");
+ed27("MARSH-OBERHUBER 3C", "MARSH-OBERHUBER 2");
+ok(/LINFOCÍTICO \(MARSH-OBERHUBER 2; CORAZZA-VILLANACCI A\), EM ATIVIDADE/.test(linha0()) && els.corpo.value.includes("- Atrofia vilositária: Não identificada (vilosidades preservadas), com hiperplasia das criptas.") && /Corazza-Villanacci \(2007\): A /.test(els.corpo.value), "Marsh no título -> sem atrofia por extenso, linha e Corazza");
+ed27("CORAZZA-VILLANACCI A", "CORAZZA-VILLANACCI B2");
+ok(els.corpo.value.includes("Marsh-Oberhuber (1999): 3C") && /ATROFIA VILOSITÁRIA ACENTUADA/.test(linha0()), "Corazza no título -> Marsh e atrofia");
+ok(/^- Atrofia vilositária: /.test(els.corpo.value.split("\n")[1]) && /Corazza-Villanacci/.test(els.corpo.value.trim().split("\n").pop()), "ordem mantida: atrofia em cima, Corazza por último");
+// linhas antigas são convertidas
+els.corpo.value = "- DUODENITE CRÔNICA INATIVA:\n- Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas.\n- Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo)."; els.corpo.onfocus(); els.tb_sync.onclick();
+ok(!/Arquitetura alterada/.test(els.corpo.value) && els.corpo.value.includes("- Atrofia vilositária: Presente, acentuada (mucosa plana, sem vilosidades identificáveis)") && /CORAZZA-VILLANACCI B2/.test(linha0()), "linha antiga de arquitetura convertida no ⟳");
+
+// salvar: achados mandam no título; o que não se resolve bloqueia
+els.fSitio.value = "gastrica"; els.fSeg.value = ""; els.fNome.value = "Mucosa gástrica"; els.fLetra.value = "A";
+const gN27 = t.SEED_SITES.gastrica.criterios.find(c => c.g === "Infiltrado neutrofílico").opt;
+els.corpo.value = "- GASTRITE CRÔNICA INATIVA:\n" + gN27[2][1] + "\n- Pesquisa para H. pylori: Positiva (+1)."; els.corpo.onfocus();
+ok(salva(), "inconsistência resolvível: salva");
+eq(t.WORK.samples[t.WORK.samples.length - 1].corpo.split("\n")[0], "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:", "ao salvar, atividade e H. pylori vão ao título pelos achados");
+eq(t.alertas().length, 0, "nada inconsistente chega ao laudo");
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.fNome.value = "Ceco"; els.fLetra.value = "B";
+els.corpo.value = "- COLITE CRÔNICA EM ATIVIDADE LEVE:\n- Arquitetura das criptas preservada."; els.corpo.onfocus();
+ok(!salva(), "título em atividade sem linha de neutrófilos: não salva");
+ok(/não há linha de neutrófilos/.test(els.alertEditor.innerHTML), "o aviso fica acima do botão Salvar");
+// transição: subtítulo gástrico exíguo ganha o padrão eosinofílico
+({ t, els } = boot({}));
+els.fSitio.value = "esofago"; els.fSeg.value = "Transição esôfago-gástrica"; els.fSeg.onchange(); els.corpo.value = ""; els.fNome.value = "Transição esofagogástrica"; els.fLetra.value = "A";
+t.inserePorcao("eso", t.SEED_SITES.esofago.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"));
+t.inserePorcao("gas", t.SEED_SITES.gastrica.presets.find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"));
+t.porcaoAtivaSet("gas"); t.amostraMod("exigua");
+t.appendLine("- Achados eosinofílicos associados: Degranulação de eosinófilos (grânulos extracelulares).");
+ok(salva(), "transição salva");
+const cT = t.WORK.samples[0].corpo;
+ok(cT.includes("- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS SEGUINTES ACHADOS HISTOLÓGICOS, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):"), "subtítulo gástrico exíguo ganha o padrão eosinofílico");
+ok(!t.alertas().some(a => /não indica o padrão eosinofílico/.test(a.msg)), "sem o alerta da foto 1");
+// formato novo da transição no laudo
+const lT27 = t.buildLaudo().split("\n"), iA = lT27.indexOf("A) Transição esofagogástrica:");
+eq(lT27.slice(iA + 1, iA + 6).join("|"), "- MUCOSA DE TRANSIÇÃO ESÔFAGO-GÁSTRICA APRESENTANDO:|- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA.|- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS).| |- MICROSCOPIA:", "transição: diagnósticos no topo e microscopia");
+ok(lT27[iA + 6] === "- MUCOSA ESOFÁGICA:" && lT27.includes("- MUCOSA GÁSTRICA:") && lT27.indexOf("- MUCOSA GÁSTRICA:") > lT27.indexOf("- MUCOSA ESOFÁGICA:"), "transição: achados sob cada porção");
+ok(/^- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS SEGUINTES ACHADOS HISTOLÓGICOS/m.test(t.WORK.samples[0].corpo), "o editor (amostra salva) continua no formato de edição");
+// formato novo: título "APRESENTANDO"
+t.WORK.samples.length = 0;
+t.WORK.samples.push({ nome: "Mucosa duodenal", site: "duodeno", seg: "", corpo: "- MUCOSA DUODENAL APRESENTANDO:\n- Parasitos: Não identificados." });
+const lD27 = t.buildLaudo();
+ok(lD27.includes("A) Mucosa duodenal:\n- MUCOSA DUODENAL APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA.\n \n- MICROSCOPIA:\n- Parasitos: Não identificados."), "APRESENTANDO aponta para a microscopia");
+ok(/font-weight:bold;">- MUCOSA DUODENAL APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA\./.test(t.laudoToRichHTML(lD27)), "título fechado em '.' continua em negrito");
+
+// Hirschsprung: o modelo do Pedro, montado pelo editor
+({ t, els } = boot({}));
+const HS27 = t.SEED_SITES.hirschsprung, HL27 = t.HS_L;
+els.fSitio.value = "hirschsprung"; els.fSeg.value = "Biópsia retal incisional (espessura total)"; els.fNome.value = "Biópsia retal"; els.fLetra.value = "A"; els.corpo.value = "";
+["- Amostra adequada: Mucosa com arquitetura glandular preservada e hiperplasia folicular linfoide, submucosa representada [@ernica] apresentando vasocongestão, camada muscular própria representada.",
+ "- Fragmentos examinados: 1.", "- Examinados 3 níveis de corte.", "- Bloco esgotado: Não.", "- " + HL27.subP, "- " + HL27.mpP, "- " + HL27.nervP].forEach(l => t.appendLine(l));
+const tit27 = els.corpo.value.split("\n").filter(l => t.lineKind(l) === "b");
+eq(tit27.join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:|- PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NOS PLEXOS NEURAIS DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS):|- FILETES NEURAIS SUBMUCOSOS HIPERTRÓFICOS (VIDE NOTAS):", "os 3 títulos do modelo saem dos achados");
+ok(salva(), "modelo salvo");
+const lH27 = t.buildLaudo();
+ok(lH27.includes("A) Biópsia retal:\n- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS.\n- PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NOS PLEXOS NEURAIS DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS).\n- FILETES NEURAIS SUBMUCOSOS HIPERTRÓFICOS (VIDE NOTAS).\n \n- MICROSCOPIA:\n- Amostra adequada: Mucosa com arquitetura glandular preservada e hiperplasia folicular linfoide, submucosa representada [1] apresentando vasocongestão, camada muscular própria representada.\n- Fragmentos examinados: 1.\n- Examinados 3 níveis de corte.\n- Bloco esgotado: Não.\n- Plexo da submucosa: Células ganglionares presentes.\n- Plexo da camada muscular própria: Células ganglionares presentes.\n- Filetes neurais submucosos hipertróficos: Presentes."), "laudo do modelo: formato e ordem");
+ok(/\nNOTAS:\n- Amostra A: células ganglionares presentes, com inervação mucosa reduzida à calretinina e\/ou nervos submucosos hipertróficos: os achados podem corresponder a zona de transição e pedem correlação clínica e radiológica \[2\]\.\n- A amostra será encaminhada para exame de imunohistoquímica para complementação diagnóstica \(calretinina\)\./.test(lH27), "notas: zona de transição (original) e imuno-histoquímica");
+ok(lH27.includes("REFERÊNCIAS BIBLIOGRÁFICAS:\n1. " + t.CITE.ernica + "\n2. " + t.CITE.veras), "referências do modelo");
+// topografia: um plexo
+eq(t.hsTitGang("- " + HL27.subP), "PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NO PLEXO NEURAL DA SUBMUCOSA", "um plexo: no plexo neural da submucosa");
+ok(!/encaminhada para exame de imunohistoquímica/.test((() => { t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Biópsia retal", site: "hirschsprung", seg: "Biópsia retal por sucção", corpo: t.presetText(HS27.presets.find(p => p.rot === "Células ganglionares presentes")) }); return t.buildLaudo(); })()), "com calretinina feita, sem a nota de imuno-histoquímica");
 
 console.log(`OK — ${n} asserts`);
 
