@@ -1269,6 +1269,54 @@ ok(lH27.includes("REFERÊNCIAS BIBLIOGRÁFICAS:\n1. " + t.CITE.ernica + "\n2. " 
 eq(t.hsTitGang("- " + HL27.subP), "PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NO PLEXO NEURAL DA SUBMUCOSA", "um plexo: no plexo neural da submucosa");
 ok(!/encaminhada para exame de imunohistoquímica/.test((() => { t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Biópsia retal", site: "hirschsprung", seg: "Biópsia retal por sucção", corpo: t.presetText(HS27.presets.find(p => p.rot === "Células ganglionares presentes")) }); return t.buildLaudo(); })()), "com calretinina feita, sem a nota de imuno-histoquímica");
 
+// 28. v3.12: corpus CAP (Barrett, displasia do esôfago, polipectomia) + gastrite autoimune
+({ t, els } = boot({}));
+const laudo28 = (corpo, site, seg) => { t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo, site, seg: seg || "" }); return t.buildLaudo(); };
+// Barrett
+const lB = laudo28("- ESOFAGITE CRÔNICA INATIVA:\n- Metaplasia intestinal: Presente, incompleta.", "esofago", "Terço distal");
+ok(/Amostra A: a metaplasia intestinal \(epitélio colunar com células caliciformes\) é o critério histológico de esôfago de Barrett adotado pelo CAP, com controvérsia sobre incluir epitélio colunar sem células caliciformes \[\d+\]; imprescindível correlação endoscópica\./.test(lB) && lB.includes(t.CITE.capeso), "esôfago com metaplasia: nota de Barrett e referência do CAP");
+ok(!/Barrett/.test(laudo28("- ESOFAGITE CRÔNICA INATIVA:\n- Metaplasia intestinal: Não identificada.", "esofago", "Terço distal")), "sem metaplasia: sem nota de Barrett");
+ok(!/Barrett/.test(laudo28("- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:\n- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:\n- Metaplasia intestinal: Não identificada.\n- MUCOSA GÁSTRICA: PADRÃO CÁRDIA, APRESENTANDO:\n- Metaplasia intestinal: Presente, completa.", "esofago", "Transição esôfago-gástrica")), "metaplasia na porção gástrica da transição: sem nota de Barrett");
+ok(!/Barrett/.test(laudo28("- GASTRITE CRÔNICA INATIVA:\n- Metaplasia intestinal: Presente, completa.", "gastrica")), "estômago: sem nota de Barrett");
+// displasia do esôfago
+const dE = t.SEED_SITES.esofago.criterios.find(c => c.g === "Displasia").opt;
+eq(dE.map(o => o[0]).join("|"), "Não identificada|Escamosa de baixo grau|Escamosa de alto grau|Glandular de baixo grau|Glandular de alto grau", "esôfago: 5 opções de displasia");
+els.fSitio.value = "esofago"; els.fSeg.value = "Terço distal"; els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:"; els.corpo.onfocus();
+t.appendLine(dE[3][1]);
+eq(els.corpo.value.split("\n")[0], "- ESOFAGITE CRÔNICA INATIVA, COM DISPLASIA GLANDULAR DE BAIXO GRAU:", "displasia glandular entra no título");
+t.appendLine(dE[2][1]);
+eq(els.corpo.value.split("\n")[0], "- ESOFAGITE CRÔNICA INATIVA, COM DISPLASIA ESCAMOSA DE ALTO GRAU:", "troca para escamosa de alto grau");
+t.appendLine(dE[0][1]);
+eq(els.corpo.value.split("\n")[0], "- ESOFAGITE CRÔNICA INATIVA, SEM DISPLASIA:", "não identificada: sem displasia");
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("SEM DISPLASIA", "COM DISPLASIA GLANDULAR DE ALTO GRAU"); els.corpo.onchange();
+ok(els.corpo.value.includes("- Displasia: Presente, glandular de alto grau.") && els.corpo.value.split("\n").filter(l => /^- Displasia/.test(l)).length === 1, "título editado -> linha de displasia com o tipo");
+eq(t.titleSetDisplasia("- GASTRITE CRÔNICA INATIVA:", "- Displasia: Presente, de baixo grau."), "- GASTRITE CRÔNICA INATIVA:", "estômago: displasia continua só trocando trecho existente");
+eq(t.titleSetDisplasia("- PÓLIPO JUVENIL, SEM DISPLASIA:", "- Displasia: Presente, de alto grau."), "- PÓLIPO JUVENIL, COM DISPLASIA DE ALTO GRAU:", "pólipo: como antes");
+// pólipo
+const PO = t.SEED_SITES.polipo.criterios, gp = g => PO.find(c => c.g === g);
+ok(!gp("Base / pedículo") && ["Procedimento", "Integridade", "Tamanho do pólipo (maior dimensão, cm)", "Configuração", "Margem"].every(gp), "pólipo: 5 grupos de polipectomia, sem 'Base / pedículo'");
+els.fSitio.value = "polipo"; els.fSeg.value = "Cólon"; els.corpo.value = "- PÓLIPO JUVENIL, SEM DISPLASIA:"; els.corpo.onfocus();
+t.appendLine(gp("Integridade").opt[0][1]); t.appendLine(gp("Integridade").num.tpl.replace("{n}", "3"));
+t.appendLine(gp("Configuração").num.tpl.replace("{n}", "1,2")); t.appendLine(gp("Tamanho do pólipo (maior dimensão, cm)").num.tpl.replace("{n}", "1,5"));
+t.appendLine(gp("Margem").opt[0][1]); t.appendLine(gp("Procedimento").opt[0][1]);
+ok(els.corpo.value.includes("- Integridade: Fragmentado (3 fragmentos).") && !/Integridade: Íntegro/.test(els.corpo.value), "integridade trocada, não duplicada");
+ok(["- Configuração: Pedunculado (pedículo de 1,2 cm).", "- Tamanho do pólipo: 1,5 cm (maior dimensão).", "- Margem: Livre de lesão.", "- Procedimento: Polipectomia."].every(l => els.corpo.value.includes(l)), "linhas de polipectomia");
+// gastrite autoimune
+const GA = t.SEED_SITES.gastrica, pAI = GA.presets.find(p => /DE PADRÃO AUTOIMUNE/.test(p.titulo));
+eq(pAI.titulo, "GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS)", "texto pronto: título validado");
+eq(pAI.bullets.filter(b => /^(Atrofia|Metaplasia pseudopilórica|Metaplasia intestinal|Hiperplasia de células enterocromafins-símile|Pesquisa para H\. pylori):/.test(b)).join("|"), "Atrofia: Presente, com redução de células parietais.|Metaplasia pseudopilórica: Presente.|Metaplasia intestinal: Não identificada.|Hiperplasia de células enterocromafins-símile: Presente (imuno-histoquímica para cromogranina A).|Pesquisa para H. pylori: Negativa.", "texto pronto: achados validados");
+ok(GA.criterios.some(c => c.g === "Metaplasia pseudopilórica") && GA.criterios.find(c => c.g === "Hiperplasia de células enterocromafins-símile").opt.length === 3 && GA.criterios.find(c => c.g === "Atrofia").opt.some(o => /com redução de células parietais/.test(o[1])), "estômago: grupos novos e opção de atrofia");
+const lA = laudo28(t.presetText(pAI), "gastrica", "Corpo/fundo (oxíntico)");
+ok(/Amostra A: o padrão de gastrite atrófica do corpo\/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H\. pylori, favorece gastrite autoimune \[\d+\]; em crianças, pode haver atrofia também no antro \[\d+\] e associação com outras doenças autoimunes e anemia ferropriva \[\d+\]; imprescindível correlação clínica-laboratorial/.test(lA), "nota da gastrite autoimune");
+ok([t.CITE.hall19, t.CITE.kulak21, t.CITE.pogoriler15].every(r => lA.includes(r)) && !/\[@/.test(lA), "3 referências numeradas");
+ok(lA.includes("- GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS).\n \n- MICROSCOPIA:"), "formato novo do laudo");
+eq(t.alertas().length, 0, "texto pronto sem alerta");
+els.fSitio.value = "gastrica"; els.fSeg.value = ""; els.corpo.value = t.presetText(pAI); els.corpo.onfocus();
+t.appendLine(GA.criterios.find(c => c.g === "Metaplasia pseudopilórica").opt[0][1]);
+eq(els.corpo.value.split("\n").filter(l => /^- Metaplasia pseudopilórica/.test(l)).join(), "- Metaplasia pseudopilórica: Não identificada.", "metaplasia pseudopilórica trocada, não duplicada");
+ok(t.LIB.notas.some(n => n.tag === "Barrett") && t.LIB.notas.some(n => n.tag === "Gastrite autoimune"), "notas novas na biblioteca");
+eq(t.concorda(t.presetText(pAI)).trocas.length, 0, "concordância: gastrite autoimune");
+
 console.log(`OK — ${n} asserts`);
 
 

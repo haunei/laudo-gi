@@ -1,5 +1,12 @@
 # Changelog
 
+## v3.12.0 — 2026-10-23
+- Corpus CAP da skill máscara (release 2026_09), lido e validado item a item:
+  - Esôfago (CAP Esôfago 4.2.0.1, Nota J): metaplasia intestinal presente na mucosa esofágica gera nota de Barrett (critério de células caliciformes, controvérsia, correlação endoscópica), com o protocolo nas referências. Não sai na porção gástrica da transição nem no estômago.
+  - Esôfago: grupo Displasia (escamosa/glandular, baixo/alto grau), com o tipo no título da esofagite ("COM DISPLASIA GLANDULAR DE BAIXO GRAU" / "SEM DISPLASIA").
+  - Pólipo (CAP Biópsia colorretal 4.3.0.0): procedimento, integridade (íntegro/fragmentado), tamanho, configuração (pedunculado com pedículo/séssil) e margem, no lugar de "Base / pedículo".
+- Estômago: gastrite crônica atrófica de padrão autoimune (texto pronto; grupos "Metaplasia pseudopilórica" e "Hiperplasia de células enterocromafins-símile"; atrofia com redução de células parietais) e nota com Hall 2019, Kulak 2021 e Pogoriler 2015 (conferidos no PubMed; a entidade não está no RAG do WHO).
+
 ## v3.11.0 — 2026-10-22
 - Correção no editor: ao salvar, os achados mandam no título (atividade, H. pylori, metaplasia, displasia, segmento gástrico, Whitehead, amostra exígua/superficial, padrão eosinofílico, EDS, Marsh/Corazza, Hirschsprung), porção por porção na transição. Inconsistência que não se resolve sozinha não salva: o aviso fica acima do botão Salvar e nada inconsistente chega ao laudo (a categoria de DECH escolhida à mão continua permitida). O subtítulo gástrico "REPRESENTAÇÃO …" ganha ", DE PADRÃO EOSINOFÍLICO".
 - Duodeno: "Arquitetura", "Atrofia vilositária" e "Relação vilosidade/cripta" viram uma linha só, logo abaixo do título, com 6 opções que dão o Marsh-Oberhuber e o Corazza-Villanacci ao mesmo tempo. Título com ", COM ATROFIA VILOSITÁRIA X (MARSH-OBERHUBER m; CORAZZA-VILLANACCI k)" antes da atividade (Marsh 1–2: só os parênteses; Marsh 0: nada). Linha, Marsh, Corazza, linfocitose e título sincronizados nos dois sentidos, clicando ou editando à mão; Marsh e Corazza por último no bloco. Texto pronto de padrão linfocítico no modelo do Pedro (3B, B1). Linhas antigas convertidas no ⟳ e ao salvar.

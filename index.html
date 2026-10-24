@@ -431,6 +431,9 @@ const SEED_SITES = {
           ["Não identificada (Alcian blue/PAS)","- Metaplasia intestinal: Não identificada (confirmado com coloração histoquímica especial Alcian blue pH 2,5/PAS sem diastase)."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
           monta:x=>"- Metaplasia intestinal: Presente"+(x[0]?", "+x[0]:"")+(x[1]?", "+x[1]:"")+"."}},
+      {g:"Displasia", dica:"Tipos e graus dos Achados adicionais do protocolo CAP de esôfago (4.2.0.1). Entra no título da esofagite.", opt:[["Não identificada","- Displasia: Não identificada."],
+        ["Escamosa de baixo grau","- Displasia: Presente, escamosa de baixo grau."],["Escamosa de alto grau","- Displasia: Presente, escamosa de alto grau."],
+        ["Glandular de baixo grau","- Displasia: Presente, glandular de baixo grau."],["Glandular de alto grau","- Displasia: Presente, glandular de alto grau."]]},
       {g:"Descamação superficial (padrão de esofagite dissecante)", dica:"Dois tons + descamação/flaking com clivagem + paraqueratose = critérios de esofagite dissecante superficial (Rubrecht 2025; Hart 2015): o título muda. Com menos itens, fica como achado inespecífico, em qualquer título. Epitélio destacado sem necrose, inflamação ou paraqueratose pode ser artefato do procedimento; paraqueratose fina, de poucas camadas, aparece também sobre estenoses (Carmack 2009).",
         opt:[["Ausentes","- Achados de descamação superficial: Não identificados."]],
         stack:{pre:"- Achados de descamação superficial: ", pos:" [@carmack09,hart15,rubrecht25]", itens:[
@@ -528,6 +531,15 @@ const SEED_SITES = {
         "Presença de infiltrado inflamatório neutrofílico leve, com criptite apenas em mucosa gástrica de padrão oxíntico.",
         "Agregados linfoides: Presentes.","Hiperplasia foveolar: Leve (graduação conforme Dixon 1986 [@dixon86]).","Metaplasia intestinal: Não identificada.",
         "Atrofia: Leve (em mucosa de padrão oxíntico) e moderada (em mucosa de padrão misto oxíntico/mucinoso).",
+        "Pesquisa para H. pylori: Negativa."]),
+      P("GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS)",[
+        "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 4 eosinófilos/campo de grande aumento).",
+        "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Atrofia: Presente, com redução de células parietais.",
+        "Metaplasia pseudopilórica: Presente.",
+        "Metaplasia intestinal: Não identificada.",
+        "Hiperplasia de células enterocromafins-símile: Presente (imuno-histoquímica para cromogranina A).",
         "Pesquisa para H. pylori: Negativa."])
     ],
     criterios:[
@@ -901,6 +913,12 @@ function titleSetMarshDuo(t, m, comClass){
 }
 const insereApos=(cr, g, novos)=>{ const i=cr.findIndex(c=>c.g===g); cr.splice(i+1, 0, ...novos); };
 insereApos(SEED_SITES.gastrica.criterios, "Hiperplasia folicular linfoide", [OPT_AGREG]);
+// gastrite autoimune (Hall 2019; Kulak 2021; Pogoriler 2015)
+insereApos(SEED_SITES.gastrica.criterios, "Metaplasia intestinal", [
+  {g:"Metaplasia pseudopilórica", opt:[["Não identificada","- Metaplasia pseudopilórica: Não identificada."],["Presente","- Metaplasia pseudopilórica: Presente."]]},
+  {g:"Hiperplasia de células enterocromafins-símile", opt:[["Não identificada (cromogranina A)","- Hiperplasia de células enterocromafins-símile: Não identificada (imuno-histoquímica para cromogranina A)."],
+    ["Presente (cromogranina A)","- Hiperplasia de células enterocromafins-símile: Presente (imuno-histoquímica para cromogranina A)."],["Não avaliada","- Hiperplasia de células enterocromafins-símile: Não avaliada."]]}]);
+SEED_SITES.gastrica.criterios.find(c=>c.g==="Atrofia").opt.push(["Com redução de células parietais","- Atrofia: Presente, com redução de células parietais."]);
 insereApos(SEED_SITES.ileo.criterios, "Hiperplasia folicular linfoide", [OPT_AGREG]);
 insereApos(SEED_SITES.ileo.criterios, "Arquitetura", [OPT_ATR_VIL, OPT_MET_FOV]);
 SEED_SITES.duodeno.criterios.unshift(OPT_ATR_DUO, OPT_MET_FOV);
@@ -948,7 +966,11 @@ SEED_SITES.polipo = {
   criterios:[
     {g:"Displasia", opt:[["Não identificada","- Displasia: Não identificada."],["Baixo grau","- Displasia: Presente, de baixo grau."],["Alto grau","- Displasia: Presente, de alto grau."]]},
     {g:"Superfície", opt:[["Íntegra","- Superfície: Íntegra."],["Erodida","- Superfície: Erodida, com tecido de granulação."]]},
-    {g:"Base / pedículo", opt:[["Livre","- Base/pedículo: Livre de lesão."],["Não avaliável","- Base/pedículo: Não avaliável (fragmentação)."]]},
+    {g:"Procedimento", dica:"Elementos de polipectomia do protocolo CAP de biópsia colorretal (4.3.0.0).", opt:[["Polipectomia","- Procedimento: Polipectomia."],["Mucosectomia endoscópica","- Procedimento: Mucosectomia endoscópica."],["Dissecção endoscópica submucosa","- Procedimento: Dissecção endoscópica submucosa."]]},
+    {g:"Integridade", opt:[["Íntegro","- Integridade: Íntegro."]], num:{tpl:"- Integridade: Fragmentado ({n} fragmentos).", btn:"fragmentado (n)"}},
+    {g:"Tamanho do pólipo (maior dimensão, cm)", num:{tpl:"- Tamanho do pólipo: {n} cm (maior dimensão).", btn:"inserir"}},
+    {g:"Configuração", opt:[["Séssil","- Configuração: Séssil."]], num:{tpl:"- Configuração: Pedunculado (pedículo de {n} cm).", btn:"pedunculado (pedículo, cm)"}},
+    {g:"Margem", opt:[["Livre de lesão","- Margem: Livre de lesão."],["Lesão na margem mucosa","- Margem: Lesão na margem mucosa."],["Não avaliável","- Margem: Não avaliável (fragmentação)."]]},
     {g:"Alteração por inibidor de bomba de prótons", opt:[["Não identificada","- Alterações de células parietais associadas a inibidor de bomba de prótons: Não identificadas."],["Presente","- Alterações de células parietais associadas a inibidor de bomba de prótons: Presentes."]]}
   ]
 };
@@ -1151,6 +1173,8 @@ const NOTAS_PADRAO = [
   {tag:"EDS", texto:"Os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21]."},
   {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25]."},
   {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
+  {tag:"Barrett", texto:"A metaplasia intestinal (epitélio colunar com células caliciformes) é o critério histológico de esôfago de Barrett adotado pelo CAP, com controvérsia sobre incluir epitélio colunar sem células caliciformes [@capeso]; imprescindível correlação endoscópica."},
+  {tag:"Gastrite autoimune", texto:"O padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12)."},
   {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
 ];
 
@@ -1178,6 +1202,10 @@ const CITE = {
   habbal:"Habbal M, Scaffidi MA, Rumman A, Khan R, Ramaj M, Al-Mazroui A, et al. Clinical, endoscopic, and histologic characteristics of lymphocytic esophagitis: a systematic review. Esophagus. 2019;16(2):123-132. doi:10.1007/s10388-018-0649-1.",
   shulman:"Shulman HM, Cardona DM, Greenson JK, Hingorani S, Horn T, Huber E, et al. NIH Consensus development project on criteria for clinical trials in chronic graft-versus-host disease: II. The 2014 Pathology Working Group Report. Biol Blood Marrow Transplant. 2015;21(4):589-603. doi:10.1016/j.bbmt.2014.12.031.",
   lerner:"Lerner KG, Kao GF, Storb R, Buckner CD, Clift RA, Thomas ED. Histopathology of graft-vs.-host reaction (GvHR) in human recipients of marrow from HL-A-matched sibling donors. Transplant Proc. 1974;6(4):367-71.",
+  capeso:"College of American Pathologists. Protocol for the examination of specimens from patients with carcinoma of the esophagus. Version 4.2.0.1. Northfield (IL): College of American Pathologists; 2022.",
+  hall19:"Hall SN, Appelman HD. Autoimmune gastritis. Arch Pathol Lab Med. 2019;143(11):1327-1331. doi:10.5858/arpa.2019-0345-RA.",
+  kulak21:"Kulak O, Gurram B, Montgomery EA, Park JY. Pediatric autoimmune gastritis: clinical correlates and histologic features. Hum Pathol. 2021;116:31-38. doi:10.1016/j.humpath.2021.07.002.",
+  pogoriler15:"Pogoriler J, Kamin D, Goldsmith JD. Pediatric non-Helicobacter pylori atrophic gastritis: a case series. Am J Surg Pathol. 2015;39(6):786-792. doi:10.1097/PAS.0000000000000378.",
   mast:"Mastracci L, Grillo F, Parente P, Unti E, Battista S, Spaggiari P, et al. Gastro-esophageal reflux disease and Barrett's esophagus: an overview with an histologic diagnostic approach. Pathologica. 2020;112(3):117-127. doi:10.32074/1591-951X-162.",
   youssef:"Youssef R, Saeed O, Lin J, González IA. Characterization of Esophageal Biopsies from Stem Cell Transplant Patients With and Without Esophageal Graft-Versus-Host Disease. Mod Pathol. 2025;38(6):100727. doi:10.1016/j.modpat.2025.100727.",
   mostafa:"Mostafa M, Hartley CP, Hagen CE. Evaluation of the lower histologic threshold for gastric graft versus host disease. Mod Pathol. 2020;33(5):962-970. doi:10.1038/s41379-019-0421-7.",
@@ -1241,6 +1269,8 @@ function notaCeliaca(corpo){
 }
 const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
 const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
+const NOTA_BARRETT="a metaplasia intestinal (epitélio colunar com células caliciformes) é o critério histológico de esôfago de Barrett adotado pelo CAP, com controvérsia sobre incluir epitélio colunar sem células caliciformes [@capeso]; imprescindível correlação endoscópica.";
+const NOTA_AUTOIMUNE="o padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12).";
 const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
 const NOTA_DESC_INESP="os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25].";
 const NOTA_EDS_BOLHA="bolhas e clivagem intraepitelial proeminentes exigem exclusão de dermatoses vesicobolhosas (síndrome de Stevens-Johnson, pênfigo, penfigoide), por imunofluorescência e correlação clínica [@carmack09].";
@@ -1278,7 +1308,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.11.0";
+const APP_VERSION="3.12.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1866,10 +1896,11 @@ function titleSetMetaplasia(title, linha){
   const novo = m ? "COM METAPLASIA INTESTINAL"+(m[1]?" "+m[1].toUpperCase():"")+(m[2]?(m[1]?" E ":" ")+m[2].toUpperCase():"") : "";
   return titleSetTrecho(title, RE_T_MI, novo, /GASTRITE|ESOFAGITE/.test(title));
 }
-const RE_T_DISP=/(,? )(?:SEM DISPLASIA|COM DISPLASIA DE (?:BAIXO|ALTO) GRAU)/;
+const RE_T_DISP=/(,? )(?:SEM DISPLASIA|COM DISPLASIA (?:(?:ESCAMOSA|GLANDULAR) )?DE (?:BAIXO|ALTO) GRAU)/;
+// displasia no título: estômago e pólipo trocam o trecho que já existe; na esofagite (tipo escamoso/glandular), o trecho também entra
 function titleSetDisplasia(title, linha){
-  const m=linha.match(/^- Displasia: (Não identificada|Presente, de (baixo|alto) grau)/); if(!m) return title;
-  return titleSetTrecho(title, RE_T_DISP, m[2] ? "COM DISPLASIA DE "+m[2].toUpperCase()+" GRAU" : "SEM DISPLASIA", false);
+  const m=linha.match(/^- Displasia: (Não identificada|Presente, (?:(escamosa|glandular) )?de (baixo|alto) grau)/); if(!m) return title;
+  return titleSetTrecho(title, RE_T_DISP, m[3] ? "COM DISPLASIA "+(m[2] ? m[2].toUpperCase()+" " : "")+"DE "+m[3].toUpperCase()+" GRAU" : "SEM DISPLASIA", /ESOFAGITE/.test(title));
 }
 let prevTit="";
 function ultimoTitulo(txt){ const ls=(txt||"").split("\n"); for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b") return ls[i].trim(); return ""; }
@@ -2046,13 +2077,13 @@ function bloqueiaAtiv(antes){
 // título editado à mão -> achados: só o item do título que mudou na edição vai para os achados
 const L_EDS_COMPLETA="- Achados de descamação superficial: Aspecto em dois tons (núcleos picnóticos e necróticos na zona superficial, sobre zona basal de aspecto normal), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial, paraqueratose proeminente (de várias camadas celulares) [@carmack09,hart15,rubrecht25].";
 function itensTitulo(tit, raw, teg){
-  const mi=tit.match(/COM METAPLASIA INTESTINAL(?: (COMPLETA|INCOMPLETA))?(?: E)?(?: (LEVE|MODERADA|ACENTUADA))?/), d=tit.match(/SEM DISPLASIA|COM DISPLASIA DE (BAIXO|ALTO) GRAU/);
+  const mi=tit.match(/COM METAPLASIA INTESTINAL(?: (COMPLETA|INCOMPLETA))?(?: E)?(?: (LEVE|MODERADA|ACENTUADA))?/), d=tit.match(/SEM DISPLASIA|COM DISPLASIA (?:(ESCAMOSA|GLANDULAR) )?DE (BAIXO|ALTO) GRAU/);
   const wh=tit.match(/DUODENITE CRÔNICA (LEVE|MODERADA|ACENTUADA)/), rest=teg ? raw.trim().slice(TEG_PRE.gas.length) : "";
   return {
     ativ:grauDoTitulo(tit),
     hp:/ASSOCIADA A H\. ?pylori|PESQUISA PARA H\. ?pylori POSITIVA/i.test(tit),
     mi: mi ? "- Metaplasia intestinal: Presente"+(mi[1]?", "+mi[1].toLowerCase():"")+(mi[2]?", "+mi[2].toLowerCase():"")+"." : null,
-    disp: d ? (d[1] ? "- Displasia: Presente, de "+d[1].toLowerCase()+" grau." : "- Displasia: Não identificada.") : null,
+    disp: d ? (d[2] ? "- Displasia: Presente, "+(d[1] ? d[1].toLowerCase()+" " : "")+"de "+d[2].toLowerCase()+" grau." : "- Displasia: Não identificada.") : null,
     wh: wh ? wh[1] : null,
     am: teg ? (/^REPRESENTAÇÃO EXÍGUA E SUPERFICIAL/.test(rest) ? "exsup" : /^REPRESENTAÇÃO EXÍGUA/.test(rest) ? "exigua" : /^REPRESENTAÇÃO SUPERFICIAL/.test(rest) ? "superficial" : null)
       : /^- EXÍGUOS? FRAGMENTOS? DE /.test(tit) ? "exigua" : /^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /.test(tit) ? "superficial" : null,
@@ -2265,6 +2296,8 @@ function autoNotas(){
     }
     if(s.site==="hirschsprung"){ hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n)); if(hsPedeIhq(s.corpo, s.seg) && !extra.includes(NOTA_IHQ_CAL)) extra.push(NOTA_IHQ_CAL); }
     if(s.site==="duodeno"){ const nc=notaCeliaca(s.corpo); if(nc) add(L_, nc); }
+    if(s.site==="esofago" && /^- Metaplasia intestinal: Presente/m.test(s.corpo||"")) add(L_, NOTA_BARRETT);
+    if(s.site==="gastrica" && /DE PADRÃO AUTOIMUNE/.test((s.corpo||"").split("\n").filter(l=>lineKind(l)==="b").join(" "))) add(L_, NOTA_AUTOIMUNE);
     if(s.site==="esofago"){ const ed=edsEstado(s.corpo); if(ed==="suficiente") add(L_, NOTA_EDS); else if(ed==="inesp") add(L_, NOTA_DESC_INESP); if(ed && /^- Achados de descamação superficial: .*bolhas intraepiteliais/mi.test(s.corpo)) add(L_, NOTA_EDS_BOLHA); }
     if(RE_EOS_ASSOC_POS.test(s.corpo||"")){
       if(s.site==="esofago" && /^- Achados eosinofílicos associados: .*(microabscessos eosinofílicos|camada superficial)/mi.test(s.corpo)) add(L_, NOTA_EOE_QUAL);
