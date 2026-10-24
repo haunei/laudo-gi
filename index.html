@@ -535,11 +535,12 @@ const SEED_SITES = {
       P("GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS)",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
         "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 4 eosinófilos/campo de grande aumento).",
+        "Distribuição do infiltrado inflamatório crônico: Em toda a espessura da mucosa.",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Atrofia: Presente, com redução de células parietais.",
         "Metaplasia pseudopilórica: Presente.",
         "Metaplasia intestinal: Não identificada.",
-        "Hiperplasia de células enterocromafins-símile: Presente (imuno-histoquímica para cromogranina A).",
+        "Hiperplasia de células enterocromafins-símile: Presente, linear.",
         "Pesquisa para H. pylori: Negativa."])
     ],
     criterios:[
@@ -913,11 +914,16 @@ function titleSetMarshDuo(t, m, comClass){
 }
 const insereApos=(cr, g, novos)=>{ const i=cr.findIndex(c=>c.g===g); cr.splice(i+1, 0, ...novos); };
 insereApos(SEED_SITES.gastrica.criterios, "Hiperplasia folicular linfoide", [OPT_AGREG]);
-// gastrite autoimune (Hall 2019; Kulak 2021; Pogoriler 2015)
+// gastrite autoimune (Hall 2019 e Pogoriler 2015, textos completos; Kulak 2021, resumo)
 insereApos(SEED_SITES.gastrica.criterios, "Metaplasia intestinal", [
   {g:"Metaplasia pseudopilórica", opt:[["Não identificada","- Metaplasia pseudopilórica: Não identificada."],["Presente","- Metaplasia pseudopilórica: Presente."]]},
-  {g:"Hiperplasia de células enterocromafins-símile", opt:[["Não identificada (cromogranina A)","- Hiperplasia de células enterocromafins-símile: Não identificada (imuno-histoquímica para cromogranina A)."],
-    ["Presente (cromogranina A)","- Hiperplasia de células enterocromafins-símile: Presente (imuno-histoquímica para cromogranina A)."],["Não avaliada","- Hiperplasia de células enterocromafins-símile: Não avaliada."]]}]);
+  {g:"Hiperplasia de células enterocromafins-símile", dica:"Reconhecível na coloração de rotina; imuno-histoquímica para cromogranina A ajuda nos casos difíceis. Pode faltar nas fases iniciais (Hall 2019).",
+    opt:[["Não identificada","- Hiperplasia de células enterocromafins-símile: Não identificada."],["Presente, linear","- Hiperplasia de células enterocromafins-símile: Presente, linear."],["Presente, micronodular","- Hiperplasia de células enterocromafins-símile: Presente, micronodular."],
+    ["Presente, linear e micronodular","- Hiperplasia de células enterocromafins-símile: Presente, linear e micronodular."],["Presente (cromogranina A)","- Hiperplasia de células enterocromafins-símile: Presente (confirmada por imuno-histoquímica para cromogranina A)."],["Não avaliada","- Hiperplasia de células enterocromafins-símile: Não avaliada."]]},
+  {g:"Imuno-histoquímica para gastrina", dica:"Corpo atrófico pode simular mucosa antral (falso-negativo); a gastrina confirma o sítio. Células G podem aumentar na metaplasia pseudopilórica e faltar na metaplasia intestinal (Pogoriler 2015).",
+    opt:[["Ausência de células G","- Imuno-histoquímica para gastrina: Ausência de células G (confirma mucosa oxíntica)."],["Presença de células G","- Imuno-histoquímica para gastrina: Presença de células G (mucosa antral)."]]}]);
+insereApos(SEED_SITES.gastrica.criterios, "Celularidade mononuclear (lâmina própria)", [{g:"Distribuição do infiltrado inflamatório crônico", opt:[["Predomínio basal","- Distribuição do infiltrado inflamatório crônico: Predomínio basal."],
+  ["Em toda a espessura","- Distribuição do infiltrado inflamatório crônico: Em toda a espessura da mucosa."],["Superficial","- Distribuição do infiltrado inflamatório crônico: Superficial."]]}]);
 SEED_SITES.gastrica.criterios.find(c=>c.g==="Atrofia").opt.push(["Com redução de células parietais","- Atrofia: Presente, com redução de células parietais."]);
 insereApos(SEED_SITES.ileo.criterios, "Hiperplasia folicular linfoide", [OPT_AGREG]);
 insereApos(SEED_SITES.ileo.criterios, "Arquitetura", [OPT_ATR_VIL, OPT_MET_FOV]);
@@ -1174,7 +1180,7 @@ const NOTAS_PADRAO = [
   {tag:"Descamação inespecífica", texto:"Os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25]."},
   {tag:"Duodenite linfocítica", texto:"A duodenite de padrão linfocítico pode ocorrer na doença celíaca, que corresponde a cerca de 10% a 20% dos casos de linfocitose intraepitelial sem atrofia vilositária [@smyrk17], e em outras condições, como infecção por H. pylori, uso de anti-inflamatórios não esteroides, supercrescimento bacteriano, giardíase, hipersensibilidade alimentar, doenças autoimunes, imunodeficiências e doença inflamatória intestinal [@lauwers15]; a confirmação diagnóstica requer correlação com dados clínicos, laboratoriais (sorologia) e endoscópicos [@husby20]."},
   {tag:"Barrett", texto:"A metaplasia intestinal (epitélio colunar com células caliciformes) é o critério histológico de esôfago de Barrett adotado pelo CAP, com controvérsia sobre incluir epitélio colunar sem células caliciformes [@capeso]; imprescindível correlação endoscópica."},
-  {tag:"Gastrite autoimune", texto:"O padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12)."},
+  {tag:"Gastrite autoimune", texto:"O padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune; a hiperplasia de células enterocromafins-símile pode faltar nas fases iniciais [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes, imunodeficiência e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12), lembrando que os autoanticorpos podem ser negativos no início [@pogoriler15]."},
   {tag:"Celíaca", texto:"A associação de linfocitose intraepitelial com atrofia vilositária e hiperplasia de criptas favorece doença celíaca, embora não seja específica: outras causas de atrofia vilositária, como imunodeficiência comum variável, enteropatia autoimune e medicamentos (anti-inflamatórios não esteroides, olmesartana), devem ser afastadas [@smyrk17,villanacci20]; a confirmação requer correlação com sorologia (anti-transglutaminase IgA e IgA total), dados clínicos e endoscópicos [@husby20]."}
 ];
 
@@ -1270,7 +1276,7 @@ function notaCeliaca(corpo){
 const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
 const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
 const NOTA_BARRETT="a metaplasia intestinal (epitélio colunar com células caliciformes) é o critério histológico de esôfago de Barrett adotado pelo CAP, com controvérsia sobre incluir epitélio colunar sem células caliciformes [@capeso]; imprescindível correlação endoscópica.";
-const NOTA_AUTOIMUNE="o padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12).";
+const NOTA_AUTOIMUNE="o padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune; a hiperplasia de células enterocromafins-símile pode faltar nas fases iniciais [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes, imunodeficiência e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12), lembrando que os autoanticorpos podem ser negativos no início [@pogoriler15].";
 const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
 const NOTA_DESC_INESP="os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25].";
 const NOTA_EDS_BOLHA="bolhas e clivagem intraepitelial proeminentes exigem exclusão de dermatoses vesicobolhosas (síndrome de Stevens-Johnson, pênfigo, penfigoide), por imunofluorescência e correlação clínica [@carmack09].";
