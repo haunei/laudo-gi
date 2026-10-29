@@ -118,7 +118,7 @@ button.danger{color:var(--danger);}button.danger:hover{background:var(--alc-bg);
 .alerta{display:flex;gap:10px;align-items:center;border:1px solid var(--c-notas);background:var(--al-bg);color:var(--al-ink);border-radius:8px;padding:10px 12px;margin:0 0 8px;}
 .alerta.conf{border-color:var(--c-refs);background:var(--alc-bg);color:var(--alc-ink);}
 .alerta .tile{background:var(--c-notas);}.alerta.conf .tile{background:var(--c-refs);}
-.alerta span{flex:1;}
+.alerta .tile{flex:none;}.alerta > span:last-child{flex:1;}
 .editor-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;align-items:center;}
 .editor-actions .spacer{flex:1;}
 .sample-list{list-style:none;margin:0 0 12px;padding:0;}
@@ -631,10 +631,11 @@ const SEED_SITES = {
       {g:"Linfangiectasias", opt:[["Não identificadas","- Linfangiectasias: Não identificadas."],["Identificadas","- Linfangiectasias: Identificadas."]]},
       {g:"Orientação dos fragmentos", dica:"A graduação de Marsh-Oberhuber só vale com orientação adequada; recomendam-se pelo menos 4 biópsias do duodeno distal e 1 do bulbo (ESPGHAN 2020).",
         opt:[["Adequada","- Orientação dos fragmentos: Adequada."],["Inadequada","- Orientação dos fragmentos: Inadequada (avaliação da arquitetura e graduação de Marsh-Oberhuber prejudicadas [@husby20])."]]},
-      {g:"Marsh-Oberhuber (1999)", dica:"Marsh 1 (linfocitose com vilosidades normais) não é específico de doença celíaca: só se aplica com doença celíaca comprovada; sem isso, descrever como linfocitose intraepitelial (Lauwers 2015, ESsCD 2019). Ao escolher o Marsh, a linha de Corazza-Villanacci entra sozinha.", opt:[
+      {g:"Marsh-Oberhuber (1999)", dica:"Os tipos 1 a 3 exigem linfocitose intraepitelial (no duodeno, 30 ou mais por 100 enterócitos); sem ela, a atrofia sozinha não classifica (Não se aplica). Marsh 1 (linfocitose com vilosidades normais) não é específico de doença celíaca: só se aplica com doença celíaca comprovada; sem isso, descrever como linfocitose intraepitelial (Lauwers 2015, ESsCD 2019). Ao escolher o Marsh, a linha de Corazza-Villanacci entra sozinha.", opt:[
         ["0","- Classificação de Marsh-Oberhuber (1999): 0."],["1","- Classificação de Marsh-Oberhuber (1999): 1."],
         ["2","- Classificação de Marsh-Oberhuber (1999): 2."],["3A","- Classificação de Marsh-Oberhuber (1999): 3A."],
-        ["3B","- Classificação de Marsh-Oberhuber (1999): 3B."],["3C","- Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo)."]]}
+        ["3B","- Classificação de Marsh-Oberhuber (1999): 3B."],["3C","- Classificação de Marsh-Oberhuber (1999): 3C (tipo destrutivo)."],
+        ["Não se aplica","- Classificação de Marsh-Oberhuber (1999): Não se aplica."]]}
     ]
   },
 
@@ -667,7 +668,8 @@ const SEED_SITES = {
       {g:"Arquitetura", opt:[
         ["Preservada","- Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas."],
         ["Encurtamento focal de vilos.","- Arquitetura alterada: Encurtamento focal de vilosidades, focalmente associado a leve linfocitose intraepitelial das mesmas."],
-        ["Atrofia global/severa","- Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas."]]},
+        ["Atrofia global/severa","- Arquitetura alterada: Atrofia global e severa de vilosidades, acompanhada de criptas hipertróficas."],
+        ["Não avaliável","- Arquitetura glandular: Não avaliável com segurança pela baixa representatividade da amostra."]]},
       {g:"Celularidade mononuclear", opt:[
         ["Preservada","- Celularidade preservada de leucócitos mononucleares em lâmina própria."],
         ["Aumentada","- Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário."]]},
@@ -712,7 +714,7 @@ const SEED_SITES = {
         "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Agregado linfoide: Presente."]),
-      P("EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA",[
+      P("AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO COLITE CRÔNICA INATIVA",[
         "Amostra exígua, pouco representativa.","Arquitetura glandular alterada: Perda do paralelismo glandular.",
         "Presença de infiltrado inflamatório mononuclear (linfohistoplasmocitário) moderado em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
@@ -749,7 +751,7 @@ const SEED_SITES = {
 // critérios compartilhados cólon/reto
 const CRIT_COLON = [
   {g:"Arquitetura glandular", dica:"Marque todos os critérios presentes e clique em inserir: sai uma linha só.",
-    opt:[["Preservada","- Arquitetura glandular preservada."]],
+    opt:[["Preservada","- Arquitetura glandular preservada."],["Não avaliável","- Arquitetura glandular: Não avaliável com segurança pela baixa representatividade da amostra."]],
     stack:{pre:"- Arquitetura glandular alterada: ", itens:[
       ["perda do paralelismo","perda do paralelismo glandular"],["encurtamento","encurtamento glandular"],["ramificação","ramificação glandular"],
       ["rarefação","rarefação glandular"],["atrofia","atrofia glandular"],["superfície viliforme","superfície viliforme"],
@@ -816,9 +818,15 @@ const grupoEosAssoc=k=>{ const a=EOS_ASSOC[k]; return {g:"Eosinófilos: achados 
 const AM_LINHA = {exigua:"Amostra exígua, pouco representativa.", superficial:"Amostra superficial, pouco representativa."};
 const AM_PRE = {exigua:"EXÍGUO FRAGMENTO DE ", superficial:"FRAGMENTO SUPERFICIAL DE "};
 const MUC_SITIO = {esofago:"MUCOSA ESOFÁGICA", gastrica:"MUCOSA GÁSTRICA", duodeno:"MUCOSA DUODENAL", ileo:"MUCOSA DE ÍLEO", colon:"MUCOSA COLÔNICA", reto:"MUCOSA RETAL"};
+// representatividade (v3.13): modificadores numa linha só, na ordem abaixo; sem modificador, linha explícita de adequada
+const AM_MODS = [["exigua","Exígua","exígua"],["superficial","Superficial","superficial"],["esmag","Esmagamento","com artefatos técnicos de esmagamento"],["cauter","Cauterização","com artefatos de cauterização (eletrocoagulação)"]];
+const AM_ADEQ = "- Representatividade da amostra: Adequada.";
+const RE_AM_LINHA = /^- Amostra (.+), pouco representativa\.$/, RE_AM_LINHAS = /^- (Amostra .+, pouco representativa\.|Representatividade da amostra: )/;
+function linhaAmostra(keys){ const it=AM_MODS.filter(m=>keys.includes(m[0])).map(m=>m[2]); return it.length ? "- Amostra "+juntar(it)+", pouco representativa." : AM_ADEQ; }
+function modsDaLinha(l){ const x=(l||"").match(RE_AM_LINHA); return x ? AM_MODS.filter(m=>x[1].includes(m[2])).map(m=>m[0]) : []; }
 ["esofago","gastrica","duodeno","ileo","colon"].forEach(k=>{
   const site=SEED_SITES[k], normais=site.presets.filter(p=>/^MUCOSA .*SEM (ALTERAÇÕES|PARTICULARIDADES) HISTO(PATO)?LÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
-  normais.forEach(p=>site.presets.push(P(AM_PRE.exigua+p.titulo, [AM_LINHA.exigua].concat(p.bullets))));
+  normais.forEach(p=>site.presets.push(P("AMOSTRA POUCO REPRESENTATIVA DE "+p.titulo, [AM_LINHA.exigua].concat(p.bullets))));
 });
 
 // Reto: mesmos textos do cólon, com a nomenclatura de reto
@@ -875,8 +883,15 @@ SEED_SITES.gastrica.presets.forEach(p=>{
   if(m && i>=0) p.bullets[i]=LINHA_ATIV.gastrica[["LEVE","MODERADA","ACENTUADA"].indexOf(m[1])+1];
 });
 // agregados linfoides (estômago e íleo), metaplasia foveolar gástrica e atrofia vilositária (duodeno e íleo), grau da duodenite (Whitehead 1975)
-const RE_MARSH=/^- Classificação de Marsh-Oberhuber \(1999\): (0|1|2|3A|3B|3C)\b/, RE_CORAZZA=/^- Classificação de Corazza-Villanacci \(2007\): /;
+const RE_MARSH=/^- Classificação de Marsh-Oberhuber \(1999\): (0|1|2|3A|3B|3C|Não se aplica)\b/, RE_CORAZZA=/^- Classificação de Corazza-Villanacci \(2007\): /;
 const CORAZZA = {A:"A (não atrófica)", B1:"B1 (atrófica, relação vilosidade/cripta menor que 3:1, vilosidades ainda identificáveis)", B2:"B2 (atrófica, vilosidades não identificáveis)"};
+// código do Marsh na linha ("NA" = não se aplica)
+const mCode=l=>{ const x=(l||"").match(RE_MARSH); return x ? (x[1]==="Não se aplica" ? "NA" : x[1]) : null; };
+// cortes de linfócitos intraepiteliais por 100 enterócitos no duodeno: Marsh-Oberhuber a partir de 30 (tabelinha do Pedro; tipo 0 abaixo de 30), Corazza-Villanacci acima de 25 (Corazza 2007)
+const MARSH_CORTE=30, CORAZZA_CORTE=25;
+// sem linfocitose acima do corte, só a atrofia (ou a hiperplasia de criptas) não classifica: "NA"; sem atrofia, Marsh 0
+function marshDe(a, n){ return (n||0)>=MARSH_CORTE ? (a==="01" ? "1" : a) : (a==="01" ? "0" : "NA"); }
+function corazzaDe(a, n){ return (n||0)>CORAZZA_CORTE ? (a==="3C" ? "B2" : (a==="3A"||a==="3B") ? "B1" : "A") : "NA"; }
 const OPT_AGREG = {g:"Agregados linfoides", opt:[["Presentes","- Agregados linfoides: Presentes."],["Ausentes","- Agregados linfoides: Não identificados."]]};
 const OPT_MET_FOV = {g:"Metaplasia foveolar gástrica", dica:"Grau qualitativo (não há escala publicada conferida; Whitehead 1975 registra a metaplasia gástrica superficial só como presente ou ausente).",
   opt:[["Não identificada","- Metaplasia foveolar gástrica: Não identificada."],["Leve","- Metaplasia foveolar gástrica: Presente, leve."],
@@ -897,16 +912,17 @@ const ATR_DUO = [
   ["Leve (3A · B1)","- Atrofia vilositária: Presente, leve (encurtamento leve a moderado das vilosidades, ainda identificáveis; relação vilosidade/cripta menor que 3:1), acompanhada de criptas hipertróficas.","3A"],
   ["Moderada (3B · B1)","- Atrofia vilositária: Presente, moderada (apenas restos curtos de vilosidades, ainda identificáveis; relação vilosidade/cripta menor que 3:1), acompanhada de criptas hipertróficas.","3B"],
   ["Acentuada (3C · B2)","- Atrofia vilositária: Presente, acentuada (mucosa plana, sem vilosidades identificáveis), acompanhada de criptas hipertróficas.","3C"]];
-const OPT_ATR_DUO = {g:"Atrofia vilositária (Marsh-Oberhuber / Corazza-Villanacci)", dica:"Uma linha só, logo abaixo do título: dá o Marsh-Oberhuber (Oberhuber 1999) e o Corazza-Villanacci (Corazza 2007), e os dois vão ao título. Sem atrofia: Marsh 0, ou 1 com linfocitose intraepitelial presente.",
+const OPT_ATR_DUO = {g:"Atrofia vilositária (Marsh-Oberhuber / Corazza-Villanacci)", dica:"Uma linha só, logo abaixo do título. Com a linfocitose intraepitelial, dá o Marsh-Oberhuber (Oberhuber 1999; 30 ou mais por 100 enterócitos) e o Corazza-Villanacci (Corazza 2007; mais de 25), e os dois vão ao título. Sem linfocitose acima do corte, a atrofia sozinha não classifica: Não se aplica (sem atrofia, Marsh 0).",
   opt:ATR_DUO.map(([r,l])=>[r,l])};
 const RE_ATR_DUO=/^- (Atrofia vilositária|Arquitetura (?:preservada|alterada)|Relação vilosidade\/cripta): /;
 // título do duodeno: ", COM ATROFIA VILOSITÁRIA X (MARSH-OBERHUBER m; CORAZZA-VILLANACCI k)" antes da atividade; Marsh 1-2 só os parênteses
 const RE_T_DUOCL=/,? (?:COM ATROFIA VILOSITÁRIA (?:LEVE|MODERADA|ACENTUADA)(?: \(MARSH-OBERHUBER [^)]*\))?|\(MARSH-OBERHUBER [^)]*\))/;
 const ATR_TIT={"3A":"LEVE", "3B":"MODERADA", "3C":"ACENTUADA"};
-function titleSetMarshDuo(t, m, comClass){
+function titleSetMarshDuo(t, m, comClass, a, ca){
   if(!/DUODENITE/.test(t)) return t;
-  const x=t.replace(RE_T_DUOCL, "").replace(/DUODENITE CRÔNICA, (EM ATIVIDADE|INATIVA)/, "DUODENITE CRÔNICA $1"), par = comClass && m && m!=="0" ? "(MARSH-OBERHUBER "+m+"; CORAZZA-VILLANACCI "+corazzaDoMarsh(m)+")" : "";
-  const novo = ATR_TIT[m] ? ", COM ATROFIA VILOSITÁRIA "+ATR_TIT[m]+(par ? " "+par : "") : (par ? " "+par : "");
+  if(a===undefined) a=m; if(ca===undefined) ca=corazzaDoMarsh(m);
+  const x=t.replace(RE_T_DUOCL, "").replace(/DUODENITE CRÔNICA, (EM ATIVIDADE|INATIVA)/, "DUODENITE CRÔNICA $1"), par = comClass && m && m!=="0" && m!=="NA" ? "(MARSH-OBERHUBER "+m+"; CORAZZA-VILLANACCI "+ca+")" : "";
+  const novo = ATR_TIT[a] ? ", COM ATROFIA VILOSITÁRIA "+ATR_TIT[a]+(par ? " "+par : "") : (par ? " "+par : "");
   if(!novo) return x;
   const k=x.search(/,? (?:EM ATIVIDADE|INATIVA)\b/);
   if(k>=0) return x.slice(0,k)+novo+(x[k]==="," ? "" : ",")+x.slice(k);
@@ -1282,6 +1298,13 @@ const NOTA_DESC_INESP="os achados de descamação superficial descritos são ine
 const NOTA_EDS_BOLHA="bolhas e clivagem intraepitelial proeminentes exigem exclusão de dermatoses vesicobolhosas (síndrome de Stevens-Johnson, pênfigo, penfigoide), por imunofluorescência e correlação clínica [@carmack09].";
 const NOTA_EXIGUA="o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral.";
 const NOTA_SUPERF="o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral.";
+// nota de viés amostral com os modificadores presentes (exígua sozinha: texto de antes)
+function notaAmostra(keys){
+  const adj=["exigua","superficial"].filter(k=>keys.includes(k)), art=[["esmag","técnicos de esmagamento"],["cauter","de cauterização"]].filter(x=>keys.includes(x[0])).map(x=>x[1]), p=[];
+  if(adj.length) p.push(adj.length===1 && adj[0]==="exigua" ? "pela exiguidade da amostra" : "pela representação "+juntar(adj.map(k=>k==="exigua" ? "exígua" : "superficial"))+" da amostra");
+  if(art.length) p.push("por artefatos "+(art.length===2 ? "técnicos de esmagamento e de cauterização" : art[0]));
+  return p.length ? "o exame histopatológico foi prejudicado "+p.join(" e ")+". Considerar viés amostral." : "";
+}
 
 const REFS_HEADER = "REFERÊNCIAS BIBLIOGRÁFICAS:";
 // REFS do SEED (tag eosinofílica; tags/CRUD chegam na Etapa 3)
@@ -1314,7 +1337,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.12.0";
+const APP_VERSION="3.13.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1333,6 +1356,45 @@ function load(k){ try{return JSON.parse(localStorage.getItem(k));}catch(e){retur
 function store(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 const $=id=>document.getElementById(id);
 const letterOf=i=>String.fromCharCode(65+i);
+
+// Ressecção intestinal / ostomia (modelos do Pedro): laudo por camadas; porções "SEGMENTO DE INTESTINO" e "MARGEM \"n\"", cada uma com os diagnósticos logo abaixo
+const RE_RES_PORCAO=/^- (SEGMENTO DE INTESTINO|MARGEM "[^"]*"):$/;
+const RES_DIAG=["MUCOSA ENTÉRICA ATRÓFICA","MUCOSA ENTÉRICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS","MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA","MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS","PROCESSO INFLAMATÓRIO MISTO, ULCERADO","PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA","A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS (VIDE NOTAS)"];
+// porção nova no fim do texto (margens numeradas em sequência)
+function resPorcao(tipo){
+  const ta=$("corpo"), ls=ta.value.trim() ? ta.value.replace(/\s+$/,"").split("\n") : [];
+  const n=ls.filter(l=>/^- MARGEM "/.test(l.trim())).length+1;
+  ls.push(tipo==="seg" ? "- SEGMENTO DE INTESTINO:" : '- MARGEM "'+n+'":'); ta.value=ls.join("\n");
+  prevTit=ultimoTitulo(ta.value); snapEditor();
+}
+// diagnóstico da porção: logo abaixo dos títulos da porção em edição (a última)
+function resDiag(x){
+  const ta=$("corpo"), ls=ta.value.trim() ? ta.value.replace(/\s+$/,"").split("\n") : [], b=blocoAtual(ls);
+  ls.splice(b.st+1, 0, "- "+x+":"); ta.value=ls.join("\n");
+  prevTit=ultimoTitulo(ta.value); snapEditor();
+}
+SEED_SITES.resseccao = {
+  nome:"Ressecção intestinal / ostomia", nomeAmostra:"Segmento intestinal", eos:"",
+  segmentos:["Intestino delgado","Cólon","Ostomia","Anastomose"],
+  presets:[
+    P("ENTERITE CRÔNICA AGUDIZADA, INESPECÍFICA (VIDE NOTA)",["Mucosa entérica com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado.","Submucosa apresenta edema, vasocongestão, infiltrado inflamatório mononuclear leve e presença de células ganglionares.","Camada muscular própria apresentando infiltrado inflamatório misto, com presença de neutrófilos, e focos de fibrose e neoformação vascular capilar, além de vasocongestão.","Subserosa/serosa apresentando edema, vasocongestão, neoformação vascular capilar, infiltrado inflamatório mononuclear leve e fibrose.","Não foram identificados granulomas.","Não foram identificadas células atípicas ou heterólogas."]),
+    P("SEGMENTO DE INTESTINO",["MUCOSA ENTÉRICA ATRÓFICA:","PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO:","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA:","Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico acentuado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração, além de granulomas supurativos mucosos e submucosos, com eosinófilos ao seu redor.","Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, rico em eosinófilos, edema e vasocongestão.","Subserosa apresenta edema e vasocongestão.","Não foram identificados linfonodos peri-intestinais no material examinado.","A pesquisa para agentes infecciosos específicos foi negativa com as colorações histoquímicas realizadas (HE, PAS sem diastase, Grocott e Ziehl-Neelsen).","Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.","MARGEM \"1\":","MUCOSA ENTÉRICA ATRÓFICA:","PROCESSO INFLAMATÓRIO MISTO, ULCERADO:","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA:","A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS (VIDE NOTAS):","Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico moderado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração.","Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, edema e vasocongestão.","Subserosa apresenta infiltrado inflamatório mononuclear leve associado a células gigantes multinucleadas tipo corpo estranho, edema e vasocongestão.","Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.","MARGEM \"2\":","MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA:","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA:","Mucosa de padrão colônico apresentando alteração da arquitetura glandular (ramificação) e celularidade da lâmina própria preservada.","Submucosa apresenta vasocongestão.","Camada muscular própria de aspecto histológico preservado.","Subserosa apresenta edema e vasocongestão.","Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.","Não foram identificadas células atípicas ou heterólogas no material examinado."])
+  ],
+  criterios:[
+    {g:"Porção", fx:[["Segmento de intestino",()=>resPorcao("seg")],["Margem (próxima)",()=>resPorcao("margem")]],
+      dica:"Entra no fim do texto; as margens são numeradas em sequência (\"1\", \"2\"…). No laudo, os diagnósticos de cada porção ficam no topo e as camadas sob \"- MICROSCOPIA:\"."},
+    {g:"Diagnósticos da porção", fx:RES_DIAG.map(x=>[x.charAt(0)+x.slice(1).toLowerCase().replace(/ \(vide notas\)$/, ""), ()=>resDiag(x)]), dica:"Entram logo abaixo do título da porção em edição, em caixa alta."},
+    {g:"Mucosa", opt:[["Mucosa entérica alterada (focal)","- Mucosa entérica com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado."],["Mucosa entérica atrófica, atividade acentuada","- Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico acentuado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração, além de granulomas supurativos mucosos e submucosos, com eosinófilos ao seu redor."],["Mucosa entérica atrófica, atividade moderada","- Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico moderado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração."],["Mucosa colônica alterada","- Mucosa de padrão colônico apresentando alteração da arquitetura glandular (ramificação) e celularidade da lâmina própria preservada."],["Mucosa entérica preservada","- Mucosa de padrão entérico com vilosidades preservadas e celularidade da lâmina própria preservada, não sendo identificada criptite, microabscessos, erosão ou ulceração."]]},
+    {g:"Submucosa", opt:[["Edema, vasocongestão, infiltrado leve","- Submucosa apresenta edema, vasocongestão, infiltrado inflamatório mononuclear leve e presença de células ganglionares."],["Vasocongestão","- Submucosa apresenta vasocongestão."],["Com muscular própria: misto, rico em eosinófilos","- Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, rico em eosinófilos, edema e vasocongestão."],["Com muscular própria: misto","- Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, edema e vasocongestão."]]},
+    {g:"Camada muscular própria", opt:[["Infiltrado misto, fibrose","- Camada muscular própria apresentando infiltrado inflamatório misto, com presença de neutrófilos, e focos de fibrose e neoformação vascular capilar, além de vasocongestão."],["Preservada","- Camada muscular própria de aspecto histológico preservado."]]},
+    {g:"Subserosa / serosa", opt:[["Edema, neoformação vascular, fibrose","- Subserosa/serosa apresentando edema, vasocongestão, neoformação vascular capilar, infiltrado inflamatório mononuclear leve e fibrose."],["Edema e vasocongestão","- Subserosa apresenta edema e vasocongestão."],["Células gigantes tipo corpo estranho","- Subserosa apresenta infiltrado inflamatório mononuclear leve associado a células gigantes multinucleadas tipo corpo estranho, edema e vasocongestão."]]},
+    {g:"Células ganglionares", opt:[["Presentes nos plexos","- Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria."]]},
+    {g:"Granulomas", opt:[["Não identificados","- Não foram identificados granulomas."],["Supurativos","- Presença de granulomas supurativos mucosos e submucosos."]]},
+    {g:"Agentes infecciosos", opt:[["Pesquisa negativa (HE, PAS, Grocott, ZN)","- A pesquisa para agentes infecciosos específicos foi negativa com as colorações histoquímicas realizadas (HE, PAS sem diastase, Grocott e Ziehl-Neelsen)."]]},
+    {g:"Linfonodos", opt:[["Não identificados","- Não foram identificados linfonodos peri-intestinais no material examinado."]]},
+    {g:"Células atípicas", opt:[["Não identificadas","- Não foram identificadas células atípicas ou heterólogas no material examinado."]]}
+  ]
+};
 
 const LIB = (()=>{
   const sites={}, siteOrder=Object.keys(SEED_SITES);
@@ -1477,7 +1539,13 @@ function linhaAtrDe(m, atual){
   if(m==="0" || m==="1") return /focalmente hipotróficas|Encurtamento focal/.test(atual||"") ? ATR_DUO[2][1] : ATR_DUO[0][1];
   return ATR_DUO.find(x=>x[2]===m)[1];
 }
-function marshOpt(m){ return SEED_SITES.duodeno.criterios.find(c=>c.g==="Marsh-Oberhuber (1999)").opt.find(o=>o[1].match(RE_MARSH)[1]===m)[1]; }
+function marshOpt(m){ return SEED_SITES.duodeno.criterios.find(c=>c.g==="Marsh-Oberhuber (1999)").opt.find(o=>mCode(o[1])===m)[1]; }
+// linfócitos intraepiteliais por 100 enterócitos na linha do trecho (null sem linha; "Presente" sem número conta como acima do corte)
+function lieDoBloco(){ const l=linhaDoBloco(/^- Linfocitose intraepitelial: /); if(!l) return null;
+  const x=l.match(/(\d+) linfócitos\/100 enterócitos/); return x ? +x[1] : /^- Linfocitose intraepitelial: Presente/.test(l) ? 99 : 0; }
+// Corazza do trecho: pela atrofia e pelos linfócitos; sem linha de linfocitose, pelo Marsh escolhido
+function corazzaDoBloco(m){ const atr=linhaDoBloco(RE_ATR_DUO), a=atr ? marshDaLinha(atr) : null, n=lieDoBloco();
+  return n===null || !a ? corazzaDoMarsh(m) : corazzaDe(a, n); }
 // linha de atrofia logo abaixo do título; Marsh e Corazza no fim do bloco
 function poeAtrDuo(line){
   const ta=$("corpo"), ls=ta.value.split("\n"), b=blocoAtual(ls); if(b.st<0) return;
@@ -1493,22 +1561,23 @@ function ordenaDuo(){
   corpo.splice(k, 0, ...fim); corpo.unshift(...ini);
   ls.splice(b.st+1, b.fim-b.st-1, ...corpo); ta.value=ls.join("\n");
 }
-// fonte: "linha" (atrofia ou linfocitose clicada/editada), "marsh" (classificação), "titulo" (título editado); dado = Marsh
+// fonte: "linha" (atrofia ou linfocitose clicada/editada), "marsh" (classificação escolhida), "titulo" (atrofia/Corazza editados no título); dado = Marsh
+// a = atrofia ("01" sem atrofia, "2" hiperplasia de criptas, "3A"-"3C"); com "linha" e "titulo", o Marsh sai da atrofia + linfocitose (sem linha de linfocitose, só da atrofia)
 function duoSinc(fonte, dado){
-  const atr=linhaDoBloco(RE_ATR_DUO), ml=linhaDoBloco(RE_MARSH);
-  let m = fonte==="linha" ? (atr ? marshDaLinha(atr) : ml ? ml.match(RE_MARSH)[1] : null) : dado;
+  const atr=linhaDoBloco(RE_ATR_DUO), ml=linhaDoBloco(RE_MARSH), d01=c=>c==="0"||c==="1" ? "01" : c==="NA" ? null : c;
+  let a, m;
+  if(fonte==="marsh"){ m=dado; a = m==="NA" ? (atr ? marshDaLinha(atr) : null) : d01(m); }
+  else { a = fonte==="titulo" ? d01(dado) : atr ? marshDaLinha(atr) : d01(mCode(ml)); if(!a) return; const n=lieDoBloco(); m = n===null ? (a==="01" ? "0" : a) : marshDe(a, n); }
   if(!m) return;
-  if(m==="01") m = linhaDoBloco(/^- Linfocitose intraepitelial: Presente/) ? "1" : "0";
-  const nova=linhaAtrDe(m, atr);
-  if(atr!==nova) poeAtrDuo(nova);
+  if(a){ const nova=linhaAtrDe(a==="01" ? "0" : a, atr); if(atr!==nova) poeAtrDuo(nova); }
   if(ml && marshOpt(m)!==ml) setLinha(marshOpt(m));
   corazzaSinc();
-  editTitle(t=>titleSetMarshDuo(t, m, !!ml));
+  editTitle(t=>titleSetMarshDuo(t, m, !!ml, a, corazzaDoBloco(m)));
   ordenaDuo();
 }
 // título editado -> Marsh: o item que mudou (Marsh, atrofia ou Corazza) decide
 function marshDoTitulo(N, A){
-  const cur=((linhaDoBloco(RE_MARSH)||"").match(RE_MARSH)||[])[1]||null;
+  const cur=mCode(linhaDoBloco(RE_MARSH));
   if(N.mo!==A.mo) return N.mo || "01";
   if(N.at!==A.at) return N.at ? {LEVE:"3A", MODERADA:"3B", ACENTUADA:"3C"}[N.at] : "01";
   if(N.ca==="A") return ["1","2"].includes(cur) ? cur : "1";
@@ -1572,6 +1641,7 @@ function unidades(samples, rotDe){
 function reconciliaTrecho(){
   const site=siteAtivo(), ls=$("corpo").value.split("\n"), b=blocoAtual(ls); if(b.st<0) return;
   if(site==="hirschsprung"){ hsSinc(); return; }
+  if(site==="resseccao") return;
   const linhas=ls.slice(b.st+1, b.fim), teg=!!b.teg && porcaoAtiva==="gas";
   linhas.forEach(l=>{
     if(/^- Pesquisa para H\. pylori: /.test(l)) editTitle(t=>titleSetHp(t, /Positiva/.test(l)));
@@ -1581,7 +1651,7 @@ function reconciliaTrecho(){
   });
   if(site==="duodeno") editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(linhas.join("\n"))));
   const tipo = teg ? (linhas.includes(TEG_AM.exsup.l) ? "exsup" : linhas.includes(TEG_AM.exigua.l) ? "exigua" : linhas.includes(TEG_AM.superficial.l) ? "superficial" : null)
-    : linhas.some(l=>/^- Amostra exígua, /.test(l)) ? "exigua" : linhas.some(l=>/^- Amostra superficial, /.test(l)) ? "superficial" : null;
+    : linhas.some(l=>RE_AM_LINHA.test(l)) ? "pouco" : null;
   if((teg || (MUC_SITIO[site] && !b.teg)) && itensTitulo(tituloAtivo(), ls[b.st], teg).am!==tipo){
     if(teg){ const l2=$("corpo").value.split("\n"), b2=blocoAtual(l2); l2[b2.st]=subSetAmostraTEG(l2[b2.st], tipo); $("corpo").value=l2.join("\n"); }
     else editTitle(t=>titleSetAmostra(t, tipo, site));
@@ -1605,7 +1675,7 @@ function snapEditor(){
 function marshSincMao(){
   if(!duoPrev) return;
   const m=linhaDoBloco(RE_MARSH), atr=linhaDoBloco(RE_ATR_DUO), lie=linhaDoBloco(/^- Linfocitose intraepitelial: /);
-  if(m && m!==duoPrev.m) duoSinc("marsh", m.match(RE_MARSH)[1]);
+  if(m && m!==duoPrev.m) duoSinc("marsh", mCode(m));
   else if((atr && (atr!==duoPrev.atr || !ATR_DUO.some(x=>x[1]===atr))) || (lie && lie!==duoPrev.lie)) duoSinc("linha");
 }
 function ressincTEG(){
@@ -1631,7 +1701,7 @@ function vr(text){
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
-  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- Amostra (exígua|superficial), /, /^- Classificação de Marsh-Oberhuber \(1999\): /];
+  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- (Amostra .+, pouco representativa\.|Representatividade da amostra: )/, /^- Classificação de Marsh-Oberhuber \(1999\): /];
 function setLinha(line){
   const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [], b=blocoAtual(ls), start=b.st;
   const lab=line.match(/^- ([^:(]{3,45}): /), fam=FAMILIAS.find(f=>f.test(line));
@@ -1914,21 +1984,43 @@ function linhaNeutroDoBloco(){
   const ls=$("corpo").value.split("\n"), b=blocoAtual(ls);
   return ls.find((l,i)=>i>b.st && i<b.fim && RE_NEUTRO.test(l)) || null;
 }
-// amostra exígua/superficial: prefixo do título (padrão "EXÍGUO FRAGMENTO DE MUCOSA … APRESENTANDO …") e linha de amostragem
-const RE_AM_PRE=/^(EXÍGUOS? FRAGMENTOS? DE |FRAGMENTOS? SUPERFICIA(?:L|IS) DE )/;
+// representatividade: "AMOSTRA POUCO REPRESENTATIVA DE MUCOSA X, APRESENTANDO …" (v3.13); lê também "EXÍGUO FRAGMENTO DE…" e "FRAGMENTO SUPERFICIAL DE…"
+const RE_AM_PRE=/^(EXÍGUOS? FRAGMENTOS? DE |FRAGMENTOS? SUPERFICIA(?:L|IS) DE |AMOSTRA POUCO REPRESENTATIVA DE )/;
+function tiraPreAmostra(t, muc){
+  if(!RE_AM_PRE.test(t)) return t;
+  t=t.replace(RE_AM_PRE,"");
+  if(muc && t.startsWith(muc+", APRESENTANDO ")) return t.slice(muc.length+15);
+  if(muc && t.startsWith(muc+" APRESENTANDO ")) return t.slice(muc.length+14);
+  return t.replace(/, APRESENTANDO$/, " APRESENTANDO");
+}
 function titleSetAmostra(title, tipo, site){
-  const muc=MUC_SITIO[site]; let t=title.replace(/^- /,"").replace(/:$/,"");
-  if(RE_AM_PRE.test(t)){ t=t.replace(RE_AM_PRE,""); if(muc && t.startsWith(muc+" APRESENTANDO ")) t=t.slice(muc.length+14); }
+  const muc=MUC_SITIO[site]; let t=tiraPreAmostra(title.replace(/^- /,"").replace(/:$/,""), muc);
+  if(tipo) t = "AMOSTRA POUCO REPRESENTATIVA DE "+(/^MUCOSA /.test(t) || !muc ? t.replace(/ APRESENTANDO$/, ", APRESENTANDO") : muc+", APRESENTANDO "+t);
+  return "- "+t+":";
+}
+// na transição esofagogástrica, o padrão da v3.11 (prefixo de exígua/superficial)
+function titleSetAmostraTEG(title, tipo, site){
+  const muc=MUC_SITIO[site]; let t=tiraPreAmostra(title.replace(/^- /,"").replace(/:$/,""), muc);
   if(tipo) t = /^MUCOSA /.test(t) || !muc ? AM_PRE[tipo]+t : AM_PRE[tipo]+muc+" APRESENTANDO "+t;
   return "- "+t+":";
 }
+// grupo de representatividade: linha logo abaixo do título (troca a anterior) e título; keys vazio = adequada
+function amostraMods(keys){
+  const ta=$("corpo"), site=siteAtivo(), ls=ta.value.split("\n"), b=blocoAtual(ls);
+  for(let i=b.fim-1;i>b.st;i--) if(RE_AM_LINHAS.test(ls[i])) ls.splice(i,1);
+  ls.splice(b.st+1, 0, linhaAmostra(keys)); ta.value=ls.join("\n");
+  const ok=b.st>=0 && editTitle(t=>titleSetAmostra(t, keys.length ? "pouco" : null, site));
+  prevTit=ultimoTitulo(ta.value); snapEditor();
+  return ok;
+}
 function amostraMod(tipo){
   if(isTEG() && porcaoAtiva==="gas") return amostraModTEG(tipo);
+  if(!isTEG()) return amostraMods(tipo ? [tipo] : []);
   const ta=$("corpo"), site=siteAtivo();
   if(tipo) appendLine("- "+AM_LINHA[tipo]);
   else { const ls=ta.value.split("\n"); let st=-1; for(let i=ls.length-1;i>=0;i--) if(lineKind(ls[i])==="b"){ st=i; break; }
     const j=ls.findIndex((l,i)=>i>st && /^- Amostra (exígua|superficial), /.test(l)); if(j>=0){ ls.splice(j,1); ta.value=ls.join("\n"); } }
-  const ok=editTitle(t=>titleSetAmostra(t, tipo, site));
+  const ok=editTitle(t=>titleSetAmostraTEG(t, tipo, site));
   prevTit=ultimoTitulo(ta.value); snapEditor();
   return ok;
 }
@@ -1942,7 +2034,7 @@ const GAS_SEG = {
   "Misto oxíntico/mucinoso":{tit:"EM MUCOSA DE PADRÃO MISTO OXÍNTICO/MUCINOSO", am:"Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso.", norm:"MUCOSA GÁSTRICA DE PADRÃO MISTO OXÍNTICO/MUCINOSO", re:/MISTO OXÍNTICO\/MUCINOSO/}
 };
 const RE_GAS_TIT=/EM MUCOSA (?:DE ANTRO|DE PADRÃO OXÍNTICO \(CORPO\/FUNDO\)|OXÍNTICA \((?:PADRÃO )?CORPO\/FUNDO\)|DE TRANSIÇÃO CORPO-ANTRO|DE PADRÃO MISTO OXÍNTICO\/MUCINOSO|DE PADRÃO CÁRDIA)/;
-const RE_GAS_NORM=/^(- (?:(?:EXÍGUO FRAGMENTO|FRAGMENTO SUPERFICIAL) DE )?)MUCOSA GÁSTRICA DE (?:PADRÃO ANTRAL|PADRÃO OXÍNTICO|TRANSIÇÃO CORPO-ANTRO|PADRÃO MISTO OXÍNTICO\/MUCINOSO|PADRÃO CÁRDIA)/;
+const RE_GAS_NORM=/^(- (?:(?:EXÍGUO FRAGMENTO|FRAGMENTO SUPERFICIAL|AMOSTRA POUCO REPRESENTATIVA) DE )?)MUCOSA GÁSTRICA DE (?:PADRÃO ANTRAL|PADRÃO OXÍNTICO|TRANSIÇÃO CORPO-ANTRO|PADRÃO MISTO OXÍNTICO\/MUCINOSO|PADRÃO CÁRDIA)/;
 const RE_GAS_AM=/^- Amostragem: Mucosa gástrica de (?:padrão antral|padrão oxíntico \(corpo\/fundo\)|transição corpo-antro|padrão misto oxíntico\/mucinoso|padrão cárdia \(glândulas mucinosas\))\.$/;
 function gasTitulo(t, g){ return t.replace(RE_GAS_TIT, g.tit).replace(RE_GAS_NORM, (x,pre)=>pre+g.norm); }
 function adaptaGas(txt, seg){
@@ -1958,13 +2050,15 @@ function gasTextos(site, seg){
     if(!vistos.has(q.titulo)){ vistos.add(q.titulo); out.push(q); } });
   return out.sort((a,b)=>a.i-b.i);
 }
-// duodeno: Corazza-Villanacci (2007) preenchida a partir do Marsh-Oberhuber: 1 e 2 -> A; 3A e 3B -> B1; 3C -> B2; 0 -> sem linha
-function corazzaDoMarsh(m){ return m==="0" ? null : (m==="1"||m==="2") ? "A" : m==="3C" ? "B2" : "B1"; }
-function linhaCorazza(k){ return "- Classificação de Corazza-Villanacci (2007): "+CORAZZA[k]+" [@corazza07]."; }
+// duodeno: Corazza-Villanacci (2007) logo abaixo do Marsh-Oberhuber, pela atrofia e pela linfocitose (acima de 25): A, B1, B2 ou "Não se aplica";
+// sem linha de linfocitose, pelo Marsh: 1 e 2 -> A; 3A e 3B -> B1; 3C -> B2. Com Marsh 0 e sem critério de Corazza, sem linha
+function corazzaDoMarsh(m){ return m==="0" ? null : m==="NA" ? "NA" : (m==="1"||m==="2") ? "A" : m==="3C" ? "B2" : "B1"; }
+function linhaCorazza(k){ return "- Classificação de Corazza-Villanacci (2007): "+(k==="NA" ? "Não se aplica." : CORAZZA[k]+" [@corazza07]."); }
 function corazzaSinc(){
-  const ta=$("corpo"), ls=ta.value.split("\n"), st=blocoAtual(ls).st;
-  const im=ls.findIndex((l,i)=>i>st && RE_MARSH.test(l)); if(im<0) return;
-  const k=corazzaDoMarsh(ls[im].match(RE_MARSH)[1]), ic=ls.findIndex((l,i)=>i>st && RE_CORAZZA.test(l));
+  const ta=$("corpo"), ls0=ta.value.split("\n"), st0=blocoAtual(ls0).st;
+  const im0=ls0.findIndex((l,i)=>i>st0 && RE_MARSH.test(l)); if(im0<0) return;
+  const m=mCode(ls0[im0]); let k=corazzaDoBloco(m); if(k==="NA" && m==="0") k=null;
+  const ls=ta.value.split("\n"), st=blocoAtual(ls).st, ic=ls.findIndex((l,i)=>i>st && RE_CORAZZA.test(l));
   if(ic>=0) ls.splice(ic,1);
   const j=ls.findIndex((l,i)=>i>st && RE_MARSH.test(l));
   if(k) ls.splice(j+1, 0, linhaCorazza(k));
@@ -2036,6 +2130,7 @@ function edsSinc(){
 function sincAposLinha(line){
   const site=siteAtivo();
   if(site==="hirschsprung"){ hsSinc(); return; }
+  if(site==="resseccao") return;
   if(RE_NEUTRO.test(line)) editTitle(t=>tituloComAtiv(t, grauDaLinha(line)));
   else if(/^- Pesquisa para H\. pylori: /.test(line)){
     const pos=/Positiva/.test(line);
@@ -2046,7 +2141,7 @@ function sincAposLinha(line){
   else if(/^- Displasia: /.test(line)) editTitle(t=>titleSetDisplasia(t, line));
   else if(site==="gastrica" && RE_GAS_AM.test(line)){ const g=Object.values(GAS_SEG).find(x=>"- "+x.am===line); editTitle(t=>gasTitulo(t, g)); }
   else if(/^- Grau da duodenite: /.test(line)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(line)));
-  else if(RE_MARSH.test(line)) duoSinc("marsh", line.match(RE_MARSH)[1]);
+  else if(RE_MARSH.test(line)) duoSinc("marsh", mCode(line));
   else if(site==="duodeno" && (RE_ATR_DUO.test(line) || /^- Linfocitose intraepitelial: /.test(line))) duoSinc("linha");
   if(/eosinófilos?\/campo de grande aumento|^- Achados eosinofílicos associados: /.test(line)) eosSinc();
   if(site==="esofago" && /^- Achados de descamação superficial: /.test(line)) edsSinc();
@@ -2092,7 +2187,7 @@ function itensTitulo(tit, raw, teg){
     disp: d ? (d[2] ? "- Displasia: Presente, "+(d[1] ? d[1].toLowerCase()+" " : "")+"de "+d[2].toLowerCase()+" grau." : "- Displasia: Não identificada.") : null,
     wh: wh ? wh[1] : null,
     am: teg ? (/^REPRESENTAÇÃO EXÍGUA E SUPERFICIAL/.test(rest) ? "exsup" : /^REPRESENTAÇÃO EXÍGUA/.test(rest) ? "exigua" : /^REPRESENTAÇÃO SUPERFICIAL/.test(rest) ? "superficial" : null)
-      : /^- EXÍGUOS? FRAGMENTOS? DE /.test(tit) ? "exigua" : /^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /.test(tit) ? "superficial" : null,
+      : /^- EXÍGUOS? FRAGMENTOS? DE /.test(tit) ? "exigua" : /^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /.test(tit) ? "superficial" : /^- AMOSTRA POUCO REPRESENTATIVA DE /.test(tit) ? "pouco" : null,
     eds: RE_T_EDS_FULL.test(tit) || RE_T_EDS_TR.test(tit),
     duo: {mo:(tit.match(/MARSH-OBERHUBER (0|1|2|3A|3B|3C)\b/)||[])[1]||null, at:(tit.match(/COM ATROFIA VILOSITÁRIA (LEVE|MODERADA|ACENTUADA)/)||[])[1]||null, ca:(tit.match(/CORAZZA-VILLANACCI (A|B1|B2)\b/)||[])[1]||null}};
 }
@@ -2106,14 +2201,26 @@ function tituloParaAchados(antes){
     if(N.mi!==A.mi && (N.mi || /GASTRITE|ESOFAGITE/.test(tit))) poeLinhaNoBloco(N.mi || "- Metaplasia intestinal: Não identificada.");
     if(N.disp!==A.disp && N.disp) poeLinhaNoBloco(N.disp);
   }
-  if(site==="duodeno" && ["mo","at","ca"].some(k=>N.duo[k]!==A.duo[k])) duoSinc("titulo", marshDoTitulo(N.duo, A.duo));
+  if(site==="duodeno" && ["mo","at","ca"].some(k=>N.duo[k]!==A.duo[k])) duoSinc(N.duo.mo!==A.duo.mo ? "marsh" : "titulo", marshDoTitulo(N.duo, A.duo));
   if(site==="duodeno" && N.wh!==A.wh){ if(N.wh) poeLinhaNoBloco("- "+LINHA_WH[N.wh]); else tiraLinhaDoBloco(/^- Grau da duodenite: /); }
   if(N.am!==A.am && (teg || MUC_SITIO[site])){
     const lsT=Object.values(TEG_AM).map(x=>x.l);
-    tiraLinhaDoBloco({test:l=>/^- Amostra (exígua|superficial), /.test(l) || (teg && lsT.includes(l))});
-    if(N.am) poeLinhaNoBloco(teg ? TEG_AM[N.am].l : "- "+AM_LINHA[N.am]);
+    if(teg || b.teg){
+      tiraLinhaDoBloco({test:l=>/^- Amostra (exígua|superficial), /.test(l) || (teg && lsT.includes(l))});
+      if(N.am) poeLinhaNoBloco(teg ? TEG_AM[N.am].l : "- "+AM_LINHA[N.am]);
+    }
+    // fora da transição: o título manda na presença; com "AMOSTRA POUCO REPRESENTATIVA" escrito à mão, a linha de modificadores que houver fica
+    else if(!N.am) amostraModsLinha([]);
+    else if(N.am!=="pouco" || !linhaDoBloco(RE_AM_LINHA)) amostraModsLinha(N.am==="pouco" ? null : [N.am]);
   }
   if(site==="esofago" && N.eds && !A.eds && edsEstado(ls.slice(b.st+1, b.fim).join("\n"))!=="suficiente") poeLinhaNoBloco(L_EDS_COMPLETA);
+}
+// linha de representatividade sem mexer no título (keys null: só tira a de adequada)
+function amostraModsLinha(keys){
+  const ta=$("corpo"), ls=ta.value.split("\n"), b=blocoAtual(ls); if(b.st<0) return;
+  for(let i=b.fim-1;i>b.st;i--) if(keys ? RE_AM_LINHAS.test(ls[i]) : ls[i]===AM_ADEQ) ls.splice(i,1);
+  if(keys) ls.splice(b.st+1, 0, linhaAmostra(keys));
+  ta.value=ls.join("\n");
 }
 // roda quando o texto do editor é alterado à mão: frases pelas contagens e vínculo título <-> atividade
 function ressincEditor(){
@@ -2122,6 +2229,7 @@ function ressincEditor(){
   corrigeCampo("corpo");
   if(isTEG() && porcoesIdx(ta.value.split("\n")).length){ ressincTEG(); prevTit=ultimoTitulo(ta.value); renderAlertaEditor(); return; }
   if(site==="hirschsprung"){ if(hsBloco(ta.value).tits.join("\n")!==hsPrev) hsTitParaLinhas(); hsSinc(); }
+  if(site==="resseccao"){ prevTit=ultimoTitulo(ta.value); renderAlertaEditor(); return; }
   let tit=ultimoTitulo(ta.value), mudou=!!tit && tit!==prevTit;
   if(mudou && bloqueiaAtiv(prevTit)){ tit=ultimoTitulo(ta.value); mudou=false; }
   if(site==="gastrica" && mudou){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
@@ -2310,8 +2418,12 @@ function autoNotas(){
       add(L_, NOTA_EOS_QUAL);
     }
     if(MUC_SITIO[s.site]){
-      if(/^- Amostra exígua|REPRESENTAÇÃO EXÍGUA/m.test(s.corpo||"")) add(L_, NOTA_EXIGUA);
-      if(/^- (Amostra superficial|Amostragem: Mucosa gástrica superficial)|REPRESENTAÇÃO (?:EXÍGUA E )?SUPERFICIAL/m.test(s.corpo||"")) add(L_, NOTA_SUPERF);
+      const lAm=s.teg ? null : (s.corpo||"").split("\n").find(l=>RE_AM_LINHA.test(l));
+      if(lAm) add(L_, notaAmostra(modsDaLinha(lAm)));
+      else {
+        if(/^- Amostra exígua|REPRESENTAÇÃO EXÍGUA/m.test(s.corpo||"")) add(L_, NOTA_EXIGUA);
+        if(/^- (Amostra superficial|Amostragem: Mucosa gástrica superficial)|REPRESENTAÇÃO (?:EXÍGUA E )?SUPERFICIAL/m.test(s.corpo||"")) add(L_, NOTA_SUPERF);
+      }
     }
     if(s.dech){ if(s.dech.viral && !extra.includes(NOTA_VIRAL)) extra.push(NOTA_VIRAL); if(!extra.includes(NOTA_DECH)) extra.push(NOTA_DECH); }
   });
@@ -2356,8 +2468,11 @@ function alertasDe(samples, rotDe){
     if(gt && gl && gt[1].slice(0,3).toLowerCase()!==gl[1].slice(0,3))
       out.push({conf:true, msg:rot+": o título diz atividade "+gt[1].toLowerCase()+", mas a linha de neutrófilos diz "+gl[1]+"."});
     const lie=(corpo||"").match(/(\d+) linfócitos\/100 enterócitos/), marsh=(corpo||"").match(/Marsh-Oberhuber \(1999\): (\d)/);
-    if(lie && marsh && ((+marsh[1]>=1 && +lie[1]<25) || (+marsh[1]===0 && +lie[1]>=30)))
-      out.push({conf:true, msg:rot+": Marsh-Oberhuber "+marsh[1]+" não combina com "+lie[1]+" linfócitos por 100 enterócitos."});
+    if(lie && marsh && ((+marsh[1]>=1 && +lie[1]<MARSH_CORTE) || (+marsh[1]===0 && +lie[1]>=MARSH_CORTE)))
+      out.push({conf:true, msg:rot+": Marsh-Oberhuber "+marsh[1]+" não combina com "+lie[1]+" linfócitos por 100 enterócitos (tipos 1 a 3 a partir de "+MARSH_CORTE+")."});
+    const caz=(corpo||"").match(/Corazza-Villanacci \(2007\): (A|B1|B2)\b/);
+    if(lie && caz && +lie[1]<=CORAZZA_CORTE)
+      out.push({conf:true, msg:rot+": Corazza-Villanacci "+caz[1]+" não combina com "+lie[1]+" linfócitos por 100 enterócitos (graus A, B1 e B2 acima de "+CORAZZA_CORTE+")."});
     if(/OLGIM: Estágio 0/.test(corpo||"") && /Metaplasia intestinal: Presente/.test(corpo||""))
       out.push({conf:true, msg:rot+": OLGIM estágio 0 com metaplasia intestinal presente."});
     if(/OLGA: Estágio 0/.test(corpo||"") && /Atrofia: Presente/.test(corpo||""))
@@ -2385,8 +2500,8 @@ function alertasDe(samples, rotDe){
     if(RE_MARSH.test(c.split("\n").find(l=>RE_MARSH.test(l))||"") && /^- Orientação dos fragmentos: Inadequada/m.test(c)) out.push({conf:false, msg:rot+": Marsh-Oberhuber com fragmentos de orientação inadequada; a graduação fica prejudicada."});
   });
   samples.forEach((s,i)=>{ if(!MUC_SITIO[s.site] || porcoesIdx((s.corpo||"").split("\n")).length) return; const c=tiraMarcas(s.corpo||"");
-    [["exígua",/^- EXÍGUOS? FRAGMENTOS? DE /m,/^- Amostra exígua/m],["superficial",/^- FRAGMENTOS? SUPERFICIA(?:L|IS) DE /m,/^- Amostra superficial/m]].forEach(([nome,rt,rl])=>{
-      if(rt.test(c)!==rl.test(c)) out.push({conf:false, msg:"Amostra "+rotDe(i)+": título e linha de amostra "+nome+" não batem; confira."}); }); });
+    const tPre=c.split("\n").some(l=>lineKind(l)==="b" && RE_AM_PRE.test(l.trim().replace(/^- /,""))), lPre=c.split("\n").some(l=>RE_AM_LINHA.test(l));
+    if(tPre!==lPre) out.push({conf:false, msg:"Amostra "+rotDe(i)+": título e linha de representatividade da amostra não batem; confira."}); });
   samples.forEach((s,i)=>{ if(s.site==="hirschsprung") hsAlertas("Amostra "+rotDe(i), s.corpo, s.seg).forEach(a=>out.push(a)); });
   return out;
 }
@@ -2502,7 +2617,8 @@ function renderCrit(){
   }
   const grupos=(site.id==="hirschsprung" ? hsGrupos(site, $("fSeg").value) : (site.criterios||[])).slice();
   if(["ileo","colon","reto"].includes(site.id)) grupos.unshift({g:"Atividade: criptas com criptite ou abscesso", ativ:true, dica:"Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada. Insere a linha e ajusta o título."});
-  if(MUC_SITIO[site.id]) grupos.push({g:"Amostra (modificador)", amostra:true, dica:"Exígua ou superficial: insere a linha, ajusta o início do título e gera a nota de viés amostral. Adequada desfaz."});
+  if(MUC_SITIO[site.id]) grupos.push(teg ? {g:"Amostra (modificador)", amostra:true, dica:"Exígua ou superficial: insere a linha, ajusta o início do título e gera a nota de viés amostral. Adequada desfaz."}
+    : {g:"Representatividade da amostra", amostra:true, dica:"Marque os presentes e clique em inserir: sai uma linha só, logo abaixo do título, o título passa a \"AMOSTRA POUCO REPRESENTATIVA DE …, APRESENTANDO\" e entra a nota de viés amostral. Adequada põe a linha de adequada e desfaz o título."});
   if(!grupos.length){ box.innerHTML='<p class="hint">Nenhum critério para este sítio.</p>'; return; }
   const mkb=(par, label, fn, cls)=>{ const b=document.createElement("button"); b.type="button"; b.innerHTML=fmtInline(label); if(cls) b.className=cls; b.onclick=()=>fn(b); par.appendChild(b); return b; };
   grupos.forEach(c=>{
@@ -2538,8 +2654,15 @@ function renderCrit(){
       });
       mkb(opts, "inserir linha", ()=>{ appendLine(c.combo.monta(sel)); const d=c.combo.depois && c.combo.depois(sel); if(d) appendLine(d); toast("Linha inserida"); }, "go");
     }
-    if(c.amostra) (teg && porcaoAtiva==="gas" ? [["Exígua e superficial","exsup"]] : []).concat([["Exígua","exigua"],["Superficial","superficial"],["Adequada",null]]).forEach(([label,tipo])=>mkb(opts, label, ()=>{
+    if(c.amostra && teg) (porcaoAtiva==="gas" ? [["Exígua e superficial","exsup"]] : []).concat([["Exígua","exigua"],["Superficial","superficial"],["Adequada",null]]).forEach(([label,tipo])=>mkb(opts, label, ()=>{
       toast(amostraMod(tipo) ? "Amostra: "+label.toLowerCase() : "Sem título no editor: só a linha foi ajustada"); }));
+    else if(c.amostra){
+      const sel=[];
+      AM_MODS.forEach(([k,label])=>mkb(opts, label, b=>{ const i=sel.indexOf(k); if(i>=0){ sel.splice(i,1); b.className=""; } else { sel.push(k); b.className="on"; } }));
+      mkb(opts, "inserir linha", ()=>{ if(!sel.length){ toast("Marque ao menos um modificador"); return; }
+        toast(amostraMods(sel.slice()) ? "Amostra pouco representativa" : "Sem título no editor: só a linha foi inserida"); }, "go");
+      mkb(opts, "Adequada", ()=>{ toast(amostraMods([]) ? "Amostra adequada" : "Sem título no editor: só a linha foi inserida"); });
+    }
     if(c.ativ){
       const mkn=()=>{ const w=document.createElement("span"); w.className="num"; const i=document.createElement("input"); i.type="number"; i.min="0"; i.placeholder="nº"; w.appendChild(i); opts.appendChild(w); return i; };
       const a=mkn(); const de=document.createElement("span"); de.className="muted"; de.textContent="de"; opts.appendChild(de); const b=mkn();
@@ -2649,12 +2772,31 @@ function formataAmostra(corpo){
     ps.forEach(o=>{ micro.push(TEG_PRE[o.p].trim()); micro.push(...limpa(ls.slice(o.ini+1, o.fim))); });
     return topo.join(L)+L+" "+L+MICRO+L+micro.join(L);
   }
+  const ir=ls.map((l,k)=>RE_RES_PORCAO.test(l.trim()) ? k : -1).filter(k=>k>=0);
+  if(ir.length){
+    // ressecção: cada porção com os diagnósticos no topo; as camadas sob "- MICROSCOPIA:", em cada porção
+    const topo=ls.slice(0, ir[0]).filter(l=>l.trim()).map(l=>lineKind(l)==="b" ? fechaTitulo(l) : l), micro=[];
+    ir.forEach((ini,k)=>{ const fim=k+1<ir.length ? ir[k+1] : ls.length; let j=ini+1;
+      topo.push(ls[ini].trim()); while(j<fim && lineKind(ls[j])==="b"){ topo.push(fechaTitulo(ls[j])); j++; }
+      const h=ls[ini].trim().slice(2,-1); micro.push("- "+h.charAt(0)+h.slice(1).toLowerCase()+":"); micro.push(...limpa(ls.slice(j, fim))); });
+    return topo.join(L)+L+" "+L+MICRO+L+micro.join(L);
+  }
   let i=0; while(i<ls.length && !ls[i].trim()) i++;
-  const tits=[]; while(i<ls.length && lineKind(ls[i])==="b"){ tits.push(ls[i]); i++; }
-  const achados=limpa(ls.slice(i));
-  if(!tits.length || achados.some(l=>lineKind(l)==="b")) return corpo;
-  return tits.map(fechaTitulo).join(L)+(achados.length ? L+" "+L+MICRO+L+achados.join(L) : "");
+  if(i>=ls.length || lineKind(ls[i])!=="b") return corpo;
+  // cada bloco (títulos seguidos + achados) por si; linha em branco entre os blocos
+  const blocos=[];
+  while(i<ls.length){
+    const tits=[]; while(i<ls.length && lineKind(ls[i])==="b"){ tits.push(ls[i]); i++; }
+    const ini=i; while(i<ls.length && lineKind(ls[i])!=="b") i++;
+    blocos.push({tits, achados:limpa(ls.slice(ini, i))});
+  }
+  return blocos.map(({tits, achados})=>{
+    // título descritivo (MUCOSA/AMOSTRA/FRAGMENTO): fica com ":" e os achados logo abaixo
+    if(tits.length===1 && RE_T_DESCR.test(tits[0].trim())) return [tits[0].trim()].concat(achados).join(L);
+    return tits.map(fechaTitulo).join(L)+(achados.length ? L+" "+L+MICRO+L+achados.join(L) : "");
+  }).join(L+" "+L);
 }
+const RE_T_DESCR=/^- (MUCOSA|AMOSTRA|FRAGMENTO|EXÍGUO)/;
 function buildLaudo(){
   const samples=WORK.samples;
   if(!samples.length) return "";
@@ -2688,6 +2830,7 @@ function lineKind(line){
 }
 // no laudo, o título do topo termina em "." e continua em negrito
 function laudoKind(line){
+  if(line.trim()===MICRO) return "";
   const k=lineKind(line); if(k) return k;
   const t=line.trim(); return /^- .*\.$/.test(t) && /[A-ZÀ-Ý]{3}/.test(t) && !/[a-zà-ÿ]/.test(t.replace(SPECIES_RE,"")) ? "b" : "";
 }

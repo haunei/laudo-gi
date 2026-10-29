@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -93,8 +93,8 @@ ok(rich.includes("font-size:8pt") && rich.includes("Arial"), "Arial 8pt");
 ok(rich.includes("text-align:justify") && rich.includes("line-height:1.15") && rich.includes("color:#000000"), "justificado, 1.15, preto");
 ok(rich.includes("<i>H. pylori</i>"), "H. pylori em itálico");
 const nBold = (rich.match(/font-weight:bold/g) || []).length;
-eq(nBold, lines.filter(l => t.lineKind(l) === "b" || (/^- .*\.$/.test(l) && !/[a-zà-ÿ]/.test(l.replace(/H\. pylori/g, "")))).length, "negrito só nos títulos");
-eq(nBold, 4, "os 2 títulos (fechados em '.') e os 2 '- MICROSCOPIA:'");
+eq(nBold, lines.filter(l => l !== "- MICROSCOPIA:" && (t.lineKind(l) === "b" || (/^- .*\.$/.test(l) && !/[a-zà-ÿ]/.test(l.replace(/H\. pylori/g, ""))))).length, "negrito só nos títulos");
+eq(nBold, 2, "os 2 títulos (fechados em '.'); '- MICROSCOPIA:' sem negrito");
 
 // 6. Rascunho sobrevive ao reload
 t.saveNow();
@@ -644,47 +644,53 @@ els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.fSeg.onchange
 eq(els.fNome.value, "Mucosa duodenal (2ª porção)", "nome da amostra do duodeno");
 // textos prontos de amostra exígua
 for (const k of ["esofago", "gastrica", "duodeno", "ileo", "colon", "reto"]) {
-  const ex = t.SEED_SITES[k].presets.filter(p => /^EXÍGUO FRAGMENTO DE MUCOSA .* SEM (ALTERAÇÕES|PARTICULARIDADES) HISTO(PATO)?LÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
+  const ex = t.SEED_SITES[k].presets.filter(p => /^AMOSTRA POUCO REPRESENTATIVA DE MUCOSA .* SEM (ALTERAÇÕES|PARTICULARIDADES) HISTO(PATO)?LÓGICAS SIGNIFICATIVAS$/.test(p.titulo));
   ok(ex.length >= 1, "texto pronto exíguo: " + k);
   for (const p of ex) {
     eq(p.bullets[0], "Amostra exígua, pouco representativa.", "linha de amostragem primeiro: " + p.titulo);
-    ok(p.titulo.startsWith("EXÍGUO FRAGMENTO DE " + t.MUC_SITIO[k]), "mucosa do próprio sítio: " + p.titulo);
+    ok(p.titulo.startsWith("AMOSTRA POUCO REPRESENTATIVA DE " + t.MUC_SITIO[k]), "mucosa do próprio sítio: " + p.titulo);
     eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância sem troca: " + p.titulo);
   }
 }
-eq(t.SEED_SITES.gastrica.presets.filter(p => /^EXÍGUO/.test(p.titulo)).length, 3, "estômago: antral, oxíntico e cárdia");
-const ilN = t.SEED_SITES.ileo.presets.filter(p => /^(EXÍGUO FRAGMENTO DE )?MUCOSA DE ÍLEO (SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS|APRESENTANDO)$/.test(p.titulo));
-eq(ilN.map(p => p.titulo).join(" | "), "MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS | MUCOSA DE ÍLEO APRESENTANDO | EXÍGUO FRAGMENTO DE MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "íleo: dois cabeçalhos de normalidade e o exíguo");
+eq(t.SEED_SITES.gastrica.presets.filter(p => /^AMOSTRA POUCO/.test(p.titulo)).length, 3, "estômago: antral, oxíntico e cárdia");
+const ilN = t.SEED_SITES.ileo.presets.filter(p => /^(AMOSTRA POUCO REPRESENTATIVA DE )?MUCOSA DE ÍLEO (SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS|APRESENTANDO)$/.test(p.titulo));
+eq(ilN.map(p => p.titulo).join(" | "), "MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS | MUCOSA DE ÍLEO APRESENTANDO | AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "íleo: dois cabeçalhos de normalidade e o exíguo");
 eq(ilN[0].bullets.join("|"), ilN[1].bullets.join("|"), "íleo: os dois cabeçalhos com os mesmos achados");
 eq(ilN[2].bullets.slice(1).join("|"), ilN[0].bullets.join("|"), "íleo exíguo: mesmos achados + linha de amostragem");
 for (const [sg, nm] of [["Íleo terminal", "Mucosa de íleo terminal"], ["Íleo (neoterminal)", "Mucosa de íleo neoterminal"], ["Bolsa ileal", "Mucosa de bolsa ileal"], ["", "Mucosa de íleo terminal"]]) {
   els.fSitio.value = "ileo"; els.fSeg.value = sg; els.fSeg.onchange(); eq(els.fNome.value, nm, "nome do íleo sem repetição: " + (sg || "sem segmento")); }
 // modificador
 const TA = t.titleSetAmostra;
-eq(TA("- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "exigua", "esofago"), "- EXÍGUO FRAGMENTO DE MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "título MUCOSA: só prefixo");
-eq(TA("- COLITE CRÔNICA INATIVA:", "exigua", "colon"), "- EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "outro título: mucosa do sítio + apresentando");
-eq(TA("- EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "superficial", "colon"), "- FRAGMENTO SUPERFICIAL DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "exígua -> superficial");
-eq(TA("- FRAGMENTO SUPERFICIAL DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", null, "colon"), "- COLITE CRÔNICA INATIVA:", "adequada desfaz");
-eq(TA("- GASTRITE CRÔNICA INATIVA:", "superficial", "gastrica"), "- FRAGMENTO SUPERFICIAL DE MUCOSA GÁSTRICA APRESENTANDO GASTRITE CRÔNICA INATIVA:", "superficial no estômago");
-eq(t.lineKind(TA("- RETITE CRÔNICA INATIVA:", "exigua", "reto")), "b", "título com prefixo segue em negrito");
+eq(TA("- MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "pouco", "esofago"), "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "título MUCOSA: só prefixo");
+eq(TA("- MUCOSA DE ÍLEO APRESENTANDO:", "pouco", "ileo"), "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:", "título MUCOSA … APRESENTANDO: modelo do Pedro");
+eq(TA("- COLITE CRÔNICA INATIVA:", "pouco", "colon"), "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO COLITE CRÔNICA INATIVA:", "outro título: mucosa do sítio + apresentando");
+eq(TA("- EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", "pouco", "colon"), "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO COLITE CRÔNICA INATIVA:", "prefixo antigo convertido");
+eq(TA("- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO COLITE CRÔNICA INATIVA:", null, "colon"), "- COLITE CRÔNICA INATIVA:", "adequada desfaz");
+eq(TA("- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:", null, "ileo"), "- MUCOSA DE ÍLEO APRESENTANDO:", "adequada desfaz (descritivo)");
+eq(TA("- FRAGMENTO SUPERFICIAL DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:", null, "colon"), "- COLITE CRÔNICA INATIVA:", "adequada desfaz o prefixo antigo");
+eq(t.lineKind(TA("- RETITE CRÔNICA INATIVA:", "pouco", "reto")), "b", "título com prefixo segue em negrito");
 els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Arquitetura glandular preservada.";
-t.amostraMod("exigua");
-eq(els.corpo.value, "- EXÍGUO FRAGMENTO DE MUCOSA COLÔNICA APRESENTANDO COLITE CRÔNICA INATIVA:\n- Arquitetura glandular preservada.\n- Amostra exígua, pouco representativa.", "editor: exígua põe linha e prefixo");
-t.amostraMod("superficial");
-ok(/^- FRAGMENTO SUPERFICIAL DE MUCOSA COLÔNICA APRESENTANDO/.test(els.corpo.value) && els.corpo.value.split("\n").filter(l => /^- Amostra (exígua|superficial)/.test(l)).length === 1 && els.corpo.value.includes("- Amostra superficial, pouco representativa."), "editor: superficial substitui exígua");
-t.amostraMod(null);
-eq(els.corpo.value, "- COLITE CRÔNICA INATIVA:\n- Arquitetura glandular preservada.", "editor: adequada volta ao original");
+t.amostraMods(["superficial", "esmag"]);
+eq(els.corpo.value, "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO COLITE CRÔNICA INATIVA:\n- Amostra superficial e com artefatos técnicos de esmagamento, pouco representativa.\n- Arquitetura glandular preservada.", "editor: linha logo abaixo do título e título novo");
+t.amostraMods(["exigua", "superficial", "cauter"]);
+ok(els.corpo.value.split("\n")[1] === "- Amostra exígua, superficial e com artefatos de cauterização (eletrocoagulação), pouco representativa." && els.corpo.value.split("\n").filter(l => /pouco representativa\.$/.test(l)).length === 1, "editor: troca a linha, não duplica");
+t.amostraMods([]);
+eq(els.corpo.value, "- COLITE CRÔNICA INATIVA:\n- Representatividade da amostra: Adequada.\n- Arquitetura glandular preservada.", "editor: adequada põe a linha explícita e desfaz o título");
 // notas e alertas
 t.WORK.samples.length = 0;
-const pEx = (k) => t.presetText(t.SEED_SITES[k].presets.find(p => /^EXÍGUO/.test(p.titulo)));
+const pEx = (k) => t.presetText(t.SEED_SITES[k].presets.find(p => /^AMOSTRA POUCO/.test(p.titulo)));
 t.WORK.samples.push({ nome: "Esôfago", corpo: pEx("esofago"), site: "esofago", seg: "" }, { nome: "Reto", corpo: pEx("reto"), site: "reto", seg: "Reto" },
-  { nome: "Antro", corpo: "- FRAGMENTO SUPERFICIAL DE MUCOSA GÁSTRICA APRESENTANDO GASTRITE CRÔNICA INATIVA:\n- Amostra superficial, pouco representativa.", site: "gastrica", seg: "Antro" });
+  { nome: "Antro", corpo: "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA GÁSTRICA, APRESENTANDO GASTRITE CRÔNICA INATIVA:\n- Amostra superficial, pouco representativa.", site: "gastrica", seg: "Antro" },
+  { nome: "Íleo", corpo: "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:\n- Amostra exígua, superficial, com artefatos técnicos de esmagamento e com artefatos de cauterização (eletrocoagulação), pouco representativa.", site: "ileo", seg: "" },
+  { nome: "Cólon", corpo: "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO:\n- Amostra com artefatos técnicos de esmagamento, pouco representativa.", site: "colon", seg: "Ceco" });
 l16 = t.buildLaudo();
 ok(l16.includes("- Amostras A e B: o exame histopatológico foi prejudicado pela exiguidade da amostra. Considerar viés amostral."), "nota de exiguidade, amostras juntas");
 ok(l16.includes("- Amostra C: o exame histopatológico foi prejudicado pela representação superficial da amostra. Considerar viés amostral."), "nota de amostra superficial");
+ok(l16.includes("- Amostra D: o exame histopatológico foi prejudicado pela representação exígua e superficial da amostra e por artefatos técnicos de esmagamento e de cauterização. Considerar viés amostral."), "nota composta: todos os modificadores");
+ok(l16.includes("- Amostra E: o exame histopatológico foi prejudicado por artefatos técnicos de esmagamento. Considerar viés amostral."), "nota composta: só esmagamento");
 eq(t.alertas().length, 0, "título e linha coerentes: sem alerta");
 t.WORK.samples[2].corpo = "- GASTRITE CRÔNICA INATIVA:\n- Amostra superficial, pouco representativa.";
-ok(t.alertas().some(a => /amostra superficial não batem/.test(a.msg)), "linha sem prefixo no título: alerta");
+ok(t.alertas().some(a => /Amostra C: título e linha de representatividade da amostra não batem/.test(a.msg)), "linha sem prefixo no título: alerta");
 // barra do editor
 const M = t.marcaSel;
 eq(M("abc def", 4, 7, "up").text, "abc DEF", "caixa alta");
@@ -703,7 +709,7 @@ ok(t.laudoToRichHTML("Materiais: x.\n \nA) X:\n- GASTRITE ASSOCIADA A H. PYLORI:
 // 17. v3.5.1: duodeno, cólon e reto com os dois cabeçalhos de normalidade (como o íleo)
 for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔNICA"], ["reto", "MUCOSA RETAL"], ["ileo", "MUCOSA DE ÍLEO"], ["esofago", "MUCOSA ESOFÁGICA"], ["gastrica", "MUCOSA GÁSTRICA DE PADRÃO ANTRAL"], ["gastrica", "MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO"]]) {
   const ps = t.SEED_SITES[k].presets, achar = (tt) => ps.filter(p => p.titulo === tt);
-  const sem = achar(muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), apr = achar(muc + " APRESENTANDO"), ex = achar("EXÍGUO FRAGMENTO DE " + muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
+  const sem = achar(muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), apr = achar(muc + " APRESENTANDO"), ex = achar("AMOSTRA POUCO REPRESENTATIVA DE " + muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
   ok(sem.length === 1 && apr.length === 1 && ex.length === 1, k + ": dois cabeçalhos e um exíguo");
   eq(apr[0].bullets.join("|"), sem[0].bullets.join("|"), k + ": mesmos achados nos dois cabeçalhos");
   eq(ex[0].bullets.join("|"), ["Amostra exígua, pouco representativa."].concat(sem[0].bullets).join("|"), k + ": exíguo com os mesmos achados");
@@ -1133,6 +1139,7 @@ edita("INATIVA", "EM ATIVIDADE");
 ok(els.corpo.value.includes("- " + t.linhaAtiv("duodeno", "EM ATIVIDADE")), "duodeno: título em atividade -> linha presente");
 // Marsh <-> arquitetura e atrofia vilositária
 const marsh = g => DU.criterios.find(c => c.g === "Marsh-Oberhuber (1999)").opt.find(o => o[0] === g)[1];
+t.appendLine(DU.criterios.find(c => /^Linfocitose intraepitelial/.test(c.g)).num.tpl.replace("{n}", "40")); // v3.13: classificação só com linfocitose
 t.appendLine(marsh("3B"));
 const ATR = DU.criterios.find(c => c.g === "Atrofia vilositária (Marsh-Oberhuber / Corazza-Villanacci)").opt;
 ok(els.corpo.value.includes(ATR[4][1]) && !/^- Arquitetura/m.test(els.corpo.value), "Marsh 3B -> linha única de atrofia moderada");
@@ -1249,8 +1256,10 @@ ok(/^- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS SEGUINTES ACHA
 t.WORK.samples.length = 0;
 t.WORK.samples.push({ nome: "Mucosa duodenal", site: "duodeno", seg: "", corpo: "- MUCOSA DUODENAL APRESENTANDO:\n- Parasitos: Não identificados." });
 const lD27 = t.buildLaudo();
-ok(lD27.includes("A) Mucosa duodenal:\n- MUCOSA DUODENAL APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA.\n \n- MICROSCOPIA:\n- Parasitos: Não identificados."), "APRESENTANDO aponta para a microscopia");
-ok(/font-weight:bold;">- MUCOSA DUODENAL APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA\./.test(t.laudoToRichHTML(lD27)), "título fechado em '.' continua em negrito");
+ok(lD27.includes("A) Mucosa duodenal:\n- MUCOSA DUODENAL APRESENTANDO:\n- Parasitos: Não identificados."), "v3.13: título descritivo fica com ':' e os achados logo abaixo");
+ok(/font-weight:bold;">- MUCOSA DUODENAL APRESENTANDO:/.test(t.laudoToRichHTML(lD27)), "título descritivo em negrito");
+t.WORK.samples[0].corpo = "- DUODENITE CRÔNICA APRESENTANDO:\n- Parasitos: Não identificados.";
+ok(t.buildLaudo().includes("- DUODENITE CRÔNICA APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA.\n \n- MICROSCOPIA:\n- Parasitos"), "diagnóstico com APRESENTANDO aponta para a microscopia");
 
 // Hirschsprung: o modelo do Pedro, montado pelo editor
 ({ t, els } = boot({}));
@@ -1317,6 +1326,80 @@ t.appendLine(GA.criterios.find(c => c.g === "Metaplasia pseudopilórica").opt[0]
 eq(els.corpo.value.split("\n").filter(l => /^- Metaplasia pseudopilórica/.test(l)).join(), "- Metaplasia pseudopilórica: Não identificada.", "metaplasia pseudopilórica trocada, não duplicada");
 ok(t.LIB.notas.some(n => n.tag === "Barrett") && t.LIB.notas.some(n => n.tag === "Gastrite autoimune"), "notas novas na biblioteca");
 eq(t.concorda(t.presetText(pAI)).trocas.length, 0, "concordância: gastrite autoimune");
+
+// 29. v3.13: formato do laudo do Pedro (A a G), Marsh/Corazza pela linfocitose, representatividade da amostra, ressecção intestinal / ostomia
+({ t, els } = boot({}));
+// laudo de referência: o editor no formato de edição -> o laudo do modelo, idêntico
+const gold = fs.readFileSync(new URL("./golden_v313.txt", import.meta.url), "utf8").replace(/\r/g, "").replace(/\n$/, "").replace(/^$/gm, " ");
+const CIT29 = { 1: "pap", 2: "deb", 3: "iwa", 4: "whitehead", 5: "hayat", 6: "campora22", 7: "geboes" };
+const SITE29 = { A: ["gastrica", ""], B: ["duodeno", ""], C: ["ileo", "Íleo terminal"], D: ["colon", "Cólon ascendente"], E: ["colon", "Cólon descendente"], F: ["colon", "Ceco"], G: ["reto", "Reto"] };
+t.WORK.samples.length = 0; t.WORK.prefixo = "Biópsias endoscópicas/colonoscópicas de:";
+gold.split("\n" + "-".repeat(100) + "\n").forEach((blk, k) => {
+  const ls = blk.split("\n").filter(l => l.trim() && !/^Materiais:/.test(l)), cab = ls.shift(), m = cab.match(/^([A-G])\) (.*):$/);
+  const corpo = ls.filter(l => l !== "- MICROSCOPIA:").map(l => (/^- [^a-zà-ÿ]*\.$/.test(l.replace(/H\. pylori/, "")) ? l.slice(0, -1) + ":" : l).replace(/\[(\d)\]/g, (x, d) => "[@" + CIT29[d] + "]").replace(/\[(\d),(\d)\]/g, (x, a, b) => "[@" + CIT29[a] + "," + CIT29[b] + "]")).join("\n");
+  t.WORK.samples.push({ nome: m[2], corpo, site: SITE29[m[1]][0], seg: SITE29[m[1]][1] });
+});
+const l29 = t.buildLaudo();
+eq(l29.slice(0, l29.indexOf("\n \nNOTAS:")), gold, "laudo de referência do Pedro (A a G): formato idêntico");
+ok(!/font-weight:bold;">- MICROSCOPIA/.test(t.laudoToRichHTML(l29)) && /font-weight:bold;">- DUODENITE CRÔNICA MODERADA INESPECÍFICA, INATIVA\./.test(t.laudoToRichHTML(l29)), "MICROSCOPIA sem negrito; título diagnóstico em negrito");
+ok(/font-weight:bold;">- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:/.test(t.laudoToRichHTML(l29)), "título descritivo em negrito");
+ok(l29.includes("- Amostra C: o exame histopatológico foi prejudicado pela representação superficial da amostra e por artefatos técnicos de esmagamento. Considerar viés amostral."), "nota composta da amostra C");
+ok(!t.alertas().some(a => /representatividade/.test(a.msg)), "foto 3: sem o alerta falso de título e linha");
+// título diagnóstico com vários blocos: cada bloco por si
+eq(t.formataAmostra("- GASTRITE CRÔNICA INATIVA, EM MUCOSA DE ANTRO:\n- Atrofia: Não identificada.\n- MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Atrofia: Não identificada."),
+  "- GASTRITE CRÔNICA INATIVA, EM MUCOSA DE ANTRO.\n \n- MICROSCOPIA:\n- Atrofia: Não identificada.\n \n- MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Atrofia: Não identificada.", "vários blocos: diagnóstico com microscopia, descritivo direto");
+
+// Marsh e Corazza: só com linfocitose acima do corte
+({ t, els } = boot({}));
+const DU29 = t.SEED_SITES.duodeno, ATR29 = DU29.criterios.find(c => /^Atrofia vilositária/.test(c.g)).opt, LIE29 = n => DU29.criterios.find(c => /^Linfocitose intraepitelial/.test(c.g)).num.tpl.replace("{n}", n);
+const marshL = () => (els.corpo.value.match(/^- Classificação de Marsh-Oberhuber \(1999\): .*$/m) || [""])[0], corL = () => (els.corpo.value.match(/^- Classificação de Corazza-Villanacci \(2007\): .*$/m) || [""])[0];
+els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.corpo.value = t.presetText(DU29.presets.find(p => /^DUODENITE CRÔNICA LEVE INESPECÍFICA/.test(p.titulo)) || DU29.presets.find(p => /INESPECÍFICA, INATIVA/.test(p.titulo))); els.corpo.onfocus();
+t.appendLine(LIE29(15)); t.appendLine(ATR29[3][1]);
+eq(marshL(), "- Classificação de Marsh-Oberhuber (1999): Não se aplica.", "foto 1: atrofia leve com 15 linfócitos -> Marsh não se aplica");
+eq(corL(), "- Classificação de Corazza-Villanacci (2007): Não se aplica.", "foto 1: Corazza não se aplica");
+ok(/COM ATROFIA VILOSITÁRIA LEVE, INATIVA:$/.test(els.corpo.value.split("\n")[0]) && !/MARSH-OBERHUBER/.test(els.corpo.value.split("\n")[0]), "título: só a atrofia, sem classificação");
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value, site: "duodeno", seg: "2ª porção" });
+ok(!t.alertas().some(a => /Marsh|Corazza/.test(a.msg)), "foto 1: sem o alerta de Marsh");
+t.appendLine(LIE29(35));
+ok(marshL() === "- Classificação de Marsh-Oberhuber (1999): 3A." && /: B1 /.test(corL()) && /COM ATROFIA VILOSITÁRIA LEVE \(MARSH-OBERHUBER 3A; CORAZZA-VILLANACCI B1\)/.test(els.corpo.value.split("\n")[0]), "35 linfócitos: Marsh 3A, Corazza B1 e título");
+t.appendLine(LIE29(28));
+ok(/Não se aplica\.$/.test(marshL()) && /: B1 /.test(corL()), "28 linfócitos com atrofia: Marsh não se aplica (corte 30), Corazza B1 (corte 25)");
+t.appendLine(ATR29[0][1]);
+ok(marshL() === "- Classificação de Marsh-Oberhuber (1999): 0." && /: A \(não atrófica\)/.test(corL()), "28 linfócitos sem atrofia: Marsh 0, Corazza A");
+t.appendLine(LIE29(4));
+ok(marshL() === "- Classificação de Marsh-Oberhuber (1999): 0." && corL() === "", "4 linfócitos sem atrofia: Marsh 0, sem Corazza (como no modelo)");
+t.appendLine(ATR29[1][1]);
+ok(/Não se aplica\.$/.test(marshL()) && /Não se aplica\.$/.test(corL()), "hiperplasia de criptas sem linfocitose: não se aplica nas duas");
+t.WORK.samples[0].corpo = "- DUODENITE CRÔNICA INATIVA:\n- Linfocitose intraepitelial: Não identificada (exocitose de até 15 linfócitos/100 enterócitos nas pontas das vilosidades).\n- Classificação de Marsh-Oberhuber (1999): 3A.\n- Classificação de Corazza-Villanacci (2007): B1 (atrófica) [@corazza07].";
+ok(t.alertas().some(a => /Marsh-Oberhuber 3 não combina com 15/.test(a.msg)) && t.alertas().some(a => /Corazza-Villanacci B1 não combina com 15/.test(a.msg)), "Marsh e Corazza escritos à mão contra a linfocitose: alertas");
+
+// representatividade: grupo nos sítios do TGI, título editado à mão
+({ t, els } = boot({}));
+els.fSitio.value = "ileo"; els.fSeg.value = "Íleo terminal"; els.corpo.value = t.presetText(t.SEED_SITES.ileo.presets.find(p => p.titulo === "MUCOSA DE ÍLEO APRESENTANDO")); els.corpo.onfocus();
+t.amostraMods(["superficial", "esmag"]);
+eq(els.corpo.value.split("\n").slice(0, 2).join("|"), "- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:|- Amostra superficial e com artefatos técnicos de esmagamento, pouco representativa.", "íleo: o modelo da foto 3");
+t.appendLine(t.SEED_SITES.ileo.criterios.find(c => c.g === "Arquitetura").opt.find(o => o[0] === "Não avaliável")[1]);
+ok(els.corpo.value.includes("- Arquitetura glandular: Não avaliável com segurança pela baixa representatividade da amostra.") && !/Arquitetura preservada/.test(els.corpo.value), "íleo: arquitetura não avaliável troca a linha");
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:", "- MUCOSA DE ÍLEO APRESENTANDO:"); els.corpo.onchange();
+ok(els.corpo.value.includes("- Representatividade da amostra: Adequada.") && !/pouco representativa\./.test(els.corpo.value), "título sem o prefixo -> linha de adequada");
+ok(t.SEED_SITES.colon.criterios.find(c => c.g === "Arquitetura glandular").opt.some(o => /Não avaliável com segurança/.test(o[1])), "cólon/reto: arquitetura não avaliável");
+
+// ressecção intestinal / ostomia
+({ t, els } = boot({}));
+const RS = t.SEED_SITES.resseccao;
+ok(RS && RS.nome === "Ressecção intestinal / ostomia" && RS.segmentos.join("|") === "Intestino delgado|Cólon|Ostomia|Anastomose", "sítio novo com os segmentos");
+const lR = t.formataAmostra(t.presetText(RS.presets[1])).split("\n");
+eq(lR.slice(0, lR.indexOf(" ")).join("|"), '- SEGMENTO DE INTESTINO:|- MUCOSA ENTÉRICA ATRÓFICA.|- PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.|- MARGEM "1":|- MUCOSA ENTÉRICA ATRÓFICA.|- PROCESSO INFLAMATÓRIO MISTO, ULCERADO.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.|- A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS (VIDE NOTAS).|- MARGEM "2":|- MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.', "ressecção: diagnósticos de cada porção no topo (modelo 2)");
+ok(lR[lR.indexOf(" ") + 1] === "- MICROSCOPIA:" && lR[lR.indexOf(" ") + 2] === "- Segmento de intestino:" && lR.includes('- Margem "1":') && lR.includes('- Margem "2":') && lR[lR.length - 1] === "- Não foram identificadas células atípicas ou heterólogas no material examinado.", "ressecção: camadas sob a microscopia, por porção");
+eq(t.formataAmostra(t.presetText(RS.presets[0])).split("\n").slice(0, 4).join("|"), "- ENTERITE CRÔNICA AGUDIZADA, INESPECÍFICA (VIDE NOTA).| |- MICROSCOPIA:|- Mucosa entérica com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado.", "ressecção: modelo 1");
+els.fSitio.value = "resseccao"; els.fSeg.value = "Intestino delgado"; els.corpo.value = ""; els.corpo.onfocus();
+const fx = (g, i) => RS.criterios.find(c => c.g === g).fx[i][1]();
+fx("Porção", 0); fx("Diagnósticos da porção", 0); t.appendLine("- " + "Submucosa apresenta vasocongestão.");
+fx("Porção", 1); fx("Diagnósticos da porção", 4); fx("Porção", 1);
+eq(els.corpo.value, '- SEGMENTO DE INTESTINO:\n- MUCOSA ENTÉRICA ATRÓFICA:\n- Submucosa apresenta vasocongestão.\n- MARGEM "1":\n- PROCESSO INFLAMATÓRIO MISTO, ULCERADO:\n- MARGEM "2":', "editor: porções e diagnósticos nos lugares certos; margens numeradas");
+t.appendLine(RS.criterios.find(c => c.g === "Camada muscular própria").opt[1][1]);
+ok(els.corpo.value.endsWith('- MARGEM "2":\n- Camada muscular própria de aspecto histológico preservado.'), "achado entra na porção em edição");
+eq(t.concorda(t.presetText(RS.presets[1])).trocas.length, 0, "concordância: ressecção");
 
 console.log(`OK — ${n} asserts`);
 
