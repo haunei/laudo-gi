@@ -823,13 +823,13 @@ t.appendLine(mo[3][1]); eq(cz().length, 1, "troca sem duplicar"); ok(/: B1 /.tes
 t.appendLine(mo[4][1]); ok(/: B1 /.test(cz()[0]), "3B -> B1");
 t.appendLine(mo[2][1]); ok(/: A \(não atrófica\)/.test(cz()[0]), "2 -> A");
 t.appendLine(mo[1][1]); ok(/: A \(não atrófica\)/.test(cz()[0]), "1 -> A");
-t.appendLine(mo[0][1]); eq(cz().length, 0, "0 -> sem Corazza");
+t.appendLine(mo[0][1]); ok(cz().length === 1 && /: Não se aplica\.$/.test(cz()[0]), "0 -> Corazza não se aplica (v3.13)");
 ok(!/CORAZZA|MARSH|ATROFIA/.test(els.corpo.value.split("\n")[0]), "Marsh 0: título sem atrofia nem classificações");
 els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("(1999): 0.", "(1999): 3C (tipo destrutivo)."); els.corpo.onchange();
 ok(cz().length === 1 && /: B2 /.test(cz()[0]), "Marsh editado à mão atualiza Corazza");
 const dLp = D2.presets.find(p => /PADRÃO LINFOCÍTICO.*EM ATIVIDADE/.test(p.titulo));
 ok(dLp.bullets.some(b => /^Classificação de Corazza-Villanacci \(2007\): B1/.test(b)), "texto pronto com Corazza");
-ok(!D2.presets.filter(p => p.bullets.some(b => /Marsh-Oberhuber \(1999\): 0\./.test(b))).some(p => p.bullets.some(b => /Corazza/.test(b))), "Marsh 0 sem Corazza nos textos prontos");
+ok(D2.presets.filter(p => p.bullets.some(b => /Marsh-Oberhuber \(1999\): 0\./.test(b))).every(p => p.bullets.some(b => /Corazza-Villanacci \(2007\): Não se aplica/.test(b))), "Marsh 0 com Corazza não se aplica nos textos prontos (v3.13)");
 // alertas
 t.WORK.samples.length = 0;
 t.WORK.samples.push({ nome: "Duodeno", site: "duodeno", seg: "2ª porção", corpo: "- DUODENITE CRÔNICA INATIVA:\n- Classificação de Marsh-Oberhuber (1999): 1.\n- Classificação de Corazza-Villanacci (2007): A (não atrófica) [@corazza07].\n- Orientação dos fragmentos: Inadequada (avaliação da arquitetura e graduação de Marsh-Oberhuber prejudicadas [@husby20])." });
@@ -1367,7 +1367,7 @@ ok(/Não se aplica\.$/.test(marshL()) && /: B1 /.test(corL()), "28 linfócitos c
 t.appendLine(ATR29[0][1]);
 ok(marshL() === "- Classificação de Marsh-Oberhuber (1999): 0." && /: A \(não atrófica\)/.test(corL()), "28 linfócitos sem atrofia: Marsh 0, Corazza A");
 t.appendLine(LIE29(4));
-ok(marshL() === "- Classificação de Marsh-Oberhuber (1999): 0." && corL() === "", "4 linfócitos sem atrofia: Marsh 0, sem Corazza (como no modelo)");
+ok(marshL() === "- Classificação de Marsh-Oberhuber (1999): 0." && corL() === "- Classificação de Corazza-Villanacci (2007): Não se aplica.", "4 linfócitos sem atrofia: Marsh 0, Corazza não se aplica");
 t.appendLine(ATR29[1][1]);
 ok(/Não se aplica\.$/.test(marshL()) && /Não se aplica\.$/.test(corL()), "hiperplasia de criptas sem linfocitose: não se aplica nas duas");
 t.WORK.samples[0].corpo = "- DUODENITE CRÔNICA INATIVA:\n- Linfocitose intraepitelial: Não identificada (exocitose de até 15 linfócitos/100 enterócitos nas pontas das vilosidades).\n- Classificação de Marsh-Oberhuber (1999): 3A.\n- Classificação de Corazza-Villanacci (2007): B1 (atrófica) [@corazza07].";
@@ -1389,9 +1389,9 @@ ok(t.SEED_SITES.colon.criterios.find(c => c.g === "Arquitetura glandular").opt.s
 const RS = t.SEED_SITES.resseccao;
 ok(RS && RS.nome === "Ressecção intestinal / ostomia" && RS.segmentos.join("|") === "Intestino delgado|Cólon|Ostomia|Anastomose", "sítio novo com os segmentos");
 const lR = t.formataAmostra(t.presetText(RS.presets[1])).split("\n");
-eq(lR.slice(0, lR.indexOf(" ")).join("|"), '- SEGMENTO DE INTESTINO:|- MUCOSA ENTÉRICA ATRÓFICA.|- PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.|- MARGEM "1":|- MUCOSA ENTÉRICA ATRÓFICA.|- PROCESSO INFLAMATÓRIO MISTO, ULCERADO.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.|- A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS (VIDE NOTAS).|- MARGEM "2":|- MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.', "ressecção: diagnósticos de cada porção no topo (modelo 2)");
+eq(lR.slice(0, lR.indexOf(" ")).join("|"), '- SEGMENTO DE INTESTINO:|- MUCOSA ENTÉRICA ATRÓFICA.|- PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.|- MARGEM "1":|- MUCOSA ENTÉRICA ATRÓFICA.|- PROCESSO INFLAMATÓRIO MISTO, ULCERADO.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.|- A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS.|- MARGEM "2":|- MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA.|- PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA.', "ressecção: diagnósticos de cada porção no topo (modelo 2)");
 ok(lR[lR.indexOf(" ") + 1] === "- MICROSCOPIA:" && lR[lR.indexOf(" ") + 2] === "- Segmento de intestino:" && lR.includes('- Margem "1":') && lR.includes('- Margem "2":') && lR[lR.length - 1] === "- Não foram identificadas células atípicas ou heterólogas no material examinado.", "ressecção: camadas sob a microscopia, por porção");
-eq(t.formataAmostra(t.presetText(RS.presets[0])).split("\n").slice(0, 4).join("|"), "- ENTERITE CRÔNICA AGUDIZADA, INESPECÍFICA (VIDE NOTA).| |- MICROSCOPIA:|- Mucosa entérica com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado.", "ressecção: modelo 1");
+eq(t.formataAmostra(t.presetText(RS.presets[0])).split("\n").slice(0, 4).join("|"), "- ENTERITE CRÔNICA AGUDIZADA, INESPECÍFICA.| |- MICROSCOPIA:|- Mucosa de padrão entérico com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado.", "ressecção: modelo 1");
 els.fSitio.value = "resseccao"; els.fSeg.value = "Intestino delgado"; els.corpo.value = ""; els.corpo.onfocus();
 const fx = (g, i) => RS.criterios.find(c => c.g === g).fx[i][1]();
 fx("Porção", 0); fx("Diagnósticos da porção", 0); t.appendLine("- " + "Submucosa apresenta vasocongestão.");
@@ -1400,6 +1400,13 @@ eq(els.corpo.value, '- SEGMENTO DE INTESTINO:\n- MUCOSA ENTÉRICA ATRÓFICA:\n- 
 t.appendLine(RS.criterios.find(c => c.g === "Camada muscular própria").opt[1][1]);
 ok(els.corpo.value.endsWith('- MARGEM "2":\n- Camada muscular própria de aspecto histológico preservado.'), "achado entra na porção em edição");
 eq(t.concorda(t.presetText(RS.presets[1])).trocas.length, 0, "concordância: ressecção");
+ok(t.presetText(RS.presets[1]).includes("- Subserosa apresenta infiltrado inflamatório, edema e vasocongestão.") && !/VIDE NOTA/.test(RS.presets.map(t.presetText).join("\n")), "ressecção: subserosa com infiltrado; sem VIDE NOTA");
+const SSg = RS.criterios.find(c => c.g === "Subserosa / serosa");
+eq(SSg.combo.monta(["moderado", "neutrofílico"]), "- Subserosa apresenta infiltrado inflamatório neutrofílico moderado, edema e vasocongestão.", "subserosa: grau e tipo do infiltrado");
+t.appendLine(SSg.combo.monta(["leve", "misto"])); t.appendLine(SSg.combo.monta(["acentuado", "mononuclear"]));
+eq(els.corpo.value.split("\n").filter(l => /^- Subserosa/.test(l)).join("|"), "- Subserosa apresenta infiltrado inflamatório mononuclear acentuado, edema e vasocongestão.", "subserosa: troca a linha, não duplica");
+ok(RS.criterios.find(c => c.g === "Mucosa").opt.every(o => /^Mucosa de padrão (entérico|colônico)/.test(o[0]) && /^- Mucosa de padrão (entérico|colônico)/.test(o[1])), "mucosa: 'Mucosa de padrão…' nos botões e nas frases");
+ok(t.SEED_SITES.duodeno.presets.filter(p => p.bullets.includes("Classificação de Marsh-Oberhuber (1999): 0.")).every(p => p.bullets.includes("Classificação de Corazza-Villanacci (2007): Não se aplica.")), "textos prontos do duodeno: Marsh 0 com Corazza não se aplica");
 
 console.log(`OK — ${n} asserts`);
 
