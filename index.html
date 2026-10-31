@@ -408,7 +408,7 @@ const SEED_SITES = {
         "Não foi identificada metaplasia intestinal."])
     ],
     criterios:[
-      {g:"Hiperplasia da camada basal", dica:"Normal: camada basal com menos de 15% da espessura do epitélio; papilas até 2/3 da espessura (Mastracci 2020).",
+      {g:"Hiperplasia da camada basal", dica:"Normal: camada basal com menos de 15% da espessura do epitélio; papilas até 2/3 da espessura (Mastracci 2020). Cronicidade no esôfago = alterações reativas do epitélio (camada basal com 15% ou mais, papilas acima de 2/3, espongiose); mononucleares na lâmina própria não definem cronicidade, pois aparecem em controles normais (Ismail-Beigi 1970).",
         opt:[["Ausente","- Ausência de hiperplasia da camada basal."]],
         combo:{grupos:[[["leve","leve (15% a menos de 30% da espessura do epitélio; normal: menos de 15% [@mast])"],["acentuada","acentuada (30% ou mais da espessura do epitélio; normal: menos de 15% [@mast])"]],[["papilar","papilar"]]],
           monta:x=>"- Hiperplasia "+(x[1]?"papilar ":"")+"da camada basal"+(x[0]?" "+x[0]:"")+"."}},
@@ -425,7 +425,7 @@ const SEED_SITES = {
       {g:"Exocitose de eosinófilos", opt:[
         ["Sem eosinófilos","- Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento)."]],
         num:{tpl:"- Exocitose de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
-      {g:"Neutrófilos / erosão / ulceração", opt:[
+      {g:"Neutrófilos / erosão / ulceração", dica:"Atividade = neutrófilos intraepiteliais: ausentes no epitélio normal, qualquer um é anormal (Black 1990). Erosão: necrose com tecido de granulação e/ou fibrina com neutrófilos (Mastracci 2020). Em criança, os neutrófilos são pouco sensíveis e aparecem sobretudo com erosão ou úlcera (Dahms 2004).", opt:[
         ["Ausentes","- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."],
         ["Presentes","- Presença de exocitose de neutrófilos."]]},
       {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."],
@@ -837,7 +837,7 @@ SEED_SITES.reto.presets = SEED_SITES.reto.presets.filter(p=>/^RETITE/.test(p.tit
 // Variantes de atividade: toda "crônica" tem inativa, leve, moderada e acentuada
 const GRAUS_ATIV = ["INATIVA","EM ATIVIDADE LEVE","EM ATIVIDADE MODERADA","EM ATIVIDADE ACENTUADA"];
 const LINHA_ATIV = {
-  // esôfago: não há graduação publicada da atividade; neutrófilos intraepiteliais e erosão são achados de presença/ausência (Mastracci 2020)
+  // esôfago: atividade = neutrófilos intraepiteliais, presentes ou ausentes, mais erosão; há graduação publicada (Binato 2010; escore do Esohisto), mas os estudos pediátricos registram presença ou ausência, e qualquer neutrófilo é anormal (Black 1990; Dahms 2004; Mastracci 2020)
   esofago:["Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
     "Presença de exocitose de neutrófilos, sem erosão ou ulceração.",
     "Presença de exocitose de neutrófilos e de erosão (necrose com tecido de granulação e/ou fibrina com neutrófilos [@mast])."],
