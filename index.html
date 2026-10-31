@@ -362,37 +362,37 @@ const SEED_SITES = {
       P("MUCOSA ESOFÁGICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Ausência de hiperplasia da camada basal.",
         "Ausência de ascensão vascular capilar intraepitelial.",
-        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
-        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento (CGA)).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento (CGA)).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
       P("MUCOSA ESOFÁGICA APRESENTANDO",[
         "Ausência de hiperplasia da camada basal.",
         "Ausência de ascensão vascular capilar intraepitelial.",
-        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
-        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento (CGA)).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento (CGA)).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
       P("ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS)",[
         "Achados de descamação superficial: Aspecto em dois tons (núcleos picnóticos e necróticos na zona superficial, sobre zona basal de aspecto normal), descamação e flaking da camada superficial em lâminas, com clivagem intraepitelial, paraqueratose proeminente (de várias camadas celulares) e inflamação mínima ou ausente [@carmack09,hart15,rubrecht25].",
         "Ausência de hiperplasia da camada basal.",
-        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento (CGA)).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
       P("ESOFAGITE CRÔNICA INATIVA",[
         "Hiperplasia da camada basal.",
         "Espongiose.",
         "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
-        "Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento).",
-        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA)).",
+        "Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento (CGA)).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
         "Não foi identificada metaplasia intestinal."]),
       P("ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)",[
         "Hiperplasia exuberante (papilar) da camada basal.",
         "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
-        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento).",
+        "Exocitose discreta de linfócitos pequenos (até 10 linfócitos/campo de grande aumento (CGA)).",
         "Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
-        "Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).",
+        "Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).",
         "A exocitose de eosinófilos é localizada predominantemente no terço médio da espessura do epitélio mucoso.",
         "Achados eosinofílicos associados: Não identificados (sem microabscessos eosinofílicos, eosinófilos em camada superficial ou degranulação [@gio]).",
         "Achados de descamação superficial: Descamação de células epiteliais escamosas superficiais de aspecto reativo, sem eosinófilos entremeados [@carmack09,hart15,rubrecht25].",
@@ -401,14 +401,14 @@ const SEED_SITES = {
       P("ESOFAGITE EROSIVA FÚNGICA (VIDE NOTAS)",[
         "Hiperplasia da camada basal.",
         "Ascensão vascular até o terço médio da espessura do epitélio mucoso.",
-        "Exocitose de leucócitos mononucleados (até 40 linfócitos/campo de grande aumento).",
-        "Exocitose discreta de eosinófilos (até 3 eosinófilos/campo de grande aumento).",
+        "Exocitose de leucócitos mononucleados (até 40 linfócitos/campo de grande aumento (CGA)).",
+        "Exocitose discreta de eosinófilos (até 3 eosinófilos/campo de grande aumento (CGA)).",
         "Não foi identificada ulceração.",
         "Presença de induto fibrinoleucocitário superficial contendo alguns neutrófilos, outros leucócitos, além de hifas e leveduras PAS-diastase-positivas, compatíveis com estruturas fúngicas.",
         "Não foi identificada metaplasia intestinal."])
     ],
     criterios:[
-      {g:"Hiperplasia da camada basal", dica:"Normal: camada basal com menos de 15% da espessura do epitélio; papilas até 2/3 da espessura (Mastracci 2020). Cronicidade no esôfago = alterações reativas do epitélio (camada basal com 15% ou mais, papilas acima de 2/3, espongiose); mononucleares na lâmina própria não definem cronicidade, pois aparecem em controles normais (Ismail-Beigi 1970).",
+      {g:"Hiperplasia da camada basal", dica:"Normal: camada basal com menos de 15% da espessura do epitélio; papilas até 2/3 da espessura (Mastracci 2020). Cronicidade no esôfago = alterações reativas do epitélio (camada basal com 15% ou mais, papilas acima de 2/3, espongiose); mononucleares na lâmina própria não definem cronicidade, pois aparecem em controles normais (Ismail-Beigi 1970). O Esohisto (Yerian 2011) usa 50% como limite das papilas; o app segue 2/3 (Mastracci 2020; Ismail-Beigi 1970). O grau leve/moderada/acentuada da esofagite crônica (Binato 2010) não foi adotado: o limiar de linfócitos (moderada a partir de 10 por campo) conflita com o limite normal descrito em voluntários sadios e usado no app (41 a 62 por campo, conforme o nível; Putra 2016).",
         opt:[["Ausente","- Ausência de hiperplasia da camada basal."]],
         combo:{grupos:[[["leve","leve (15% a menos de 30% da espessura do epitélio; normal: menos de 15% [@mast])"],["acentuada","acentuada (30% ou mais da espessura do epitélio; normal: menos de 15% [@mast])"]],[["papilar","papilar"]]],
           monta:x=>"- Hiperplasia "+(x[1]?"papilar ":"")+"da camada basal"+(x[0]?" "+x[0]:"")+"."}},
@@ -421,13 +421,15 @@ const SEED_SITES = {
         ["Terço inferior","- Ascensão vascular até o terço inferior da espessura do epitélio mucoso."],
         ["Terço médio","- Ascensão vascular até o terço médio da espessura do epitélio mucoso."],
         ["Terço superior","- Ascensão vascular até o terço superior da espessura do epitélio mucoso."]]},
-      {g:"Exocitose de linfócitos", num:{tpl:"- Exocitose de linfócitos pequenos (até {n} linfócitos/campo de grande aumento).", btn:"inserir (até n)"}},
+      {g:"Exocitose de linfócitos", num:{tpl:"- Exocitose de linfócitos pequenos (até {n} linfócitos/campo de grande aumento (CGA)).", btn:"inserir (até n)"}},
       {g:"Exocitose de eosinófilos", opt:[
-        ["Sem eosinófilos","- Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento)."]],
-        num:{tpl:"- Exocitose de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
-      {g:"Neutrófilos / erosão / ulceração", dica:"Atividade = neutrófilos intraepiteliais: ausentes no epitélio normal, qualquer um é anormal (Black 1990). Erosão: necrose com tecido de granulação e/ou fibrina com neutrófilos (Mastracci 2020). Em criança, os neutrófilos são pouco sensíveis e aparecem sobretudo com erosão ou úlcera (Dahms 2004).", opt:[
+        ["Sem eosinófilos","- Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento (CGA))."]],
+        num:{tpl:"- Exocitose de eosinófilos (até {n} eosinófilos/campo de grande aumento (CGA)).", btn:"até n eos"}},
+      {g:"Neutrófilos / erosão / ulceração", dica:"Atividade = neutrófilos intraepiteliais: ausentes no epitélio normal, qualquer um é anormal (Black 1990); contagem no campo de grande aumento (CGA) mais acometido: 1 a 2 ou mais de 2 (Yerian 2011). Erosão ativa: necrose, tecido de granulação (fibrose subepitelial e capilares dilatados) ou fibrina com neutrófilos; erosão cicatrizada: tecido de granulação recoberto por epitélio regenerativo afinado, sem necrose, fibrina ou neutrófilos (Yerian 2011). Em criança, os neutrófilos são pouco sensíveis e aparecem sobretudo com erosão ou úlcera (Dahms 2004).", opt:[
         ["Ausentes","- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."],
-        ["Presentes","- Presença de exocitose de neutrófilos."]]},
+        ["1 a 2/CGA","- Presença de exocitose de neutrófilos (1 a 2 neutrófilos/campo de grande aumento (CGA) [@yerian])."],
+        ["Mais de 2/CGA","- Presença de exocitose de neutrófilos (mais de 2 neutrófilos/campo de grande aumento (CGA) [@yerian])."],
+        ["Erosão cicatrizada","- Erosão cicatrizada: tecido de granulação recoberto por epitélio regenerativo afinado, sem necrose, fibrina ou neutrófilos [@yerian]."]]},
       {g:"Metaplasia intestinal", opt:[["Não identificada","- Metaplasia intestinal: Não identificada."],
           ["Não identificada (Alcian blue/PAS)","- Metaplasia intestinal: Não identificada (confirmado com coloração histoquímica especial Alcian blue pH 2,5/PAS sem diastase)."]],
         combo:{grupos:[[["completa","completa"],["incompleta","incompleta"]],[["leve","leve"],["moderada","moderada"],["acentuada","acentuada"]]],
@@ -460,74 +462,74 @@ const SEED_SITES = {
     presets:[
       P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Amostragem: Mucosa gástrica de padrão antral.",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa.","Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
       P("MUCOSA GÁSTRICA DE PADRÃO ANTRAL APRESENTANDO",[
         "Amostragem: Mucosa gástrica de padrão antral.",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa.","Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
       P("MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas).",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa."]),
       P("MUCOSA GÁSTRICA DE PADRÃO CÁRDIA APRESENTANDO",[
         "Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas).",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa."]),
       P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa."]),
       P("MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO APRESENTANDO",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa."]),
       P("GASTROPATIA REATIVA EM MUCOSA OXÍNTICA (PADRÃO CORPO/FUNDO)",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
-        "Pesquisa para H. pylori: Negativa.","Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento).",
+        "Pesquisa para H. pylori: Negativa.","Não foi evidenciada exocitose de eosinófilos (0 eosinófilos/campo de grande aumento (CGA)).",
         "Classificação OLGIM: Estágio 0.","Classificação OLGA: Estágio 0."]),
       P("GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO",[
         "Amostragem: Mucosa gástrica de padrão antral.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (contagem: até 1 eosinófilo/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (contagem: até 1 eosinófilo/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa."]),
       P("GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO)",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
-        "Celularidade levemente aumentada de leucócitos mononucleares e eosinófilos em lâmina própria (contagem: até 8 eosinófilos/campo de grande aumento, sendo identificados eosinófilos degranulados).",
+        "Celularidade levemente aumentada de leucócitos mononucleares e eosinófilos em lâmina própria (contagem: até 8 eosinófilos/campo de grande aumento (CGA), sendo identificados eosinófilos degranulados).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Não identificada.","Atrofia: Não identificada.",
         "Pesquisa para H. pylori: Negativa."]),
       P("GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA OXÍNTICA (CORPO/FUNDO), COM PESQUISA PARA H. pylori POSITIVA (+2/+3)",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, sem criptite, microabscessos, erosões ou ulcerações.",
         "Hiperplasia folicular linfoide: Presente.","Hiperplasia foveolar: Não identificada.",
         "Ausência de metaplasia intestinal.","Ausência de atrofia.","Pesquisa para H. pylori: Positiva (+2/+3)."]),
       P("GASTRITE CRÔNICA COM METAPLASIA INTESTINAL COMPLETA E ACENTUADA, SEM DISPLASIA, INATIVA (VIDE NOTAS)",[
         "Amostragem: Mucosa gástrica superficial, não sendo identificadas glândulas profundas.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia franca (contagem: até 10 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia franca (contagem: até 10 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia foveolar: Não identificada.","Metaplasia intestinal: Presente, completa, acentuada.","Atrofia: Presente, acentuada.",
         "Displasia: Não identificada.","Pesquisa para H. pylori: Negativa."]),
       P("GASTROPATIA DE PADRÃO LINFOCITÁRIO, EM ATIVIDADE MODERADA (VIDE NOTAS)",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo) e padrão misto oxíntico/mucinoso.",
-        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento).",
+        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, com frequentes plasmócitos em sua superfície, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de evidente exocitose de linfócitos ao epitélio gástrico foveolar e glandular.",
         "Presença de infiltrado inflamatório neutrofílico leve, com criptite apenas em mucosa gástrica de padrão oxíntico.",
         "Agregados linfoides: Presentes.","Hiperplasia foveolar: Leve (graduação conforme Dixon 1986 [@dixon86]).","Metaplasia intestinal: Não identificada.",
@@ -535,7 +537,7 @@ const SEED_SITES = {
         "Pesquisa para H. pylori: Negativa."]),
       P("GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS)",[
         "Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).",
-        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 4 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 4 eosinófilos/campo de grande aumento (CGA)).",
         "Distribuição do infiltrado inflamatório crônico: Em toda a espessura da mucosa.",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Atrofia: Presente, com redução de células parietais.",
@@ -556,8 +558,8 @@ const SEED_SITES = {
         ["Moderadamente aumentada","- Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria."],
         ["Severamente aumentada","- Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada."]]},
       {g:"Eosinófilos", opt:[
-        ["Sem eosinofilia","- Não foi identificada eosinofilia (0 eosinófilos/campo de grande aumento)."]],
-        num:{tpl:"- Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+        ["Sem eosinofilia","- Não foi identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA))."]],
+        num:{tpl:"- Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento (CGA)).", btn:"até n eos"}},
       {g:"Infiltrado neutrofílico", opt:[
         ["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve],["Moderado c/ criptite",NEUTRO.moderado],["Acentuado",NEUTRO.acentuado]]},
       {g:"Hiperplasia foveolar", opt:[
@@ -590,7 +592,7 @@ const SEED_SITES = {
       P("MUCOSA DUODENAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Atrofia vilositária: Não identificada (vilosidades preservadas, relação vilosidade/cripta de 3:1 ou mais), sem hiperplasia das criptas.",
         "Presença de glândulas de Brünner.",
-        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos nas pontas das vilosidades).",
         "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
@@ -598,21 +600,21 @@ const SEED_SITES = {
       P("MUCOSA DUODENAL APRESENTANDO",[
         "Atrofia vilositária: Não identificada (vilosidades preservadas, relação vilosidade/cripta de 3:1 ou mais), sem hiperplasia das criptas.",
         "Presença de glândulas de Brünner.",
-        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos nas pontas das vilosidades).",
         "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
         "Classificação de Marsh-Oberhuber (1999): 0."]),
       P("DUODENITE CRÔNICA INESPECÍFICA, INATIVA",[
         "Atrofia vilositária: Não identificada (vilosidades focalmente hipotróficas, sem criptas hipertróficas).",
-        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Linfocitose intraepitelial: Não identificada (exocitose de até 15 linfócitos/100 enterócitos nas pontas das vilosidades).",
         "Agregados linfoides: Presentes.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
         "Classificação de Marsh-Oberhuber (1999): 0."]),
       P("DUODENITE CRÔNICA DE PADRÃO LINFOCÍTICO, EM ATIVIDADE LEVE (VIDE NOTAS)",[
         "Atrofia vilositária: Presente, moderada (apenas restos curtos de vilosidades, ainda identificáveis; relação vilosidade/cripta menor que 3:1), acompanhada de criptas hipertróficas.",
-        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 22 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 22 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico leve em lâmina própria, sem criptite, microabscessos, erosões ou ulcerações.",
         "Linfocitose intraepitelial: Presente (exocitose de aproximadamente 40 linfócitos/100 enterócitos nas pontas das vilosidades).",
         "Hiperplasia folicular linfoide: Presente.","Parasitos: Não identificados.","Linfangiectasias: Não identificadas.",
@@ -623,7 +625,7 @@ const SEED_SITES = {
       {g:"Celularidade mononuclear", opt:[
         ["Preservada","- Celularidade preservada de leucócitos mononucleares em lâmina própria."],
         ["Aumentada","- Celularidade aumentada de leucócitos mononucleares em lâmina própria."]]},
-      {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+      {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento (CGA)).", btn:"até n eos"}},
       {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve]]},
       {g:"Linfocitose intraepitelial (n/100 enter.)", dica:"A frase sai sozinha pelo número: menos de 25 não identificada · 25 a 29 limítrofe · 30 ou mais presente.",
         num:{tpl:"- Linfocitose intraepitelial: Presente (exocitose de aproximadamente {n} linfócitos/100 enterócitos nas pontas das vilosidades).", btn:"inserir (n)"}},
@@ -646,22 +648,22 @@ const SEED_SITES = {
     presets:[
       P("MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
-        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("MUCOSA DE ÍLEO APRESENTANDO",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
-        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("ILEÍTE ATIVA MODERADA",[
         "Arquitetura preservada: Mucosa entérica com vilosidades preservadas, e sem sinais de hiperplasia das criptas.",
-        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("ILEÍTE CRÔNICA EM ATIVIDADE MODERADA",[
         "Arquitetura alterada: Encurtamento focal de vilosidades, focalmente associado a leve linfocitose intraepitelial das mesmas.",
-        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite, sem formar microabscessos.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."])
     ],
@@ -674,7 +676,7 @@ const SEED_SITES = {
       {g:"Celularidade mononuclear", opt:[
         ["Preservada","- Celularidade preservada de leucócitos mononucleares em lâmina própria."],
         ["Aumentada","- Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário."]]},
-      {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+      {g:"Eosinófilos", num:{tpl:"- Não sendo identificada eosinofilia (até {n} eosinófilos/campo de grande aumento (CGA)).", btn:"até n eos"}},
       {g:"Infiltrado neutrofílico", opt:[["Ausente",NEUTRO.ausente],["Leve",NEUTRO.leve],["Moderado c/ criptite",NEUTRO.moderado],["Acentuado",NEUTRO.acentuado]]},
       {g:"Hiperplasia folicular linfoide", opt:[["Presente","- Hiperplasia folicular linfoide: Presente."],["Ausente","- Hiperplasia folicular linfoide: Não identificada."]]},
       {g:"Edema / vasocongestão", opt:[["Presente","- Presença de edema e vasocongestão."]]}
@@ -687,42 +689,42 @@ const SEED_SITES = {
     presets:[
       P("MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",[
         "Arquitetura glandular preservada.",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Presença de edema e vasocongestão."]),
       P("MUCOSA COLÔNICA APRESENTANDO",[
         "Arquitetura glandular preservada.",
-        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Presença de edema e vasocongestão."]),
       P("COLITE CRÔNICA EM ATIVIDADE LEVE",[
         "Arquitetura glandular alterada: Perda do paralelismo glandular.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("COLITE CRÔNICA EM ATIVIDADE MODERADA",[
         "Arquitetura glandular alterada: Perda do paralelismo glandular.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("COLITE CRÔNICA EM ATIVIDADE ACENTUADA, DESTRUTIVA",[
         "Arquitetura glandular alterada: Perda do paralelismo, ramificação e rarefação glandular; metaplasia de células Paneth e metaplasia mucinosa; áreas de atrofia glandular, com áreas de destruição de glândulas pelo infiltrado inflamatório.",
-        "Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada, não sendo identificada eosinofilia franca (até 60 eosinófilos/campo de grande aumento).",
+        "Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada, não sendo identificada eosinofilia franca (até 60 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico acentuado em lâmina própria, com criptite, microabscessos de cripta e erosões, não sendo identificadas ulcerações.",
         "Agregado linfoide: Presente.","Presença de edema e vasocongestão."]),
       P("COLITE CRÔNICA INATIVA",[
         "Arquitetura glandular alterada: Perda do paralelismo glandular.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Agregado linfoide: Presente."]),
       P("AMOSTRA POUCO REPRESENTATIVA DE MUCOSA COLÔNICA, APRESENTANDO COLITE CRÔNICA INATIVA",[
         "Amostra exígua, pouco representativa.","Arquitetura glandular alterada: Perda do paralelismo glandular.",
-        "Presença de infiltrado inflamatório mononuclear (linfohistoplasmocitário) moderado em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento).",
+        "Presença de infiltrado inflamatório mononuclear (linfohistoplasmocitário) moderado em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Agregado linfoide: Presente."]),
       P("COLOPATIA DE PADRÃO LINFOCITÁRIO, INATIVA (VIDE NOTAS)",[
         "Arquitetura glandular alterada: Perda do paralelismo glandular e hiperplasia de células caliciformes focal.",
-        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento).",
+        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, e presença de eosinófilos (até 20 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de evidente exocitose de linfócitos ao epitélio.",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Agregados foliculares linfoides: Presentes, exuberantes, com linfócitos de tamanhos variáveis.","Presença de edema e vasocongestão."])
@@ -736,12 +738,12 @@ const SEED_SITES = {
     presets:[
       P("RETITE ATIVA LEVE",[
         "Arquitetura glandular preservada.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico leve/moderado em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Presença de edema e vasocongestão."]),
       P("COLITE CRÔNICA INATIVA",[
         "Arquitetura glandular alterada: Perda do paralelismo glandular.",
-        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).",
+        "Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
         "Agregado linfoide: Não identificado.","Presença de edema e vasocongestão."])
     ],
@@ -767,8 +769,8 @@ const CRIT_COLON = [
     ["Moderadamente aumentada","- Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria."],
     ["Severamente aumentada","- Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada."]]},
   {g:"Eosinófilos (atenção ao gradiente)", opt:[
-    ["Sem eosinofilia","- Não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento)."]],
-    num:{tpl:"- Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento).", btn:"até n eos"}},
+    ["Sem eosinofilia","- Não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA))."]],
+    num:{tpl:"- Presença de eosinófilos (até {n} eosinófilos/campo de grande aumento (CGA)).", btn:"até n eos"}},
   {g:"Exocitose de linfócitos ao epitélio", opt:[["Presente","- Presença de evidente exocitose de linfócitos ao epitélio."]]},
   {g:"Infiltrado neutrofílico", opt:[
     ["Ausente",NEUTRO.ausente],
@@ -840,7 +842,7 @@ const LINHA_ATIV = {
   // esôfago: atividade = neutrófilos intraepiteliais, presentes ou ausentes, mais erosão; há graduação publicada (Binato 2010; escore do Esohisto), mas os estudos pediátricos registram presença ou ausência, e qualquer neutrófilo é anormal (Black 1990; Dahms 2004; Mastracci 2020)
   esofago:["Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
     "Presença de exocitose de neutrófilos, sem erosão ou ulceração.",
-    "Presença de exocitose de neutrófilos e de erosão (necrose com tecido de granulação e/ou fibrina com neutrófilos [@mast])."],
+    "Presença de exocitose de neutrófilos e de erosão (presença de necrose, de tecido de granulação ou de fibrina com neutrófilos [@yerian])."],
   // estômago: leve, moderada e acentuada pela escala visual do Sistema Sydney atualizado
   gastrica:[NEUTRO.ausente, NEUTRO.leve, NEUTRO.moderado, NEUTRO.acentuado].map((x,i)=>x.slice(2).replace(/\.$/, i ? " (graduação pelo Sistema Sydney atualizado [@sydney])." : ".")),
   cripta:[NEUTRO.ausente.slice(2),
@@ -1020,7 +1022,7 @@ const HS_L = {
   camMp:"Muscular própria: Preservada (camadas circular interna e longitudinal externa).",
   camSer:"Serosa/adventícia: Preservada.",
   nervA:"Filetes neurais submucosos hipertróficos: Ausentes.",
-  nervP:"Filetes neurais submucosos hipertróficos: Presentes (mais de 2 filetes com mais de 40 µm de espessura em um mesmo campo de grande aumento [@veras]).",
+  nervP:"Filetes neurais submucosos hipertróficos: Presentes (mais de 2 filetes com mais de 40 µm de espessura em um mesmo campo de grande aumento (CGA) [@veras]).",
   calP:"Calretinina: Inervação mucosa preservada (neuritos imunorreativos em lâmina própria e muscular da mucosa).",
   calE:"Calretinina: Inervação mucosa esparsa ou fraca.",
   calS:"Calretinina: Imunorreatividade restrita a nervos submucosos.",
@@ -1133,7 +1135,7 @@ SEED_SITES.hirschsprung = {
     {g:"Células ganglionares — plexo da submucosa", dica:"Marque cada plexo avaliado: o segundo item do título segue a topografia marcada (\"no plexo neural da submucosa\", ou \"nos plexos neurais da submucosa e da camada muscular própria\").",
       opt:[["Presentes","- "+HS_L.subP],["Duvidosas","- "+HS_L.subD],["Ausentes","- "+HS_L.subA]]},
     {g:"Células ganglionares — plexo da camada muscular própria", opt:[["Presentes","- "+HS_L.mpP],["Ausentes","- "+HS_L.mpA],["Não amostrado","- "+HS_L.mpN]]},
-    {g:"Filetes neurais submucosos hipertróficos", dica:"Presentes: mais de 2 nervos com mais de 40 µm de espessura no mesmo campo de grande aumento (Veras 2019). Entram no título. Depois de 1 ano de idade, nervo acima de 40 µm é normal no reto distal (Kapur 2016): não usar como critério isolado.",
+    {g:"Filetes neurais submucosos hipertróficos", dica:"Presentes: mais de 2 nervos com mais de 40 µm de espessura no mesmo campo de grande aumento (CGA) (Veras 2019). Entram no título. Depois de 1 ano de idade, nervo acima de 40 µm é normal no reto distal (Kapur 2016): não usar como critério isolado.",
       opt:[["Ausentes","- "+HS_L.nervA],["Presentes","- "+HS_L.nervP]]},
     {g:"Calretinina", dica:"Só \"ausente\", com controle interno positivo, sustenta aganglionose. Presente não exclui segmento muito curto (Kapur 2014).",
       opt:[["Preservada","- "+HS_L.calP],["Esparsa ou fraca","- "+HS_L.calE],["Só em nervos submucosos","- "+HS_L.calS],["Ausente","- "+HS_L.calA],["Não realizada","- "+HS_L.calN]]},
@@ -1230,6 +1232,7 @@ const CITE = {
   kulak21:"Kulak O, Gurram B, Montgomery EA, Park JY. Pediatric autoimmune gastritis: clinical correlates and histologic features. Hum Pathol. 2021;116:31-38. doi:10.1016/j.humpath.2021.07.002.",
   pogoriler15:"Pogoriler J, Kamin D, Goldsmith JD. Pediatric non-Helicobacter pylori atrophic gastritis: a case series. Am J Surg Pathol. 2015;39(6):786-792. doi:10.1097/PAS.0000000000000378.",
   mast:"Mastracci L, Grillo F, Parente P, Unti E, Battista S, Spaggiari P, et al. Gastro-esophageal reflux disease and Barrett's esophagus: an overview with an histologic diagnostic approach. Pathologica. 2020;112(3):117-127. doi:10.32074/1591-951X-162.",
+  yerian:"Yerian L, Fiocca R, Mastracci L, Riddell R, Vieth M, Sharma P, et al. Refinement and reproducibility of histologic criteria for the assessment of microscopic lesions in patients with gastroesophageal reflux disease: the Esohisto Project. Dig Dis Sci. 2011;56(9):2656-65. doi:10.1007/s10620-011-1624-z.",
   youssef:"Youssef R, Saeed O, Lin J, González IA. Characterization of Esophageal Biopsies from Stem Cell Transplant Patients With and Without Esophageal Graft-Versus-Host Disease. Mod Pathol. 2025;38(6):100727. doi:10.1016/j.modpat.2025.100727.",
   mostafa:"Mostafa M, Hartley CP, Hagen CE. Evaluation of the lower histologic threshold for gastric graft versus host disease. Mod Pathol. 2020;33(5):962-970. doi:10.1038/s41379-019-0421-7.",
   sydney:"Dixon MF, Genta RM, Yardley JH, Correa P. Classification and grading of gastritis. The updated Sydney System. International Workshop on the Histopathology of Gastritis, Houston 1994. Am J Surg Pathol. 1996;20(10):1161-81. doi:10.1097/00000478-199610000-00001.",
@@ -1318,6 +1321,7 @@ const SEED_REFS = [
   {tag:"Esofagite eosinofílica", texto:CITE.agree},
   {tag:"Esofagite eosinofílica (laudo)", texto:CITE.gio},
   {tag:"Esôfago (refluxo, normal)", texto:CITE.mast},
+  {tag:"Esôfago (critérios Esohisto)", texto:CITE.yerian},
   {tag:"Linfócitos duodeno", texto:CITE.hayat},
   {tag:"Esofagite linfocítica", texto:CITE.putra},
   {tag:"Esofagite linfocítica (revisão)", texto:CITE.habbal},
@@ -1918,13 +1922,13 @@ function corrigeCampo(id){
 const EOS_FRASE = { desf:["não sendo identificada eosinofilia","Não foi identificada eosinofilia"],
   duv:["com presença de eosinófilos","Presença de eosinófilos"], compat:["com presença de eosinofilia","Presença de eosinofilia"] };
 function fraseEos(line, siteId, seg){
-  const m=/(\d+) eosinófilos?\/campo de grande aumento/.exec(line), k=eosKey(siteId, seg);
+  const m=/(\d+) eosinófilos?\/campo de grande aumento(?: \(CGA\))?/.exec(line), k=eosKey(siteId, seg);
   if(!m || !k || k==="esofago") return line;
   const f=EOS_FRASE[eosEval(k, +m[1])];
   return line
     .replace(/^- (?:Não sendo identificada eosinofilia(?: franca)?|Não foi identificada eosinofilia|Presença de eosin(?:ófilos|ofilia))(?= \()/, "- "+f[1])
     .replace(/,? (?:não sendo identificada eosinofilia(?: franca)?|(?:e|com) presença de eosin(?:ófilos|ofilia))(?= \()/, ", "+f[0])
-    .replace(/(\d+)( eosinófilos?\/campo de grande aumento; )\d+(\/mm²)/, (x,n,a,b)=>n+a+Math.round(n/FIELD_MM2)+b);
+    .replace(/(\d+)( eosinófilos?\/campo de grande aumento(?: \(CGA\))?; )\d+(\/mm²)/, (x,n,a,b)=>n+a+Math.round(n/FIELD_MM2)+b);
 }
 // frase dos linfócitos intraepiteliais do duodeno pela faixa da contagem
 function fraseLie(line, siteId){
@@ -2083,7 +2087,7 @@ const RE_EOS_ASSOC_POS=/^- Achados eosinofílicos associados: (?!Não identifica
 const RE_T_EOS=/(,? )(?:DE PADRÃO EOSINOFÍLICO|COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA)/;
 const RE_T_INFLAM=/ESOFAGITE|GASTRITE|GASTROPATIA|DUODENITE|ILEÍTE|ENTERITE|COLITE|COLOPATIA|RETITE|PROCTITE/;
 function eosEstado(txt, site, seg){
-  const t=txt||"", k=eosKey(site, seg), m=[...t.matchAll(/(\d+) eosinófilos?\/campo de grande aumento/g)].map(x=>+x[1]);
+  const t=txt||"", k=eosKey(site, seg), m=[...t.matchAll(/(\d+) eosinófilos?\/campo de grande aumento(?: \(CGA\))?/g)].map(x=>+x[1]);
   const temCont=m.length>0, temAssoc=RE_EOS_ASSOC.test(t);
   if(!temCont && !temAssoc) return undefined;
   const n=temCont ? Math.max(...m) : null, compat=k && n!==null && eosEval(k, n)==="compat";
@@ -2147,7 +2151,7 @@ function sincAposLinha(line){
   else if(/^- Grau da duodenite: /.test(line)) editTitle(t=>titleSetGrauDuo(t, grauDuoDaLinha(line)));
   else if(RE_MARSH.test(line)) duoSinc("marsh", mCode(line));
   else if(site==="duodeno" && (RE_ATR_DUO.test(line) || /^- Linfocitose intraepitelial: /.test(line))) duoSinc("linha");
-  if(/eosinófilos?\/campo de grande aumento|^- Achados eosinofílicos associados: /.test(line)) eosSinc();
+  if(/eosinófilos?\/campo de grande aumento(?: \(CGA\))?|^- Achados eosinofílicos associados: /.test(line)) eosSinc();
   if(site==="esofago" && /^- Achados de descamação superficial: /.test(line)) edsSinc();
 }
 // título -> linha de neutrófilos: a presença da atividade vem do título; o grau, sempre da linha
@@ -2275,12 +2279,12 @@ function comVR(line, siteId, seg){
   const ins=(m, suf)=>{ const end=m.index+m[0].length, close=line.indexOf(")", end);
     return close<0 ? line.slice(0,end)+" ("+suf.replace(/^; /,"")+")"+line.slice(end) : line.slice(0,close)+suf+line.slice(close); };
   let m;
-  if((m=/(\d+) eosinófilos?\/campo de grande aumento/.exec(line))){
+  if((m=/(\d+) eosinófilos?\/campo de grande aumento(?: \(CGA\))?/.exec(line))){
     const k=eosKey(siteId, seg), n=+m[1]; if(!k) return line;
     return ins(m, k==="esofago" ? "; valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo [@agree,gio]"
       : "; "+Math.round(n/FIELD_MM2)+"/mm²; valor de referência: limiar a partir de "+EOS_VR[k].mm2+"/mm² [@pap]; normal "+EOS_VR[k].normal+" por campo");
   }
-  if(siteId==="esofago" && (m=/(\d+) linfócitos\/campo de grande aumento/.exec(line))){
+  if(siteId==="esofago" && (m=/(\d+) linfócitos\/campo de grande aumento(?: \(CGA\))?/.exec(line))){
     const l=ESO_LINF[seg];
     return ins(m, l ? "; valor de referência: limite normal de "+l+" por campo neste nível [@putra]" : "; valor de referência: limite normal de 41 a 62 por campo, conforme o nível [@putra]");
   }
@@ -2317,8 +2321,8 @@ function linfNota(lim, n){
 // maior contagem de cada tipo encontrada no texto da amostra
 function contagens(s){
   const t=s.corpo||"", out={}, max=(re,k)=>{ let m; while((m=re.exec(t))) out[k]=Math.max(out[k]===undefined?-1:out[k], +m[1]); };
-  max(/(\d+) eosinófilos?\/campo de grande aumento/g, "eos");
-  if(s.site==="esofago") max(/(\d+) linfócitos\/campo de grande aumento/g, "linf");
+  max(/(\d+) eosinófilos?\/campo de grande aumento(?: \(CGA\))?/g, "eos");
+  if(s.site==="esofago") max(/(\d+) linfócitos\/campo de grande aumento(?: \(CGA\))?/g, "linf");
   if(s.site==="duodeno") max(/(\d+) linfócitos\/100 enterócitos/g, "lie");
   return out;
 }

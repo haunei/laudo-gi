@@ -136,11 +136,11 @@ eq(t.eosEval("esofago", 12), "compat", "esôfago 12 por campo"); eq(t.eosEval("e
 const colPre = t.SEED_SITES.colon.presets.find(p => p.titulo === "COLITE CRÔNICA INATIVA");
 const linhaEos = "- " + colPre.bullets.find(b => /eosinófilos\/campo/.test(b));
 const comVr = t.comVR(linhaEos, "colon", "Ceco");
-ok(comVr.includes("(até 7 eosinófilos/campo de grande aumento; 30/mm²; valor de referência: limiar a partir de 370/mm² [@pap]; normal 20,3 ± 8,2 [@deb] e 49,5 ± 22,4 [@iwa] por campo)."), "texto pronto de cólon ganha VR");
+ok(comVr.includes("(até 7 eosinófilos/campo de grande aumento (CGA); 30/mm²; valor de referência: limiar a partir de 370/mm² [@pap]; normal 20,3 ± 8,2 [@deb] e 49,5 ± 22,4 [@iwa] por campo)."), "texto pronto de cólon ganha VR");
 eq(t.comVR(comVr, "colon", "Ceco"), comVr, "não duplica o VR");
 eq(t.comVR(linhaEos, "colon", ""), linhaEos, "cólon sem segmento: linha fica como está");
-ok(t.comVR("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).", "esofago", "").includes("valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo [@agree,gio])"), "VR no esôfago");
-ok(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento).", "esofago", "Terço distal").includes("limite normal de 46 por campo neste nível [@putra])"), "VR de linfócitos por nível");
+ok(t.comVR("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).", "esofago", "").includes("valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo [@agree,gio])"), "VR no esôfago");
+ok(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA)).", "esofago", "Terço distal").includes("limite normal de 46 por campo neste nível [@putra])"), "VR de linfócitos por nível");
 ok(t.comVR("- Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos nas pontas das vilosidades).", "duodeno", "").endsWith("nas pontas das vilosidades; valor de referência: normal até 25 [@hayat], aumentado a partir de 30)."), "VR de linfócitos no duodeno, antes do parêntese");
 for (const k of Object.keys(t.SEED_SITES)) for (const p of t.SEED_SITES[k].presets) for (const b of p.bullets)
   if (/\d+ eosinófilos?\/campo/.test(b) && k !== "polipo") ok(t.comVR("- " + b, k, k === "colon" ? "Ceco" : "").includes("valor de referência"), "contagem com VR: " + k + " / " + p.titulo);
@@ -150,11 +150,11 @@ eq(t.linfEval(46, 47), "compat", "linfócitos acima do limite"); eq(t.linfEval(4
 eq(t.fmtNums([3, 1, 2]), "1-3", "faixa"); eq(t.fmtNums([2, 1]), "1,2", "par"); eq(t.fmtNums([1, 3]), "1,3", "salto");
 const rc = t.resolveCites("a [@deb] b [@pap,deb] c [@xyz]");
 eq(rc.txt, "a [1] b [1,2] c [@xyz]", "citações numeradas na ordem; chave desconhecida fica"); eq(rc.order.join(), "deb,pap", "ordem");
-const corpoCeco = "- COLITE CRÔNICA INATIVA:\n" + t.comVR("- Presença de eosinófilos (até 38 eosinófilos/campo de grande aumento).", "colon", "Ceco");
+const corpoCeco = "- COLITE CRÔNICA INATIVA:\n" + t.comVR("- Presença de eosinófilos (até 38 eosinófilos/campo de grande aumento (CGA)).", "colon", "Ceco");
 t.WORK.samples.push({ nome: "Ceco", corpo: corpoCeco, site: "colon", seg: "Ceco" }, { nome: "Cólon ascendente", corpo: corpoCeco, site: "colon", seg: "Cólon ascendente" });
 t.WORK.refsSel.push(t.LIB.refs[0].id);
 const l8 = t.buildLaudo();
-ok(l8.includes("(até 38 eosinófilos/campo de grande aumento; 160/mm²; valor de referência: limiar a partir de 370/mm² [1]; normal 20,3 ± 8,2 [2] e 49,5 ± 22,4 [3] por campo)."), "VR com números na linha");
+ok(l8.includes("(até 38 eosinófilos/campo de grande aumento (CGA); 160/mm²; valor de referência: limiar a partir de 370/mm² [1]; normal 20,3 ± 8,2 [2] e 49,5 ± 22,4 [3] por campo)."), "VR com números na linha");
 ok(l8.includes("NOTAS:\n- Amostras A e B: a contagem de eosinófilos está abaixo do limiar"), "nota de conclusão automática, amostras iguais juntas");
 ok(l8.includes("- Não há consenso sobre o número normal de eosinófilos") && l8.includes("[1-3]."), "nota fixa de falta de consenso");
 ok(l8.includes("REFERÊNCIAS BIBLIOGRÁFICAS:\n1. " + t.CITE.pap + "\n2. " + t.CITE.deb + "\n3. " + t.CITE.iwa + "\n4. " + t.LIB.refs[0].texto), "refs numeradas: citadas e depois as escolhidas");
@@ -244,18 +244,18 @@ ok(t.buildLaudo().startsWith("Materiais: Biópsia endoscópica de: A) Ceco, B) C
 
 // 11. v3.2: sincronização número/grau/critério -> frase e título
 ({ t, els } = boot({}));
-const E = (n) => "- Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até " + n + " eosinófilos/campo de grande aumento).";
+const E = (n) => "- Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até " + n + " eosinófilos/campo de grande aumento (CGA)).";
 for (const [site, seg, k] of [["gastrica", "", "estomago"], ["duodeno", "", "duodeno"], ["ileo", "", "ileo"], ["colon", "Ceco", "cecoasc"], ["colon", "Cólon transverso", "transdesc"], ["reto", "", "sigreto"]]) {
   const v = t.EOS_VR[k];
   ok(t.fraseEos(E(v.teto), site, seg).includes(", não sendo identificada eosinofilia (até " + v.teto), k + ": até o máximo normal");
   ok(t.fraseEos(E(v.teto + 1), site, seg).includes(", com presença de eosinófilos (até " + (v.teto + 1)), k + ": acima do normal");
   ok(t.fraseEos(E(v.campo), site, seg).includes(", com presença de eosinofilia (até " + v.campo), k + ": no limiar");
 }
-eq(t.fraseEos("- Não sendo identificada eosinofilia (até 60 eosinófilos/campo de grande aumento).", "duodeno", ""), "- Presença de eosinofilia (até 60 eosinófilos/campo de grande aumento).", "linha isolada do duodeno");
-eq(t.fraseEos("- Presença de eosinófilos (até 3 eosinófilos/campo de grande aumento).", "colon", "Ceco"), "- Não foi identificada eosinofilia (até 3 eosinófilos/campo de grande aumento).", "linha isolada do cólon");
+eq(t.fraseEos("- Não sendo identificada eosinofilia (até 60 eosinófilos/campo de grande aumento (CGA)).", "duodeno", ""), "- Presença de eosinofilia (até 60 eosinófilos/campo de grande aumento (CGA)).", "linha isolada do duodeno");
+eq(t.fraseEos("- Presença de eosinófilos (até 3 eosinófilos/campo de grande aumento (CGA)).", "colon", "Ceco"), "- Não foi identificada eosinofilia (até 3 eosinófilos/campo de grande aumento (CGA)).", "linha isolada do cólon");
 eq(t.fraseEos(E(90), "colon", ""), E(90), "cólon sem segmento não muda");
-eq(t.fraseEos("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).", "esofago", ""), "- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).", "esôfago não usa essas frases");
-ok(t.fraseEos(", e presença de eosinófilos (até 95 eosinófilos/campo de grande aumento; 84/mm²; valor de referência: x)", "colon", "Ceco").includes(", com presença de eosinofilia (até 95 eosinófilos/campo de grande aumento; 401/mm²;"), "frase e mm² acompanham o número editado");
+eq(t.fraseEos("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).", "esofago", ""), "- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).", "esôfago não usa essas frases");
+ok(t.fraseEos(", e presença de eosinófilos (até 95 eosinófilos/campo de grande aumento (CGA); 84/mm²; valor de referência: x)", "colon", "Ceco").includes(", com presença de eosinofilia (até 95 eosinófilos/campo de grande aumento (CGA); 401/mm²;"), "frase e mm² acompanham o número editado");
 for (const k of Object.keys(t.SEED_SITES)) for (const p of t.SEED_SITES[k].presets) for (const b of p.bullets) {
   const m = /(\d+) eosinófilos?\/campo/.exec(b), key = t.eosKey(k, k === "colon" ? "Ceco" : "");
   if (m && key && key !== "esofago" && /eosinofilia|presença de eosinófilos/i.test(b)) {
@@ -281,7 +281,7 @@ eq(t.tituloComAtiv("- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HI
 eq(t.tituloComAtiv("- RETITE ATIVA LEVE:", "EM ATIVIDADE ACENTUADA"), "- RETITE ATIVA ACENTUADA:", "convenção 'ativa' preservada");
 eq(t.linhaAtiv("gastrica", "EM ATIVIDADE MODERADA"), gNeutro[2][1].slice(2), "título -> linha (estômago)");
 ok(t.linhaAtiv("colon", "EM ATIVIDADE LEVE").includes("criptite ocasional"), "título -> linha (cólon)");
-ok(t.linhaAtiv("esofago", "EM ATIVIDADE", "- ESOFAGITE CRÔNICA EM ATIVIDADE, EROSIVA:").includes("erosão (necrose"), "título -> linha (esôfago erosiva)");
+ok(t.linhaAtiv("esofago", "EM ATIVIDADE", "- ESOFAGITE CRÔNICA EM ATIVIDADE, EROSIVA:").includes("erosão (presença de necrose, de tecido de granulação ou de fibrina com neutrófilos [@yerian])"), "título -> linha (esôfago erosiva, critério do Esohisto)");
 eq(t.linhaAtiv("duodeno", "EM ATIVIDADE"), t.SEED_SITES.duodeno.criterios.find(c => c.g === "Infiltrado neutrofílico").opt[1][1].slice(2), "título -> linha (duodeno)");
 eq(t.titleSetHp("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA:", true), "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori:", "H. pylori no título");
 eq(t.titleSetHp("- GASTRITE CRÔNICA EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori (DECH POSSÍVEL – NIH/2014):", false), "- GASTRITE CRÔNICA EM ATIVIDADE MODERADA (DECH POSSÍVEL – NIH/2014):", "H. pylori negativa tira o trecho e preserva DECH");
@@ -322,12 +322,12 @@ t.appendLine("- Pesquisa para H. pylori: Negativa.");
 ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE:"), "editor: H. pylori negativa tira o trecho");
 els.fSitio.value = "colon"; els.fSeg.value = "Ceco";
 els.corpo.value = "- COLITE CRÔNICA INATIVA:";
-t.appendLine("- Presença de eosinófilos (até 7 eosinófilos/campo de grande aumento).");
-ok(els.corpo.value.includes("- Não foi identificada eosinofilia (até 7 eosinófilos/campo de grande aumento; 30/mm²;"), "editor: frase pela contagem ao inserir");
+t.appendLine("- Presença de eosinófilos (até 7 eosinófilos/campo de grande aumento (CGA)).");
+ok(els.corpo.value.includes("- Não foi identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA); 30/mm²;"), "editor: frase pela contagem ao inserir");
 els.corpo.onfocus();
 els.corpo.value = els.corpo.value.replace("até 7 eos", "até 95 eos");
 els.corpo.onchange();
-ok(els.corpo.value.includes("- Presença de eosinofilia (até 95 eosinófilos/campo de grande aumento; 401/mm²;"), "editor: mudar a contagem muda o descritivo e o mm²");
+ok(els.corpo.value.includes("- Presença de eosinofilia (até 95 eosinófilos/campo de grande aumento (CGA); 401/mm²;"), "editor: mudar a contagem muda o descritivo e o mm²");
 els.corpo.value = "";
 // dados novos
 ok(t.SEED_SITES.gastrica.segmentos.includes("Transição corpo-antro"), "segmento de transição corpo-antro");
@@ -391,8 +391,8 @@ for (const [antes, depois] of [
   ["- Criptas hipertrófico e glândulas dilatado.", "- Criptas hipertróficas e glândulas dilatadas."],
   ["- Linfangiectasias: Não identificado.", "- Linfangiectasias: Não identificadas."],
   ["- Não sendo identificados eosinofilia.", "- Não sendo identificada eosinofilia."],
-  ["- Exocitose de eosinófilos (até 1 eosinófilos/campo de grande aumento).", "- Exocitose de eosinófilos (até 1 eosinófilo/campo de grande aumento)."],
-  ["- Presença de eosinófilos (até 2 eosinófilo/campo de grande aumento).", "- Presença de eosinófilos (até 2 eosinófilos/campo de grande aumento)."],
+  ["- Exocitose de eosinófilos (até 1 eosinófilos/campo de grande aumento (CGA)).", "- Exocitose de eosinófilos (até 1 eosinófilo/campo de grande aumento (CGA))."],
+  ["- Presença de eosinófilos (até 2 eosinófilo/campo de grande aumento (CGA)).", "- Presença de eosinófilos (até 2 eosinófilos/campo de grande aumento (CGA))."],
   ["- AGREGADOS LINFOIDE, EM MUCOSA RETAL:", "- AGREGADOS LINFOIDES, EM MUCOSA RETAL:"],
   ["- Alterações citopático sugestivas de ação viral.", "- Alterações citopáticas sugestivas de ação viral."],
 ]) eq(t.concorda(antes).text, depois, "concordância: " + antes);
@@ -413,7 +413,7 @@ ok(html.includes('id="corpo" rows="10" spellcheck="true" lang="pt-BR"'), "ortogr
 
 // 14. Chave "Referências: com / sem"
 const st4 = {}; ({ t, els } = boot(st4));
-const corpoRef = "- COLITE CRÔNICA INATIVA:\n" + t.comVR("- Presença de eosinófilos (até 38 eosinófilos/campo de grande aumento).", "colon", "Ceco");
+const corpoRef = "- COLITE CRÔNICA INATIVA:\n" + t.comVR("- Presença de eosinófilos (até 38 eosinófilos/campo de grande aumento (CGA)).", "colon", "Ceco");
 t.WORK.samples.push({ nome: "Ceco", corpo: corpoRef, site: "colon", seg: "Ceco" });
 t.WORK.refsSel.push(t.LIB.refs[0].id); t.WORK.refsFree = "Ref livre.";
 const comRefs = t.buildLaudo();
@@ -629,15 +629,15 @@ ok(gr("Rebiopsia / reoperação").some(g => /^Reoperação: técnica prévia/.te
 
 // 16. v3.5: nota de consenso por segmento, duodeno, amostra exígua/superficial, barra do editor
 ({ t, els } = boot({}));
-const duoCorpo = "- MUCOSA DUODENAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n" + t.comVR("- Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção");
+const duoCorpo = "- MUCOSA DUODENAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n" + t.comVR("- Celularidade preservada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).", "duodeno", "2ª porção");
 t.WORK.samples.push({ nome: "Mucosa duodenal (2ª porção)", corpo: duoCorpo, site: "duodeno", seg: "2ª porção" });
 let l16 = t.buildLaudo();
 ok(l16.includes("- Não há consenso sobre o número normal de eosinófilos na mucosa do duodeno; os valores variam"), "duodeno: nota de consenso fala do duodeno");
 ok(!/do íleo|do cólon/.test(l16), "duodeno: nota não fala de íleo nem cólon");
-t.WORK.samples.push({ nome: "Ceco", corpo: corpoCeco, site: "colon", seg: "Ceco" }, { nome: "Íleo", corpo: "- X:\n" + t.comVR("- Presença de eosinófilos (até 10 eosinófilos/campo de grande aumento).", "ileo", ""), site: "ileo", seg: "" });
+t.WORK.samples.push({ nome: "Ceco", corpo: corpoCeco, site: "colon", seg: "Ceco" }, { nome: "Íleo", corpo: "- X:\n" + t.comVR("- Presença de eosinófilos (até 10 eosinófilos/campo de grande aumento (CGA)).", "ileo", ""), site: "ileo", seg: "" });
 ok(t.buildLaudo().includes("na mucosa do duodeno, do íleo e do cólon;"), "vários segmentos: todos nomeados, em ordem");
 t.WORK.samples.length = 0;
-t.WORK.samples.push({ nome: "Esôfago", corpo: "- X:\n" + t.comVR("- Exocitose de eosinófilos (até 2 eosinófilos/campo de grande aumento).", "esofago", ""), site: "esofago", seg: "" });
+t.WORK.samples.push({ nome: "Esôfago", corpo: "- X:\n" + t.comVR("- Exocitose de eosinófilos (até 2 eosinófilos/campo de grande aumento (CGA)).", "esofago", ""), site: "esofago", seg: "" });
 ok(!/Não há consenso sobre o número normal/.test(t.buildLaudo()), "esôfago: sem nota de consenso");
 eq(t.SEED_SITES.duodeno.segmentos.join(), "Bulbo,2ª porção,Distal", "duodeno sem \"descendente\"");
 els.fSitio.value = "duodeno"; els.fSeg.value = "2ª porção"; els.fSeg.onchange();
@@ -867,12 +867,12 @@ eq(TE("- ESOFAGITE CRÔNICA INATIVA, COMPATÍVEL COM ESOFAGITE EOSINOFÍLICA (VI
 eq(TE("- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "padrao"), "- MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "normalidade não muda");
 eq(TE("- COLITE CRÔNICA INATIVA:", undefined), "- COLITE CRÔNICA INATIVA:", "sem dado de eosinófilos não mexe");
 eq(TE("- COLITE CRÔNICA INATIVA (DECH POSSÍVEL – NIH/2014):", "padrao"), "- COLITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (DECH POSSÍVEL – NIH/2014) (VIDE NOTAS):", "preserva o sufixo DECH");
-eq(t.eosEstado("- Presença de eosinófilos (até 44 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção"), "padrao", "duodeno 44: compatível");
-eq(t.eosEstado("- Presença de eosinófilos (até 30 eosinófilos/campo de grande aumento).", "duodeno", "2ª porção"), null, "duodeno 30: sem padrão");
-eq(t.eosEstado("- Presença de eosinófilos (até 88 eosinófilos/campo de grande aumento).", "colon", "Ceco"), "padrao", "ceco 88: compatível");
-eq(t.eosEstado("- Exocitose de eosinófilos (até 12 eosinófilos/campo de grande aumento).", "esofago", ""), "eoe", "esôfago 12: EoE");
-eq(t.eosEstado("- Exocitose de eosinófilos (até 11 eosinófilos/campo de grande aumento).", "esofago", ""), null, "esôfago 11: sem padrão");
-eq(t.eosEstado("- Exocitose de eosinófilos (até 5 eosinófilos/campo de grande aumento).\n- Achados eosinofílicos associados: Microabscessos eosinofílicos [@gio].", "esofago", ""), "padrao", "esôfago abaixo do limiar com achado: padrão");
+eq(t.eosEstado("- Presença de eosinófilos (até 44 eosinófilos/campo de grande aumento (CGA)).", "duodeno", "2ª porção"), "padrao", "duodeno 44: compatível");
+eq(t.eosEstado("- Presença de eosinófilos (até 30 eosinófilos/campo de grande aumento (CGA)).", "duodeno", "2ª porção"), null, "duodeno 30: sem padrão");
+eq(t.eosEstado("- Presença de eosinófilos (até 88 eosinófilos/campo de grande aumento (CGA)).", "colon", "Ceco"), "padrao", "ceco 88: compatível");
+eq(t.eosEstado("- Exocitose de eosinófilos (até 12 eosinófilos/campo de grande aumento (CGA)).", "esofago", ""), "eoe", "esôfago 12: EoE");
+eq(t.eosEstado("- Exocitose de eosinófilos (até 11 eosinófilos/campo de grande aumento (CGA)).", "esofago", ""), null, "esôfago 11: sem padrão");
+eq(t.eosEstado("- Exocitose de eosinófilos (até 5 eosinófilos/campo de grande aumento (CGA)).\n- Achados eosinofílicos associados: Microabscessos eosinofílicos [@gio].", "esofago", ""), "padrao", "esôfago abaixo do limiar com achado: padrão");
 eq(t.eosEstado("- Arquitetura glandular preservada.", "colon", "Ceco"), undefined, "sem dado: indefinido");
 // editor
 const hcE = (k, g, i) => t.SEED_SITES[k].criterios.find(c => c.g === g).opt[i][1];
@@ -883,11 +883,11 @@ ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE A
 t.appendLine(ga.opt[0][1]);
 ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA LEVE, INATIVA, EM MUCOSA DE ANTRO (VIDE NOTAS):") && els.corpo.value.split("\n").filter(l => /^- Achados eosinofílicos associados/.test(l)).length === 1, "editor: \"Ausentes\" troca a linha e tira o padrão");
 els.fSitio.value = "esofago"; els.fSeg.value = ""; els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:";
-t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).");
+t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).");
 ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):"), "editor: esôfago 21 vira padrão eosinofílico no título");
 els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("até 21 eosinófilos", "até 3 eosinófilos"); els.corpo.onchange();
 ok(!/EOSINOF/.test(els.corpo.value.split("\n")[0]), "editor: contagem editada à mão abaixo do limiar tira o trecho");
-els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Presença de eosinófilos (até 90 eosinófilos/campo de grande aumento).";
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Presença de eosinófilos (até 90 eosinófilos/campo de grande aumento (CGA)).";
 els.corpo.onfocus(); els.tb_sync.onclick();
 ok(/^- COLITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(els.corpo.value), "botão ⟳: cólon 90 ganha padrão eosinofílico");
 // texto pronto da EoE e notas
@@ -959,7 +959,7 @@ t.appendLine(L3);
 ok(els.corpo.value.startsWith("- ACHADOS HISTOLÓGICOS COMPATÍVEIS COM ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):"), "editor: 3 critérios mudam o título");
 t.appendLine(L1);
 ok(els.corpo.value.split("\n").filter(l => /^- Achados de descamação/.test(l)).length === 1, "linha de descamação troca, não duplica");
-els.corpo.value = tEoE + "\n- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).";
+els.corpo.value = tEoE + "\n- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).";
 els.corpo.onfocus(); els.corpo.value += "\n" + L3; els.corpo.onchange();
 ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL (VIDE NOTAS):"), "edição à mão: EoE ganha o trecho de EDS");
 // texto pronto, notas, alertas
@@ -1022,10 +1022,10 @@ eq(lsT[1], "- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:", "subtítulo esof�
 ok(lsT.includes("- MUCOSA GÁSTRICA: PADRÃO CÁRDIA, SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:"), "subtítulo gástrico normal de cárdia");
 ok(lsT.findIndex(l => /^- MUCOSA ESOFÁGICA/.test(l)) < lsT.findIndex(l => /^- MUCOSA GÁSTRICA/.test(l)), "esofágica antes da gástrica");
 ok(els.corpo.value.includes("valor de referência: limiar a partir de 110/mm²"), "VR do estômago na porção gástrica");
-ok(/eosinófilos\/campo de grande aumento; valor de referência: a partir de 15 por 0,3 mm²/.test(els.corpo.value), "VR do esôfago na porção esofágica");
+ok(/eosinófilos\/campo de grande aumento(?: \(CGA\))?; valor de referência: a partir de 15 por 0,3 mm²/.test(els.corpo.value), "VR do esôfago na porção esofágica");
 // achados na porção certa
 t.porcaoAtivaSet("eso");
-t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento).");
+t.appendLine("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).");
 lsT = els.corpo.value.split("\n");
 ok(/^- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(lsT[1]), "achado esofágico muda só o subtítulo esofágico");
 ok(lsT.includes("- MUCOSA GÁSTRICA: PADRÃO CÁRDIA, SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:"), "subtítulo gástrico intacto");
@@ -1119,11 +1119,11 @@ ok(els.corpo.value.includes("- Presença de exocitose de neutrófilos, sem eros�
 edita("EM ATIVIDADE", "EM ATIVIDADE, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL");
 ok(t.edsEstado(els.corpo.value) === "suficiente" && els.corpo.value.split("\n").filter(l => /^- Achados de descamação/.test(l)).length === 1, "título com EDS -> linha completa de descamação");
 // 7. eosinófilos: título sempre "DE PADRÃO EOSINOFÍLICO"; alerta quando não sustentado
-els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):\n- Exocitose de eosinófilos (até 3 eosinófilos/campo de grande aumento).";
+els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS):\n- Exocitose de eosinófilos (até 3 eosinófilos/campo de grande aumento (CGA)).";
 t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value, site: "esofago", seg: "Terço distal" });
 ok(t.alertas().some(a => /o título indica padrão eosinofílico, mas a contagem/.test(a.msg)), "alerta: padrão eosinofílico sem contagem que sustente");
 els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:"; els.corpo.onfocus();
-t.appendLine("- Exocitose de eosinófilos (até 40 eosinófilos/campo de grande aumento).");
+t.appendLine("- Exocitose de eosinófilos (até 40 eosinófilos/campo de grande aumento (CGA)).");
 ok(/^- ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO \(VIDE NOTAS\):/.test(els.corpo.value), "esôfago com 40: título diz padrão eosinofílico");
 t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value, site: "esofago", seg: "Terço distal" });
 ok(/achado histológico compatível com esofagite eosinofílica em atividade/.test(t.buildLaudo()), "nota diz compatível com EoE em atividade");
@@ -1271,7 +1271,7 @@ const tit27 = els.corpo.value.split("\n").filter(l => t.lineKind(l) === "b");
 eq(tit27.join("|"), "- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:|- PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NOS PLEXOS NEURAIS DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS):|- FILETES NEURAIS SUBMUCOSOS HIPERTRÓFICOS (VIDE NOTAS):", "os 3 títulos do modelo saem dos achados");
 ok(salva(), "modelo salvo");
 const lH27 = t.buildLaudo();
-ok(lH27.includes("A) Biópsia retal:\n- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS.\n- PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NOS PLEXOS NEURAIS DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS).\n- FILETES NEURAIS SUBMUCOSOS HIPERTRÓFICOS (VIDE NOTAS).\n \n- MICROSCOPIA:\n- Amostra adequada: Mucosa com arquitetura glandular preservada e hiperplasia folicular linfoide, submucosa representada [1] apresentando vasocongestão, camada muscular própria representada.\n- Fragmentos examinados: 1.\n- Examinados 3 níveis de corte.\n- Bloco esgotado: Não.\n- Plexo da submucosa: Células ganglionares presentes.\n- Plexo da camada muscular própria: Células ganglionares presentes.\n- Filetes neurais submucosos hipertróficos: Presentes (mais de 2 filetes com mais de 40 µm de espessura em um mesmo campo de grande aumento [2])."), "laudo do modelo: formato e ordem, critério de Veras nos filetes");
+ok(lH27.includes("A) Biópsia retal:\n- MUCOSA RETAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS.\n- PESQUISA PARA CÉLULAS GANGLIONARES: PRESENTES NOS PLEXOS NEURAIS DA SUBMUCOSA E DA CAMADA MUSCULAR PRÓPRIA (VIDE NOTAS).\n- FILETES NEURAIS SUBMUCOSOS HIPERTRÓFICOS (VIDE NOTAS).\n \n- MICROSCOPIA:\n- Amostra adequada: Mucosa com arquitetura glandular preservada e hiperplasia folicular linfoide, submucosa representada [1] apresentando vasocongestão, camada muscular própria representada.\n- Fragmentos examinados: 1.\n- Examinados 3 níveis de corte.\n- Bloco esgotado: Não.\n- Plexo da submucosa: Células ganglionares presentes.\n- Plexo da camada muscular própria: Células ganglionares presentes.\n- Filetes neurais submucosos hipertróficos: Presentes (mais de 2 filetes com mais de 40 µm de espessura em um mesmo campo de grande aumento (CGA) [2])."), "laudo do modelo: formato e ordem, critério de Veras nos filetes");
 ok(/\nNOTAS:\n- Amostra A: células ganglionares presentes, com inervação mucosa reduzida à calretinina e\/ou nervos submucosos hipertróficos: os achados podem corresponder a zona de transição e pedem correlação clínica e radiológica \[2\]\.\n- A amostra será encaminhada para exame de imunohistoquímica para complementação diagnóstica \(calretinina\)\./.test(lH27), "notas: zona de transição (original) e imuno-histoquímica");
 ok(lH27.includes("REFERÊNCIAS BIBLIOGRÁFICAS:\n1. " + t.CITE.ernica + "\n2. " + t.CITE.veras), "referências do modelo");
 // topografia: um plexo
@@ -1407,6 +1407,23 @@ t.appendLine(SSg.combo.monta(["leve", "misto"])); t.appendLine(SSg.combo.monta([
 eq(els.corpo.value.split("\n").filter(l => /^- Subserosa/.test(l)).join("|"), "- Subserosa apresenta infiltrado inflamatório mononuclear acentuado, edema e vasocongestão.", "subserosa: troca a linha, não duplica");
 ok(RS.criterios.find(c => c.g === "Mucosa").opt.every(o => /^Mucosa de padrão (entérico|colônico)/.test(o[0]) && /^- Mucosa de padrão (entérico|colônico)/.test(o[1])), "mucosa: 'Mucosa de padrão…' nos botões e nas frases");
 ok(t.SEED_SITES.duodeno.presets.filter(p => p.bullets.includes("Classificação de Marsh-Oberhuber (1999): 0.")).every(p => p.bullets.includes("Classificação de Corazza-Villanacci (2007): Não se aplica.")), "textos prontos do duodeno: Marsh 0 com Corazza não se aplica");
+
+// esôfago (Esohisto): contagem de neutrófilos, erosão ativa/cicatrizada; "campo de grande aumento (CGA)" no HTML inteiro
+({ t, els } = boot({}));
+ok(!/campo de grande aumento(?! \(CGA\)|\(\?:)/.test(src), "toda ocorrência de 'campo de grande aumento' traz '(CGA)'");
+eq(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento).", "esofago", "Terço distal"),
+  "- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento; valor de referência: limite normal de 46 por campo neste nível [@putra]).", "rascunho antigo (sem CGA): VR continua entrando");
+eq(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA)).", "esofago", "Terço distal"),
+  "- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA); valor de referência: limite normal de 46 por campo neste nível [@putra]).", "com CGA: VR entra dentro do parêntese externo");
+const GN = t.SEED_SITES.esofago.criterios.find(c => c.g === "Neutrófilos / erosão / ulceração");
+eq(GN.opt.map(o => o[0]).join("|"), "Ausentes|1 a 2/CGA|Mais de 2/CGA|Erosão cicatrizada", "grupo de neutrófilos: contagem do Esohisto e erosão cicatrizada");
+els.fSitio.value = "esofago"; els.fSeg.value = ""; els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:\n" + GN.opt[0][1];
+t.appendLine(GN.opt[2][1]);
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA EM ATIVIDADE:") && els.corpo.value.includes("(mais de 2 neutrófilos/campo de grande aumento (CGA) [@yerian])") && !els.corpo.value.includes("Não foi evidenciada exocitose de neutrófilos"), "mais de 2/CGA: troca a linha e põe EM ATIVIDADE");
+t.appendLine(GN.opt[3][1]); t.appendLine(GN.opt[3][1]);
+eq(els.corpo.value.split("\n").filter(l => l.startsWith("- Erosão cicatrizada:")).length, 1, "erosão cicatrizada não duplica");
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA EM ATIVIDADE:"), "erosão cicatrizada não muda o título");
+ok(t.buildLaudo && /Yerian L, Fiocca R/.test(src), "ref do Esohisto (Yerian 2011) cadastrada");
 
 console.log(`OK — ${n} asserts`);
 
