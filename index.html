@@ -408,7 +408,7 @@ const SEED_SITES = {
         "Não foi identificada metaplasia intestinal."])
     ],
     criterios:[
-      {g:"Hiperplasia da camada basal", dica:"Normal: camada basal com menos de 15% da espessura do epitélio; papilas até 2/3 da espessura (Mastracci 2020). Cronicidade no esôfago = alterações reativas do epitélio (camada basal com 15% ou mais, papilas acima de 2/3, espongiose); mononucleares na lâmina própria não definem cronicidade, pois aparecem em controles normais (Ismail-Beigi 1970). O Esohisto (Yerian 2011) usa 50% como limite das papilas; o app segue 2/3 (Mastracci 2020; Ismail-Beigi 1970). O grau leve/moderada/acentuada da esofagite crônica (Binato 2010) não foi adotado: o limiar de linfócitos (moderada a partir de 10 por campo) conflita com o limite normal descrito em voluntários sadios e usado no app (41 a 62 por campo, conforme o nível; Putra 2016).",
+      {g:"Hiperplasia da camada basal", dica:"Normal: camada basal com menos de 15% da espessura do epitélio; papilas até 2/3 da espessura (Mastracci 2020). Cronicidade no esôfago = alterações reativas do epitélio (camada basal com 15% ou mais, papilas acima de 2/3, espongiose); mononucleares na lâmina própria não definem cronicidade, pois aparecem em controles normais (Ismail-Beigi 1970). O Esohisto (Yerian 2011) usa 50% como limite das papilas; o app segue 2/3 (Mastracci 2020; Ismail-Beigi 1970). O grau leve/moderada/acentuada da esofagite crônica (Binato 2010) não foi adotado: o limiar de linfócitos (moderada a partir de 10 por campo de grande aumento (CGA)) conflita com o limite normal descrito em voluntários sadios e usado no app (41 a 62 por campo de grande aumento (CGA), conforme o nível; Putra 2016).",
         opt:[["Ausente","- Ausência de hiperplasia da camada basal."]],
         combo:{grupos:[[["leve","leve (15% a menos de 30% da espessura do epitélio; normal: menos de 15% [@mast])"],["acentuada","acentuada (30% ou mais da espessura do epitélio; normal: menos de 15% [@mast])"]],[["papilar","papilar"]]],
           monta:x=>"- Hiperplasia "+(x[1]?"papilar ":"")+"da camada basal"+(x[0]?" "+x[0]:"")+"."}},
@@ -841,7 +841,7 @@ const GRAUS_ATIV = ["INATIVA","EM ATIVIDADE LEVE","EM ATIVIDADE MODERADA","EM AT
 const LINHA_ATIV = {
   // esôfago: atividade = neutrófilos intraepiteliais, presentes ou ausentes, mais erosão; há graduação publicada (Binato 2010; escore do Esohisto), mas os estudos pediátricos registram presença ou ausência, e qualquer neutrófilo é anormal (Black 1990; Dahms 2004; Mastracci 2020)
   esofago:["Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração.",
-    "Presença de exocitose de neutrófilos, sem erosão ou ulceração.",
+    "Presença de exocitose de neutrófilos (___ neutrófilos/campo de grande aumento (CGA) [@yerian]), sem erosão ou ulceração.",
     "Presença de exocitose de neutrófilos e de erosão (presença de necrose, de tecido de granulação ou de fibrina com neutrófilos [@yerian])."],
   // estômago: leve, moderada e acentuada pela escala visual do Sistema Sydney atualizado
   gastrica:[NEUTRO.ausente, NEUTRO.leve, NEUTRO.moderado, NEUTRO.acentuado].map((x,i)=>x.slice(2).replace(/\.$/, i ? " (graduação pelo Sistema Sydney atualizado [@sydney])." : ".")),
@@ -1150,7 +1150,7 @@ SEED_SITES.hirschsprung = {
       opt:[["Sem achados de zona de transição","- "+HS_L.margS]],
       stack:{pre:"- "+HS_L.margPre, itens:[["aganglionose parcial","aganglionose parcial circunferencial (1/8 ou mais da circunferência)"],
         ["hipoganglionose mioentérica","hipoganglionose mioentérica (1/8 ou mais da circunferência)"],
-        ["nervos hipertróficos","hipertrofia de nervos submucosos (mais de 2 nervos com mais de 40 µm por campo)"]]}},
+        ["nervos hipertróficos","hipertrofia de nervos submucosos (mais de 2 nervos com mais de 40 µm por campo de grande aumento (CGA))"]]}},
     {g:"Peça: técnica", opt:[["Soave","- Técnica informada: Soave."],["Swenson","- Técnica informada: Swenson."],["Duhamel","- Técnica informada: Duhamel."]]},
     {g:"Peça: comprimento do espécime (cm)", num:{tpl:"- Comprimento do espécime: {n} cm.", btn:"inserir"}},
     {g:"Peça: camadas da parede", dica:"Preservadas de praxe, uma linha por camada (a mucosa está no grupo \"Mucosa\"). Se houver alteração, edite a linha e ajuste o título.",
@@ -2281,12 +2281,12 @@ function comVR(line, siteId, seg){
   let m;
   if((m=/(\d+) eosinófilos?\/campo de grande aumento(?: \(CGA\))?/.exec(line))){
     const k=eosKey(siteId, seg), n=+m[1]; if(!k) return line;
-    return ins(m, k==="esofago" ? "; valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo [@agree,gio]"
-      : "; "+Math.round(n/FIELD_MM2)+"/mm²; valor de referência: limiar a partir de "+EOS_VR[k].mm2+"/mm² [@pap]; normal "+EOS_VR[k].normal+" por campo");
+    return ins(m, k==="esofago" ? "; valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo de grande aumento (CGA) [@agree,gio]"
+      : "; "+Math.round(n/FIELD_MM2)+"/mm²; valor de referência: limiar a partir de "+EOS_VR[k].mm2+"/mm² [@pap]; normal "+EOS_VR[k].normal+" por campo de grande aumento (CGA)");
   }
   if(siteId==="esofago" && (m=/(\d+) linfócitos\/campo de grande aumento(?: \(CGA\))?/.exec(line))){
     const l=ESO_LINF[seg];
-    return ins(m, l ? "; valor de referência: limite normal de "+l+" por campo neste nível [@putra]" : "; valor de referência: limite normal de 41 a 62 por campo, conforme o nível [@putra]");
+    return ins(m, l ? "; valor de referência: limite normal de "+l+" por campo de grande aumento (CGA) neste nível [@putra]" : "; valor de referência: limite normal de 41 a 62 por campo de grande aumento (CGA), conforme o nível [@putra]");
   }
   if(siteId==="duodeno" && (m=/(\d+) linfócitos\/100 enterócitos/.exec(line)))
     return ins(m, "; valor de referência: normal até 25 [@hayat], aumentado a partir de 30");
@@ -2314,7 +2314,7 @@ function linfEval(lim, n){ return lim ? (n>lim ? "compat" : "desf") : (n>62 ? "c
 function linfNota(lim, n){
   const a="a contagem de linfócitos intraepiteliais do esôfago ", st=linfEval(lim,n);
   return (st==="compat" ? a+"está acima do limite normal descrito [@putra]: achado compatível com esofagite de padrão linfocítico, se a distribuição for peripapilar e os granulócitos forem raros ou ausentes."
-    : st==="duv" ? a+"está na faixa em que o limite normal depende do nível biopsiado (41 a 62 por campo [@putra]): não é possível afirmar, sem o nível, se o valor é patológico."
+    : st==="duv" ? a+"está na faixa em que o limite normal depende do nível biopsiado (41 a 62 por campo de grande aumento (CGA) [@putra]): não é possível afirmar, sem o nível, se o valor é patológico."
     : a+"está dentro do limite normal descrito [@putra]: o achado desfavorece esofagite de padrão linfocítico.")
     +" Não há consenso sobre o ponto de corte [@habbal].";
 }
@@ -2485,6 +2485,8 @@ function alertasDe(samples, rotDe){
       out.push({conf:true, msg:rot+": OLGIM estágio 0 com metaplasia intestinal presente."});
     if(/OLGA: Estágio 0/.test(corpo||"") && /Atrofia: Presente/.test(corpo||""))
       out.push({conf:true, msg:rot+": OLGA estágio 0 com atrofia presente."});
+    if(/___/.test(corpo||""))
+      out.push({conf:false, msg:rot+": há campo livre não preenchido (___); preencha a contagem ou apague o trecho."});
     if(WORK.semRefs && /vide referências bibliográficas/i.test(corpo||""))
       out.push({conf:false, msg:rot+": o texto diz \"vide referências bibliográficas\", mas as referências estão desligadas."});
     if(dech && dech.manual && dech.manual!==dech.sug)

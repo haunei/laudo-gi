@@ -128,19 +128,19 @@ eq(t.eosKey("colon", ""), null, "cólon sem segmento não tem VR");
 eq(t.eosKey("reto", ""), "sigreto", "reto");
 eq(t.eosKey("polipo", "Cólon"), null, "pólipo sem VR");
 for (const [k, c, m] of [["estomago", 26, 110], ["duodeno", 44, 185], ["ileo", 52, 220], ["cecoasc", 88, 370], ["transdesc", 71, 300], ["sigreto", 52, 220]]) {
-  eq(t.EOS_VR[k].campo, c, "limiar por campo " + k); eq(t.EOS_VR[k].mm2, m, "limiar por mm² " + k);
+  eq(t.EOS_VR[k].campo, c, "limiar por campo de grande aumento (CGA) " + k); eq(t.EOS_VR[k].mm2, m, "limiar por mm² " + k);
   eq(t.eosEval(k, c), "compat", k + " no limiar = compatível"); eq(t.eosEval(k, t.EOS_VR[k].teto), "desf", k + " no teto normal = desfavorece");
   eq(t.eosEval(k, t.EOS_VR[k].teto + 1), "duv", k + " acima do normal = duvidoso");
 }
-eq(t.eosEval("esofago", 12), "compat", "esôfago 12 por campo"); eq(t.eosEval("esofago", 11), "desf", "esôfago 11 por campo");
+eq(t.eosEval("esofago", 12), "compat", "esôfago 12 por campo de grande aumento (CGA)"); eq(t.eosEval("esofago", 11), "desf", "esôfago 11 por campo de grande aumento (CGA)");
 const colPre = t.SEED_SITES.colon.presets.find(p => p.titulo === "COLITE CRÔNICA INATIVA");
 const linhaEos = "- " + colPre.bullets.find(b => /eosinófilos\/campo/.test(b));
 const comVr = t.comVR(linhaEos, "colon", "Ceco");
-ok(comVr.includes("(até 7 eosinófilos/campo de grande aumento (CGA); 30/mm²; valor de referência: limiar a partir de 370/mm² [@pap]; normal 20,3 ± 8,2 [@deb] e 49,5 ± 22,4 [@iwa] por campo)."), "texto pronto de cólon ganha VR");
+ok(comVr.includes("(até 7 eosinófilos/campo de grande aumento (CGA); 30/mm²; valor de referência: limiar a partir de 370/mm² [@pap]; normal 20,3 ± 8,2 [@deb] e 49,5 ± 22,4 [@iwa] por campo de grande aumento (CGA))."), "texto pronto de cólon ganha VR");
 eq(t.comVR(comVr, "colon", "Ceco"), comVr, "não duplica o VR");
 eq(t.comVR(linhaEos, "colon", ""), linhaEos, "cólon sem segmento: linha fica como está");
-ok(t.comVR("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).", "esofago", "").includes("valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo [@agree,gio])"), "VR no esôfago");
-ok(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA)).", "esofago", "Terço distal").includes("limite normal de 46 por campo neste nível [@putra])"), "VR de linfócitos por nível");
+ok(t.comVR("- Exocitose de eosinófilos (até 21 eosinófilos/campo de grande aumento (CGA)).", "esofago", "").includes("valor de referência: a partir de 15 por 0,3 mm², cerca de 12 por campo de grande aumento (CGA) [@agree,gio])"), "VR no esôfago");
+ok(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA)).", "esofago", "Terço distal").includes("limite normal de 46 por campo de grande aumento (CGA) neste nível [@putra])"), "VR de linfócitos por nível");
 ok(t.comVR("- Linfocitose intraepitelial: Não identificada (exocitose de até 5 linfócitos/100 enterócitos nas pontas das vilosidades).", "duodeno", "").endsWith("nas pontas das vilosidades; valor de referência: normal até 25 [@hayat], aumentado a partir de 30)."), "VR de linfócitos no duodeno, antes do parêntese");
 for (const k of Object.keys(t.SEED_SITES)) for (const p of t.SEED_SITES[k].presets) for (const b of p.bullets)
   if (/\d+ eosinófilos?\/campo/.test(b) && k !== "polipo") ok(t.comVR("- " + b, k, k === "colon" ? "Ceco" : "").includes("valor de referência"), "contagem com VR: " + k + " / " + p.titulo);
@@ -154,7 +154,7 @@ const corpoCeco = "- COLITE CRÔNICA INATIVA:\n" + t.comVR("- Presença de eosin
 t.WORK.samples.push({ nome: "Ceco", corpo: corpoCeco, site: "colon", seg: "Ceco" }, { nome: "Cólon ascendente", corpo: corpoCeco, site: "colon", seg: "Cólon ascendente" });
 t.WORK.refsSel.push(t.LIB.refs[0].id);
 const l8 = t.buildLaudo();
-ok(l8.includes("(até 38 eosinófilos/campo de grande aumento (CGA); 160/mm²; valor de referência: limiar a partir de 370/mm² [1]; normal 20,3 ± 8,2 [2] e 49,5 ± 22,4 [3] por campo)."), "VR com números na linha");
+ok(l8.includes("(até 38 eosinófilos/campo de grande aumento (CGA); 160/mm²; valor de referência: limiar a partir de 370/mm² [1]; normal 20,3 ± 8,2 [2] e 49,5 ± 22,4 [3] por campo de grande aumento (CGA))."), "VR com números na linha");
 ok(l8.includes("NOTAS:\n- Amostras A e B: a contagem de eosinófilos está abaixo do limiar"), "nota de conclusão automática, amostras iguais juntas");
 ok(l8.includes("- Não há consenso sobre o número normal de eosinófilos") && l8.includes("[1-3]."), "nota fixa de falta de consenso");
 ok(l8.includes("REFERÊNCIAS BIBLIOGRÁFICAS:\n1. " + t.CITE.pap + "\n2. " + t.CITE.deb + "\n3. " + t.CITE.iwa + "\n4. " + t.LIB.refs[0].texto), "refs numeradas: citadas e depois as escolhidas");
@@ -423,7 +423,7 @@ els.btnRefs.onclick();
 const semRefs = t.buildLaudo();
 ok(!/\[\d+(?:[-,]\d+)*\]/.test(semRefs) && !/\[@/.test(semRefs), "sem referências: nenhum número ou marca no texto");
 ok(!semRefs.includes("REFERÊNCIAS BIBLIOGRÁFICAS:") && !semRefs.includes(t.CITE.pap) && !semRefs.includes("Ref livre."), "sem referências: sem lista (citadas, escolhidas ou livres)");
-ok(semRefs.includes("valor de referência: limiar a partir de 370/mm²; normal 20,3 ± 8,2 e 49,5 ± 22,4 por campo)."), "valor de referência continua, sem os números");
+ok(semRefs.includes("valor de referência: limiar a partir de 370/mm²; normal 20,3 ± 8,2 e 49,5 ± 22,4 por campo de grande aumento (CGA))."), "valor de referência continua, sem os números");
 ok(semRefs.includes("NOTAS:\n- Amostra A: a contagem de eosinófilos está abaixo do limiar de consenso para o ceco/cólon ascendente e dentro da faixa descrita em crianças sem doença: o achado desfavorece"), "nota de conclusão continua, sem os números");
 ok(!/ [.,;:)]| {2}/.test(semRefs.split("\n").filter(l => l.trim()).join("\n")), "sem espaço sobrando onde havia número");
 eq(els.btnRefs.textContent, "Referências: sem", "rótulo muda");
@@ -1115,7 +1115,7 @@ ok(/^- GASTRITE CRÔNICA EM ATIVIDADE ACENTUADA,/.test(els.corpo.value), "linha 
 els.fSitio.value = "esofago"; els.fSeg.value = "Terço distal";
 els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:\n- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."; els.corpo.onfocus();
 edita("INATIVA", "EM ATIVIDADE");
-ok(els.corpo.value.includes("- Presença de exocitose de neutrófilos, sem erosão ou ulceração."), "esôfago: título em atividade -> linha presente");
+ok(els.corpo.value.includes("- Presença de exocitose de neutrófilos (___ neutrófilos/campo de grande aumento (CGA) [@yerian]), sem erosão ou ulceração."), "esôfago: título em atividade -> linha presente, com campo livre para a contagem");
 edita("EM ATIVIDADE", "EM ATIVIDADE, COM ACHADOS HISTOLÓGICOS DE ESOFAGITE DISSECANTE SUPERFICIAL");
 ok(t.edsEstado(els.corpo.value) === "suficiente" && els.corpo.value.split("\n").filter(l => /^- Achados de descamação/.test(l)).length === 1, "título com EDS -> linha completa de descamação");
 // 7. eosinófilos: título sempre "DE PADRÃO EOSINOFÍLICO"; alerta quando não sustentado
@@ -1159,7 +1159,7 @@ t.inserePorcao("gas", t.SEED_SITES.gastrica.presets.find(p => p.titulo === "MUCO
 els.corpo.onfocus();
 els.corpo.value = els.corpo.value.replace("- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:", "- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA EM ATIVIDADE:"); els.corpo.onchange();
 let ls10 = els.corpo.value.split("\n"), iG10 = ls10.findIndex(l => /^- MUCOSA GÁSTRICA/.test(l));
-ok(ls10.slice(1, iG10).includes("- Presença de exocitose de neutrófilos, sem erosão ou ulceração."), "transição: subtítulo esofágico -> achado esofágico");
+ok(ls10.slice(1, iG10).includes("- Presença de exocitose de neutrófilos (___ neutrófilos/campo de grande aumento (CGA) [@yerian]), sem erosão ou ulceração."), "transição: subtítulo esofágico -> achado esofágico");
 ok(!ls10.slice(iG10).some(l => /exocitose de neutrófilos, sem erosão/.test(l)), "transição: porção gástrica intacta");
 els.corpo.onfocus();
 els.corpo.value = els.corpo.value.replace(/- MUCOSA GÁSTRICA: [^\n]*/, "- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA E SUPERFICIAL, APRESENTANDO OS SEGUINTES ACHADOS HISTOLÓGICOS (VIDE NOTAS):"); els.corpo.onchange();
@@ -1182,7 +1182,7 @@ ok(els.corpo.value.startsWith("- ILEÍTE CRÔNICA INATIVA:"), "íleo: título EM
 els.fSitio.value = "esofago"; els.fSeg.value = "Terço distal";
 els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:\n- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."; els.corpo.onfocus();
 edita2("INATIVA", "EM ATIVIDADE");
-ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA EM ATIVIDADE:") && els.corpo.value.includes("- Presença de exocitose de neutrófilos, sem erosão ou ulceração."), "esôfago (só presença) não bloqueia: a linha passa a presente");
+ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA EM ATIVIDADE:") && els.corpo.value.includes("- Presença de exocitose de neutrófilos (___ neutrófilos/campo de grande aumento (CGA) [@yerian]), sem erosão ou ulceração."), "esôfago (só presença) não bloqueia: a linha passa a presente");
 els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.corpo.value = "- COLITE CRÔNICA INATIVA:\n- Arquitetura das criptas preservada."; els.corpo.onfocus();
 t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: "- COLITE CRÔNICA EM ATIVIDADE LEVE:\n- Arquitetura das criptas preservada.", site: "colon", seg: "Ceco" });
 ok(t.alertas().some(a => /o título diz EM ATIVIDADE, mas não há linha de neutrófilos/.test(a.msg)), "alerta: título em atividade sem linha de neutrófilos");
@@ -1412,9 +1412,9 @@ ok(t.SEED_SITES.duodeno.presets.filter(p => p.bullets.includes("Classificação 
 ({ t, els } = boot({}));
 ok(!/campo de grande aumento(?! \(CGA\)|\(\?:)/.test(src), "toda ocorrência de 'campo de grande aumento' traz '(CGA)'");
 eq(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento).", "esofago", "Terço distal"),
-  "- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento; valor de referência: limite normal de 46 por campo neste nível [@putra]).", "rascunho antigo (sem CGA): VR continua entrando");
+  "- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento; valor de referência: limite normal de 46 por campo de grande aumento (CGA) neste nível [@putra]).", "rascunho antigo (sem CGA): VR continua entrando");
 eq(t.comVR("- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA)).", "esofago", "Terço distal"),
-  "- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA); valor de referência: limite normal de 46 por campo neste nível [@putra]).", "com CGA: VR entra dentro do parêntese externo");
+  "- Exocitose de linfócitos pequenos (até 20 linfócitos/campo de grande aumento (CGA); valor de referência: limite normal de 46 por campo de grande aumento (CGA) neste nível [@putra]).", "com CGA: VR entra dentro do parêntese externo");
 const GN = t.SEED_SITES.esofago.criterios.find(c => c.g === "Neutrófilos / erosão / ulceração");
 eq(GN.opt.map(o => o[0]).join("|"), "Ausentes|1 a 2/CGA|Mais de 2/CGA|Erosão cicatrizada", "grupo de neutrófilos: contagem do Esohisto e erosão cicatrizada");
 els.fSitio.value = "esofago"; els.fSeg.value = ""; els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:\n" + GN.opt[0][1];
@@ -1424,6 +1424,14 @@ t.appendLine(GN.opt[3][1]); t.appendLine(GN.opt[3][1]);
 eq(els.corpo.value.split("\n").filter(l => l.startsWith("- Erosão cicatrizada:")).length, 1, "erosão cicatrizada não duplica");
 ok(els.corpo.value.startsWith("- ESOFAGITE CRÔNICA EM ATIVIDADE:"), "erosão cicatrizada não muda o título");
 ok(t.buildLaudo && /Yerian L, Fiocca R/.test(src), "ref do Esohisto (Yerian 2011) cadastrada");
+ok(!/por campo(?! de grande aumento \(CGA\))/.test(src), "'por campo' sempre como 'por campo de grande aumento (CGA)'");
+ok(t.linhaAtiv("esofago", "EM ATIVIDADE", "- ESOFAGITE CRÔNICA EM ATIVIDADE:").includes("(___ neutrófilos/campo de grande aumento (CGA) [@yerian])"), "título -> linha: campo livre para a contagem");
+t.WORK.samples.length = 0;
+t.WORK.samples.push({ nome: "Esôfago", corpo: "- ESOFAGITE CRÔNICA EM ATIVIDADE:\n- " + t.linhaAtiv("esofago", "EM ATIVIDADE", ""), site: "esofago", seg: "" });
+const alL = t.alertas().filter(a => /campo livre/.test(a.msg));
+ok(alL.length === 1 && !alL[0].conf, "campo livre não preenchido: alerta que não bloqueia");
+t.WORK.samples[0].corpo = t.WORK.samples[0].corpo.replace("___", "2");
+eq(t.alertas().filter(a => /campo livre/.test(a.msg)).length, 0, "campo preenchido: sem alerta");
 
 console.log(`OK — ${n} asserts`);
 

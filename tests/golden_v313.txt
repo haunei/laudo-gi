@@ -3,7 +3,7 @@ Materiais: Biópsias endoscópicas/colonoscópicas de: A) Mucosa gástrica, B) M
 A) Mucosa gástrica:
 - MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:
 - Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).
-- Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA); 0/mm²; valor de referência: limiar a partir de 110/mm² [1]; normal 1,9 ± 1,3 no antro e 2,1 ± 2,4 no fundo [2]; menos de 10 [3] por campo).
+- Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA); 0/mm²; valor de referência: limiar a partir de 110/mm² [1]; normal 1,9 ± 1,3 no antro e 2,1 ± 2,4 no fundo [2]; menos de 10 [3] por campo de grande aumento (CGA)).
 - Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.
 - Hiperplasia foveolar: Não identificada.
 - Metaplasia intestinal: Não identificada.
@@ -12,7 +12,7 @@ A) Mucosa gástrica:
 
 - MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:
 - Amostragem: Mucosa gástrica de padrão antral.
-- Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA); 0/mm²; valor de referência: limiar a partir de 110/mm² [1]; normal 1,9 ± 1,3 no antro e 2,1 ± 2,4 no fundo [2]; menos de 10 [3] por campo).
+- Celularidade habitual de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (0 eosinófilos/campo de grande aumento (CGA); 0/mm²; valor de referência: limiar a partir de 110/mm² [1]; normal 1,9 ± 1,3 no antro e 2,1 ± 2,4 no fundo [2]; menos de 10 [3] por campo de grande aumento (CGA)).
 - Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.
 - Hiperplasia foveolar: Não identificada.
 - Metaplasia intestinal: Não identificada.
@@ -29,7 +29,7 @@ B) Mucosa duodenal:
 - MICROSCOPIA:
 - Atrofia vilositária: Vilosidades levemente hipotróficas, sem criptas hipertróficas.
 - Grau da duodenite: Moderado (aumento da celularidade da lâmina própria e alteração do epitélio superficial [4]).
-- Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento (CGA); 42/mm²; valor de referência: limiar a partir de 185/mm² [1]; normal 9,6 ± 5,3 [2] e 30,0 ± 15,8 [3] por campo).
+- Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento (CGA); 42/mm²; valor de referência: limiar a partir de 185/mm² [1]; normal 9,6 ± 5,3 [2] e 30,0 ± 15,8 [3] por campo de grande aumento (CGA)).
 - Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.
 - Linfocitose intraepitelial: Não identificada (exocitose de até 4 linfócitos/100 enterócitos nas pontas das vilosidades; valor de referência: normal até 25 [5], aumentado a partir de 30).
 - Presença de glândulas de Brünner.
@@ -45,7 +45,7 @@ C) Íleo:
 - AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:
 - Amostra superficial e com artefatos técnicos de esmagamento, pouco representativa.
 - Arquitetura glandular: Não avaliável com segurança pela baixa representatividade da amostra.
-- Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento (CGA); 51/mm²; valor de referência: limiar a partir de 220/mm² [1]; normal 12,4 ± 5,4 [2] e 38,3 ± 22,7 [3] por campo).
+- Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 12 eosinófilos/campo de grande aumento (CGA); 51/mm²; valor de referência: limiar a partir de 220/mm² [1]; normal 12,4 ± 5,4 [2] e 38,3 ± 22,7 [3] por campo de grande aumento (CGA)).
 - Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.
 - Hiperplasia folicular linfoide: Presente, exuberante.
 
@@ -94,6 +94,6 @@ G) Reto:
 
 - MICROSCOPIA:
 - Arquitetura glandular alterada: Perda do paralelismo glandular.
-- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 13 eosinófilos/campo de grande aumento (CGA); 55/mm²; valor de referência: limiar a partir de 220/mm² [1]; normal 8,3 ± 5,9 [2]; menos de 10 no reto [3] por campo).
+- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia (até 13 eosinófilos/campo de grande aumento (CGA); 55/mm²; valor de referência: limiar a partir de 220/mm² [1]; normal 8,3 ± 5,9 [2]; menos de 10 no reto [3] por campo de grande aumento (CGA)).
 - Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.
 - Agregado linfoide: Presente.
