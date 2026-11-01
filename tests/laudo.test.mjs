@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,montaBloco,titleSetCron,cronDaLinha,linhaComCron,gasTitulo,gasBlocos,CRON_SITIO,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -222,7 +222,8 @@ for (const k of ["duodeno", "ileo"]) ok(!/levemente|moderadamente|severamente|li
 ok(!/Espongiose (leve|moderada|acentuada)/.test(JSON.stringify(t.SEED_SITES.esofago)), "espongiose sem três graus");
 eq(t.SEED_SITES.esofago.presets.filter(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA").length, 1, "sem título duplicado");
 ok(t.SEED_SITES.gastrica.presets.find(p => p.titulo === "GASTRITE CRÔNICA EM ATIVIDADE MODERADA").bullets.some(b => b.includes("[@sydney]")), "atividade gástrica cita o Sydney");
-ok(!t.SEED_SITES.gastrica.presets.find(p => p.titulo === "GASTRITE CRÔNICA INATIVA").bullets.some(b => b.includes("[@sydney]")), "inativa não cita");
+ok(!t.SEED_SITES.gastrica.presets.find(p => p.titulo === "GASTRITE CRÔNICA INATIVA").bullets.some(b => /neutrofílico/.test(b) && b.includes("[@sydney]")), "inativa: a linha de neutrófilos não cita");
+ok(t.SEED_SITES.gastrica.presets.find(p => p.titulo === "GASTRITE CRÔNICA INATIVA").bullets.some(b => /^Celularidade levemente aumentada .* \(graduação pelo Sistema Sydney atualizado \[@sydney\]\)/.test(b)), "v3.14: a celularidade graduada cita o Sydney");
 ok(!t.SEED_SITES.reto.presets.some(p => /COLITE|COLÔNICA|COLOPATIA|RETOPATIA/.test(p.titulo)), "reto sem títulos de cólon");
 ok(t.SEED_SITES.reto.presets.some(p => p.titulo.startsWith("RETITE DE PADRÃO LINFOCITÁRIO")), "retite de padrão linfocitário");
 eq(t.SEED_SITES.reto.presets.length, t.SEED_SITES.colon.presets.length + 1, "reto tem todas as opções do cólon");
@@ -652,7 +653,7 @@ for (const k of ["esofago", "gastrica", "duodeno", "ileo", "colon", "reto"]) {
     eq(t.concorda(t.presetText(p)).trocas.length, 0, "concordância sem troca: " + p.titulo);
   }
 }
-eq(t.SEED_SITES.gastrica.presets.filter(p => /^AMOSTRA POUCO/.test(p.titulo)).length, 3, "estômago: antral, oxíntico e cárdia");
+eq(t.SEED_SITES.gastrica.presets.filter(p => /^AMOSTRA POUCO/.test(p.titulo)).length, 1, "estômago: um cartão (a topografia vem da amostragem)");
 const ilN = t.SEED_SITES.ileo.presets.filter(p => /^(AMOSTRA POUCO REPRESENTATIVA DE )?MUCOSA DE ÍLEO (SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS|APRESENTANDO)$/.test(p.titulo));
 eq(ilN.map(p => p.titulo).join(" | "), "MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS | MUCOSA DE ÍLEO APRESENTANDO | AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS", "íleo: dois cabeçalhos de normalidade e o exíguo");
 eq(ilN[0].bullets.join("|"), ilN[1].bullets.join("|"), "íleo: os dois cabeçalhos com os mesmos achados");
@@ -707,7 +708,7 @@ ok(t.laudoToPreviewHTML("Materiais: x.\n \nA) X:\n- Linha com *itálico*.").incl
 ok(t.laudoToRichHTML("Materiais: x.\n \nA) X:\n- GASTRITE ASSOCIADA A H. PYLORI:").includes("<i>H. PYLORI</i>"), "itálico do H. pylori continua");
 
 // 17. v3.5.1: duodeno, cólon e reto com os dois cabeçalhos de normalidade (como o íleo)
-for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔNICA"], ["reto", "MUCOSA RETAL"], ["ileo", "MUCOSA DE ÍLEO"], ["esofago", "MUCOSA ESOFÁGICA"], ["gastrica", "MUCOSA GÁSTRICA DE PADRÃO ANTRAL"], ["gastrica", "MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO"]]) {
+for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔNICA"], ["reto", "MUCOSA RETAL"], ["ileo", "MUCOSA DE ÍLEO"], ["esofago", "MUCOSA ESOFÁGICA"], ["gastrica", "MUCOSA GÁSTRICA"]]) {
   const ps = t.SEED_SITES[k].presets, achar = (tt) => ps.filter(p => p.titulo === tt);
   const sem = achar(muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), apr = achar(muc + " APRESENTANDO"), ex = achar("AMOSTRA POUCO REPRESENTATIVA DE " + muc + " SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
   ok(sem.length === 1 && apr.length === 1 && ex.length === 1, k + ": dois cabeçalhos e um exíguo");
@@ -723,26 +724,29 @@ for (const [k, muc] of [["duodeno", "MUCOSA DUODENAL"], ["colon", "MUCOSA COLÔN
 const G = t.SEED_SITES.gastrica, D = t.SEED_SITES.duodeno, I = t.SEED_SITES.ileo;
 const hp = t.presetText(G.presets.find(p => /PYLORI POSITIVA/i.test(p.titulo)));
 let a = t.adaptaGas(hp, "Antro");
-ok(a.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE ANTRO, COM PESQUISA PARA H. pylori POSITIVA (+2/+3):"), "H. pylori: título vai para antro");
-ok(a.includes("\n- Amostragem: Mucosa gástrica de padrão antral.\n") && !/oxíntico/i.test(a), "H. pylori: linha de amostragem vai para antro");
+ok(a.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE PADRÃO ANTRAL, COM PESQUISA PARA H. pylori POSITIVA (+2/+3):"), "H. pylori: título ganha a topografia do antro");
+ok(a.includes("\n- Amostragem: Mucosa gástrica de padrão antral.\n") && !/oxíntico/i.test(a) && a.includes("- Classificação OLGA: Estágio 0."), "H. pylori: amostragem antral, com OLGA e OLGIM");
 eq(t.adaptaGas(a, "Corpo/fundo (oxíntico)").split("\n")[0], "- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO), COM PESQUISA PARA H. pylori POSITIVA (+2/+3):", "volta para corpo/fundo");
+ok(!/OLG/.test(t.adaptaGas(a, "Corpo/fundo (oxíntico)")), "fora do antro, OLGA e OLGIM saem");
 ok(t.adaptaGas(hp, "Transição corpo-antro").includes("EM MUCOSA DE TRANSIÇÃO CORPO-ANTRO") && t.adaptaGas(hp, "Misto oxíntico/mucinoso").includes("- Amostragem: Mucosa gástrica de padrão misto oxíntico/mucinoso."), "transição e misto");
-ok(t.adaptaGas(hp, "Cárdia").startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE PADRÃO CÁRDIA,") && t.adaptaGas(hp, "Cárdia").includes("- Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas)."), "cárdia: agora adapta título e linha (v3.9)"); eq(t.adaptaGas(hp, "Incisura"), hp, "incisura: sem adaptação");
+ok(t.adaptaGas(hp, "Cárdia").startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE PADRÃO CÁRDIA,") && t.adaptaGas(hp, "Cárdia").includes("- Amostragem: Mucosa gástrica de padrão cárdia (glândulas mucinosas)."), "cárdia");
+ok(t.adaptaGas(hp, "Incisura").includes("EM MUCOSA DE TRANSIÇÃO CORPO-ANTRO"), "incisura = transição corpo-antro");
 eq(t.adaptaGas("- MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "Antro"), "- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:", "normalidade");
-eq(t.adaptaGas("- GASTROPATIA REATIVA EM MUCOSA OXÍNTICA (PADRÃO CORPO/FUNDO):", "Antro"), "- GASTROPATIA REATIVA EM MUCOSA DE ANTRO:", "gastropatia reativa");
+eq(t.adaptaGas("- GASTROPATIA REATIVA EM MUCOSA OXÍNTICA (PADRÃO CORPO/FUNDO):", "Antro"), "- GASTROPATIA REATIVA EM MUCOSA DE PADRÃO ANTRAL:", "gastropatia reativa (título antigo)");
 const linfG = t.presetText(G.presets.find(p => /LINFOCITÁRIO/.test(p.titulo)));
-ok(t.adaptaGas(linfG, "Antro").includes("Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo) e padrão misto"), "linha combinada não é tocada");
-for (const seg of ["Antro", "Corpo/fundo (oxíntico)"]) {
+eq(t.montaBloco("gastrica", linfG).split("\n")[0], "- GASTROPATIA DE PADRÃO LINFOCITÁRIO, EM ATIVIDADE MODERADA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) E MISTO OXÍNTICO/MUCINOSO (VIDE NOTAS):", "amostragem combinada: topografia própria no título");
+for (const seg of ["", "Antro", "Corpo/fundo (oxíntico)"]) {
   const tx = t.gasTextos(G, seg).map(p => p.titulo);
   eq(new Set(tx).size, tx.length, "textos do estômago sem repetição: " + seg);
-  ok(!tx.some(x => (seg === "Antro" ? /OXÍNTIC|CORPO\/FUNDO/ : /ANTRO|ANTRAL/).test(x)), "textos só do segmento: " + seg);
+  ok(!tx.some(x => /ANTRO|ANTRAL|OXÍNTIC|CORPO\/FUNDO|CÁRDIA/.test(x)), "cartões sem topografia: " + seg);
 }
-const normAntro = t.gasTextos(G, "Antro").find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
-ok(normAntro.bullets.includes("Classificação OLGA: Estágio 0."), "antro: fica o texto nativo do antro (com OLGA)");
+const normAntro = t.gasTextos(G, "Antro").find(p => p.titulo === "MUCOSA GÁSTRICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
+ok(normAntro.bullets.includes("Amostragem: Mucosa gástrica de padrão antral.") && !normAntro.bullets.some(b => /OLG/.test(b)), "cartão: amostragem do segmento; OLGA entra na inserção");
+ok(t.montaBloco("gastrica", t.presetText(normAntro)).startsWith("- MUCOSA GÁSTRICA DE PADRÃO ANTRAL SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:") && t.montaBloco("gastrica", t.presetText(normAntro)).endsWith("- Classificação OLGIM: Estágio 0.\n- Classificação OLGA: Estágio 0."), "inserção: título com a topografia; OLGIM e OLGA no antro");
 // editor: segmento, botão de amostragem e título editado
 els.fSitio.value = "gastrica"; els.fSeg.value = "Corpo/fundo (oxíntico)"; els.corpo.value = hp;
 els.fSeg.value = "Antro"; els.fSeg.onchange();
-ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE ANTRO,") && els.corpo.value.includes("- Amostragem: Mucosa gástrica de padrão antral."), "trocar o segmento adapta o editor");
+ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE PADRÃO ANTRAL,") && els.corpo.value.includes("- Amostragem: Mucosa gástrica de padrão antral."), "trocar o segmento adapta o editor");
 t.appendLine("- Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).");
 ok(els.corpo.value.startsWith("- GASTRITE CRÔNICA EM ATIVIDADE LEVE, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO),") && els.corpo.value.split("\n").filter(l => /^- Amostragem:/.test(l)).length === 1, "botão de amostragem ajusta o título, sem duplicar a linha");
 els.corpo.onfocus();
@@ -1012,7 +1016,7 @@ els.fSitio.value = "esofago"; els.fSeg.value = "Transição esôfago-gástrica";
 eq(els.fNome.value, "Transição esofagogástrica", "nome da transição");
 ok(t.isTEG(), "modo transição");
 els.corpo.value = "";
-const pEsoT = ES.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"), pGasN = GS.presets.find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
+const pEsoT = ES.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"), pGasN = t.gasTextos(GS, "Cárdia", true).find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS");
 t.inserePorcao("eso", pEsoT); t.inserePorcao("gas", pGasN);
 let lsT = els.corpo.value.split("\n");
 eq(lsT[0], "- MUCOSA DE TRANSIÇÃO ESOFAGOGÁSTRICA APRESENTANDO:", "título-mãe");
@@ -1061,7 +1065,7 @@ eq(t.toSub("- MUCOSA GÁSTRICA DE PADRÃO CÁRDIA APRESENTANDO:", "gas"), "- MUC
 els.fSeg.value = "Terço distal"; els.fSeg.onchange(); ok(!t.isTEG(), "fora da transição");
 // cárdia, achados novos, Whitehead
 ok(GS.criterios.find(c => /^Amostragem/.test(c.g)).opt.some(o => /padrão cárdia \(glândulas mucinosas\)/.test(o[1])), "amostragem de cárdia");
-ok(t.gasTextos(GS, "Cárdia").some(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), "texto pronto de cárdia");
+ok(t.gasTextos(GS, "Cárdia", true).some(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"), "texto pronto de cárdia");
 ok(ES.criterios.find(c => c.g === "Lâmina própria superficial").opt.some(o => /glândulas mucinosas tipo cárdia/.test(o[1])), "lâmina própria com glândulas tipo cárdia");
 ok(ES.criterios.find(c => c.g === "Metaplasia intestinal").opt.some(o => /Alcian blue pH 2,5\/PAS sem diastase/.test(o[1])), "metaplasia com Alcian blue/PAS");
 ok(ES.criterios.some(c => c.g === "Fibrose de lâmina própria"), "fibrose de lâmina própria");
@@ -1079,18 +1083,18 @@ els.fSitio.value = "gastrica"; els.fSeg.value = ""; els.corpo.value = t.presetTe
 edita("EM ATIVIDADE LEVE", "INATIVA");
 ok(els.corpo.value.includes(gN[0][1]) && !els.corpo.value.includes(gN[1][1]), "título INATIVA -> linha de ausência");
 edita("INATIVA", "EM ATIVIDADE MODERADA");
-ok(/^- GASTRITE CRÔNICA INATIVA,/.test(els.corpo.value) && els.corpo.value.includes(gN[0][1]), "estômago: título em atividade com linha de ausência é desfeito");
+ok(/^- GASTRITE CRÔNICA (LEVE, )?INATIVA,/.test(els.corpo.value) && els.corpo.value.includes(gN[0][1]), "estômago: título em atividade com linha de ausência é desfeito");
 t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "x", corpo: els.corpo.value.replace("INATIVA", "EM ATIVIDADE"), site: "gastrica", seg: "" });
 ok(t.alertas().some(a => /o título diz EM ATIVIDADE, mas a linha de neutrófilos diz ausência/.test(a.msg)), "alerta: título em atividade com linha de ausência");
 t.appendLine(gN[2][1]);
-ok(/^- GASTRITE CRÔNICA EM ATIVIDADE MODERADA,/.test(els.corpo.value), "grau escolhido nos achados vai ao título");
+ok(/^- GASTRITE CRÔNICA (LEVE, )?EM ATIVIDADE MODERADA,/.test(els.corpo.value), "grau escolhido nos achados vai ao título");
 // 2. H. pylori pelo título; antral/oxíntica pelos achados
 edita(/,? COM PESQUISA PARA H\. pylori POSITIVA \(\+2\/\+3\)/, "");
 ok(els.corpo.value.includes("- Pesquisa para H. pylori: Negativa.") && !/Positiva/.test(els.corpo.value), "título sem H. pylori -> pesquisa negativa");
 edita("EM ATIVIDADE MODERADA", "EM ATIVIDADE MODERADA, ASSOCIADA A H. pylori");
 ok(els.corpo.value.includes("- Pesquisa para H. pylori: Positiva.") && els.corpo.value.split("\n").filter(l => /^- Pesquisa para H\. pylori/.test(l)).length === 1, "título com H. pylori -> pesquisa positiva, sem duplicar");
 t.appendLine("- Amostragem: Mucosa gástrica de padrão antral.");
-ok(/EM MUCOSA DE ANTRO/.test(els.corpo.value.split("\n")[0]) && !/OXÍNTICA/.test(els.corpo.value.split("\n")[0]), "achado antral -> título antral");
+ok(/EM MUCOSA DE PADRÃO ANTRAL/.test(els.corpo.value.split("\n")[0]) && !/OXÍNTICA/.test(els.corpo.value.split("\n")[0]), "achado antral -> título antral");
 t.appendLine("- Amostragem: Mucosa gástrica de padrão oxíntico (corpo/fundo).");
 ok(/EM MUCOSA DE PADRÃO OXÍNTICO \(CORPO\/FUNDO\)/.test(els.corpo.value.split("\n")[0]), "achado oxíntico -> título oxíntico");
 edita("EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO)", "EM MUCOSA DE ANTRO");
@@ -1110,7 +1114,7 @@ edita("- EXÍGUO FRAGMENTO DE MUCOSA GÁSTRICA APRESENTANDO GASTRITE CRÔNICA", 
 ok(!/Amostra exígua/.test(els.corpo.value), "prefixo tirado -> linha sai");
 // edição de linha à mão continua levando ao título
 edita(gN[2][1], gN[3][1]);
-ok(/^- GASTRITE CRÔNICA EM ATIVIDADE ACENTUADA,/.test(els.corpo.value), "linha editada à mão -> grau do título");
+ok(/^- GASTRITE CRÔNICA (LEVE, )?EM ATIVIDADE ACENTUADA,/.test(els.corpo.value), "linha editada à mão -> grau do título");
 // 4/5. esôfago: presença/ausência, EDS
 els.fSitio.value = "esofago"; els.fSeg.value = "Terço distal";
 els.corpo.value = "- ESOFAGITE CRÔNICA INATIVA:\n- Não foi evidenciada exocitose de neutrófilos, erosão ou ulceração."; els.corpo.onfocus();
@@ -1155,7 +1159,7 @@ ok(els.corpo.value.includes(marsh(/Linfocitose intraepitelial: Presente/.test(el
 ({ t, els } = boot({}));
 els.fSitio.value = "esofago"; els.fSeg.value = "Transição esôfago-gástrica"; els.fSeg.onchange(); els.corpo.value = "";
 t.inserePorcao("eso", t.SEED_SITES.esofago.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"));
-t.inserePorcao("gas", t.SEED_SITES.gastrica.presets.find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"));
+t.inserePorcao("gas", t.gasTextos(t.SEED_SITES.gastrica, "Cárdia", true).find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"));
 els.corpo.onfocus();
 els.corpo.value = els.corpo.value.replace("- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA INATIVA:", "- MUCOSA ESOFÁGICA: ESOFAGITE CRÔNICA EM ATIVIDADE:"); els.corpo.onchange();
 let ls10 = els.corpo.value.split("\n"), iG10 = ls10.findIndex(l => /^- MUCOSA GÁSTRICA/.test(l));
@@ -1240,7 +1244,7 @@ ok(/não há linha de neutrófilos/.test(els.alertEditor.innerHTML), "o aviso fi
 ({ t, els } = boot({}));
 els.fSitio.value = "esofago"; els.fSeg.value = "Transição esôfago-gástrica"; els.fSeg.onchange(); els.corpo.value = ""; els.fNome.value = "Transição esofagogástrica"; els.fLetra.value = "A";
 t.inserePorcao("eso", t.SEED_SITES.esofago.presets.find(p => p.titulo === "ESOFAGITE CRÔNICA INATIVA"));
-t.inserePorcao("gas", t.SEED_SITES.gastrica.presets.find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"));
+t.inserePorcao("gas", t.gasTextos(t.SEED_SITES.gastrica, "Cárdia", true).find(p => p.titulo === "MUCOSA GÁSTRICA DE PADRÃO CÁRDIA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS"));
 t.porcaoAtivaSet("gas"); t.amostraMod("exigua");
 t.appendLine("- Achados eosinofílicos associados: Degranulação de eosinófilos (grânulos extracelulares).");
 ok(salva(), "transição salva");
@@ -1256,8 +1260,8 @@ ok(/^- MUCOSA GÁSTRICA: REPRESENTAÇÃO EXÍGUA, APRESENTANDO OS SEGUINTES ACHA
 t.WORK.samples.length = 0;
 t.WORK.samples.push({ nome: "Mucosa duodenal", site: "duodeno", seg: "", corpo: "- MUCOSA DUODENAL APRESENTANDO:\n- Parasitos: Não identificados." });
 const lD27 = t.buildLaudo();
-ok(lD27.includes("A) Mucosa duodenal:\n- MUCOSA DUODENAL APRESENTANDO:\n- Parasitos: Não identificados."), "v3.13: título descritivo fica com ':' e os achados logo abaixo");
-ok(/font-weight:bold;">- MUCOSA DUODENAL APRESENTANDO:/.test(t.laudoToRichHTML(lD27)), "título descritivo em negrito");
+ok(lD27.includes("A) Mucosa duodenal:\n- MUCOSA DUODENAL APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA.\n \n- MICROSCOPIA:\n- Parasitos: Não identificados."), "v3.14: título descritivo também com microscopia");
+ok(/font-weight:bold;">- MUCOSA DUODENAL APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA\./.test(t.laudoToRichHTML(lD27)), "título descritivo em negrito");
 t.WORK.samples[0].corpo = "- DUODENITE CRÔNICA APRESENTANDO:\n- Parasitos: Não identificados.";
 ok(t.buildLaudo().includes("- DUODENITE CRÔNICA APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA.\n \n- MICROSCOPIA:\n- Parasitos"), "diagnóstico com APRESENTANDO aponta para a microscopia");
 
@@ -1312,11 +1316,11 @@ ok(els.corpo.value.includes("- Integridade: Fragmentado (3 fragmentos).") && !/I
 ok(["- Configuração: Pedunculado (pedículo de 1,2 cm).", "- Tamanho do pólipo: 1,5 cm (maior dimensão).", "- Margem: Livre de lesão.", "- Procedimento: Polipectomia."].every(l => els.corpo.value.includes(l)), "linhas de polipectomia");
 // gastrite autoimune
 const GA = t.SEED_SITES.gastrica, pAI = GA.presets.find(p => /DE PADRÃO AUTOIMUNE/.test(p.titulo));
-eq(pAI.titulo, "GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS)", "texto pronto: título validado");
+eq(pAI.titulo, "GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA (VIDE NOTAS)", "texto pronto: título sem topografia (v3.14)");
 eq(pAI.bullets.filter(b => /^(Atrofia|Metaplasia pseudopilórica|Metaplasia intestinal|Hiperplasia de células enterocromafins-símile|Pesquisa para H\. pylori):/.test(b)).join("|"), "Atrofia: Presente, com redução de células parietais.|Metaplasia pseudopilórica: Presente.|Metaplasia intestinal: Não identificada.|Hiperplasia de células enterocromafins-símile: Presente, linear.|Pesquisa para H. pylori: Negativa.", "texto pronto: achados validados");
 ok(pAI.bullets[pAI.bullets.findIndex(b => /^Celularidade/.test(b)) + 1] === "Distribuição do infiltrado inflamatório crônico: Em toda a espessura da mucosa.", "texto pronto: distribuição do infiltrado logo depois da celularidade");
 ok(GA.criterios.some(c => c.g === "Metaplasia pseudopilórica") && GA.criterios.find(c => c.g === "Hiperplasia de células enterocromafins-símile").opt.length === 6 && GA.criterios.find(c => c.g === "Imuno-histoquímica para gastrina").opt.length === 2 && GA.criterios.find(c => c.g === "Distribuição do infiltrado inflamatório crônico").opt.length === 3 && GA.criterios.find(c => c.g === "Atrofia").opt.some(o => /com redução de células parietais/.test(o[1])), "estômago: grupos novos e opção de atrofia");
-const lA = laudo28(t.presetText(pAI), "gastrica", "Corpo/fundo (oxíntico)");
+const lA = laudo28(t.montaBloco("gastrica", t.presetText(pAI)), "gastrica", "Corpo/fundo (oxíntico)");
 ok(/Amostra A: o padrão de gastrite atrófica do corpo\/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H\. pylori, favorece gastrite autoimune; a hiperplasia de células enterocromafins-símile pode faltar nas fases iniciais \[\d+\]; em crianças, pode haver atrofia também no antro \[\d+\] e associação com outras doenças autoimunes, imunodeficiência e anemia ferropriva \[\d+\]; imprescindível correlação clínica-laboratorial .*, lembrando que os autoanticorpos podem ser negativos no início \[\d+\]\./.test(lA), "nota da gastrite autoimune");
 ok([t.CITE.hall19, t.CITE.kulak21, t.CITE.pogoriler15].every(r => lA.includes(r)) && !/\[@/.test(lA), "3 referências numeradas");
 ok(lA.includes("- GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA, EM MUCOSA DE PADRÃO OXÍNTICO (CORPO/FUNDO) (VIDE NOTAS).\n \n- MICROSCOPIA:"), "formato novo do laudo");
@@ -1330,7 +1334,7 @@ eq(t.concorda(t.presetText(pAI)).trocas.length, 0, "concordância: gastrite auto
 // 29. v3.13: formato do laudo do Pedro (A a G), Marsh/Corazza pela linfocitose, representatividade da amostra, ressecção intestinal / ostomia
 ({ t, els } = boot({}));
 // laudo de referência: o editor no formato de edição -> o laudo do modelo, idêntico
-const gold = fs.readFileSync(new URL("./golden_v313.txt", import.meta.url), "utf8").replace(/\r/g, "").replace(/\n$/, "").replace(/^$/gm, " ");
+const gold = fs.readFileSync(new URL("./golden_v314.txt", import.meta.url), "utf8").replace(/\r/g, "").replace(/\n$/, "").replace(/^$/gm, " ");
 const CIT29 = { 1: "pap", 2: "deb", 3: "iwa", 4: "whitehead", 5: "hayat", 6: "campora22", 7: "geboes" };
 const SITE29 = { A: ["gastrica", ""], B: ["duodeno", ""], C: ["ileo", "Íleo terminal"], D: ["colon", "Cólon ascendente"], E: ["colon", "Cólon descendente"], F: ["colon", "Ceco"], G: ["reto", "Reto"] };
 t.WORK.samples.length = 0; t.WORK.prefixo = "Biópsias endoscópicas/colonoscópicas de:";
@@ -1342,12 +1346,13 @@ gold.split("\n" + "-".repeat(100) + "\n").forEach((blk, k) => {
 const l29 = t.buildLaudo();
 eq(l29.slice(0, l29.indexOf("\n \nNOTAS:")), gold, "laudo de referência do Pedro (A a G): formato idêntico");
 ok(!/font-weight:bold;">- MICROSCOPIA/.test(t.laudoToRichHTML(l29)) && /font-weight:bold;">- DUODENITE CRÔNICA MODERADA INESPECÍFICA, INATIVA\./.test(t.laudoToRichHTML(l29)), "MICROSCOPIA sem negrito; título diagnóstico em negrito");
-ok(/font-weight:bold;">- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO:/.test(t.laudoToRichHTML(l29)), "título descritivo em negrito");
+ok(/font-weight:bold;">- AMOSTRA POUCO REPRESENTATIVA DE MUCOSA DE ÍLEO, APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA\./.test(t.laudoToRichHTML(l29)), "título descritivo em negrito");
 ok(l29.includes("- Amostra C: o exame histopatológico foi prejudicado pela representação superficial da amostra e por artefatos técnicos de esmagamento. Considerar viés amostral."), "nota composta da amostra C");
 ok(!t.alertas().some(a => /representatividade/.test(a.msg)), "foto 3: sem o alerta falso de título e linha");
+ok(!t.alertas().some(a => /cronicidade/.test(a.msg)), "v3.14: grau da cronicidade no título coerente com a celularidade (D a G)");
 // título diagnóstico com vários blocos: cada bloco por si
 eq(t.formataAmostra("- GASTRITE CRÔNICA INATIVA, EM MUCOSA DE ANTRO:\n- Atrofia: Não identificada.\n- MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Atrofia: Não identificada."),
-  "- GASTRITE CRÔNICA INATIVA, EM MUCOSA DE ANTRO.\n \n- MICROSCOPIA:\n- Atrofia: Não identificada.\n \n- MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS:\n- Atrofia: Não identificada.", "vários blocos: diagnóstico com microscopia, descritivo direto");
+  "- GASTRITE CRÔNICA INATIVA, EM MUCOSA DE ANTRO.\n \n- MICROSCOPIA:\n- Atrofia: Não identificada.\n \n- MUCOSA GÁSTRICA DE PADRÃO OXÍNTICO SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS.\n \n- MICROSCOPIA:\n- Atrofia: Não identificada.", "vários blocos: cada um com microscopia");
 
 // Marsh e Corazza: só com linfocitose acima do corte
 ({ t, els } = boot({}));
