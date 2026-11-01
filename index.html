@@ -244,7 +244,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 <section class="card col noprint" id="colA">
   <h2><span class="tile"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M7.5 15h9"/></svg></span>Amostra</h2>
   <label class="fld">Materiais: início da frase
-    <select id="fPrefixoSel"><option>Biópsias endoscópicas/colonoscópicas de:</option><option>Biópsia endoscópica/colonoscópica de:</option><option>Biópsias endoscópicas de:</option><option>Biópsia endoscópica de:</option><option>Biópsias colonoscópicas de:</option><option>Biópsia colonoscópica de:</option><option value="__outro">Outro…</option></select>
+    <select id="fPrefixoSel"><option>Biópsias endoscópicas/colonoscópicas de:</option><option>Biópsia endoscópica/colonoscópica de:</option><option>Biópsias endoscópicas de:</option><option>Biópsia endoscópica de:</option><option>Biópsias colonoscópicas de:</option><option>Biópsia colonoscópica de:</option><option>Ressecção intestinal de:</option><option>Ressecção de ostomia de:</option><option>Ressecção de anastomose de:</option><option value="__outro">Outro…</option></select>
     <input type="text" id="fPrefixo" hidden placeholder="Escreva o início da frase" style="margin-top:6px;">
   </label>
   <div class="grid-id acc acc-id">
@@ -1267,7 +1267,7 @@ const ESO_EOS_CAMPO=12;            // 15 por 0,3 mm² no campo FN 22
 const ESO_LINF = {"Transição esôfago-gástrica":62, "Terço distal":46, "Terço médio":41, "Terço proximal":41}; // Putra 2016
 const MATS_PADRAO = ["Esôfago","Esôfago proximal","Esôfago distal","Mucosa esofágica","Lesão de esôfago","Mucosa gástrica","Estômago","Duodeno","Mucosa duodenal","Íleo","Íleo terminal","Mucosa de íleo terminal","Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Reto","Anastomose íleo-retal"];
 const PREFIXO_PADRAO = "Biópsias endoscópicas/colonoscópicas de:";
-const PREFIXOS = [PREFIXO_PADRAO, "Biópsia endoscópica/colonoscópica de:", "Biópsias endoscópicas de:", "Biópsia endoscópica de:", "Biópsias colonoscópicas de:", "Biópsia colonoscópica de:"];
+const PREFIXOS = [PREFIXO_PADRAO, "Biópsia endoscópica/colonoscópica de:", "Biópsias endoscópicas de:", "Biópsia endoscópica de:", "Biópsias colonoscópicas de:", "Biópsia colonoscópica de:", "Ressecção intestinal de:", "Ressecção de ostomia de:", "Ressecção de anastomose de:"];
 // mostra o início da frase na lista; texto fora da lista abre em "Outro…" com o texto preservado
 function renderPrefixo(){
   const v=WORK.prefixo||PREFIXO_PADRAO, na=PREFIXOS.includes(v);
@@ -1365,47 +1365,111 @@ function store(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){
 const $=id=>document.getElementById(id);
 const letterOf=i=>String.fromCharCode(65+i);
 
-// Ressecção intestinal / ostomia (modelos do Pedro): laudo por camadas; porções "SEGMENTO DE INTESTINO" e "MARGEM \"n\"", cada uma com os diagnósticos logo abaixo
-const RE_RES_PORCAO=/^- (SEGMENTO DE INTESTINO|MARGEM "[^"]*"):$/;
-const RES_DIAG=["MUCOSA ENTÉRICA ATRÓFICA","MUCOSA ENTÉRICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS","MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA","MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS","PROCESSO INFLAMATÓRIO MISTO, ULCERADO","PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA","A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS"];
+// Ressecção intestinal / ostomia / anastomose (modelos do Pedro): o procedimento vai no início da frase de "Materiais";
+// sítio e segmento dão a localização. Laudo por camadas; porções "SEGMENTO DE INTESTINO" e 'MARGEM CIRÚRGICA "n"', cada uma com os diagnósticos logo abaixo
+const RES_PREFIXOS=["Ressecção intestinal de:","Ressecção de ostomia de:","Ressecção de anastomose de:"];
+function isResPrefixo(v){ return RES_PREFIXOS.includes((v===undefined ? WORK.prefixo : v)||""); }
+const isRes=site=>/^res_/.test(site||"");
+const RE_RES_PORCAO=/^- (SEGMENTO DE INTESTINO|MARGEM (?:CIRÚRGICA )?"[^"]*"):$/;
+const RES_PROC_UL="PROCESSO INFLAMATÓRIO MISTO, ULCERADO", RES_PROC_GR="PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO",
+  RES_GANG_D="PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA", RES_AG_D="A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS";
+const RE_PROC_D=/^PROCESSO INFLAMATÓRIO MISTO, (?:GRANULOMATOSO \(GRANULOMAS SUPURATIVOS\), )?ULCERADO$/, RE_RES_AG=/^- A pesquisa para agentes infecciosos específicos foi negativa/;
+const RES_DIAG=["MUCOSA ENTÉRICA ATRÓFICA","MUCOSA ENTÉRICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS","MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA","MUCOSA COLÔNICA SEM PARTICULARIDADES HISTOLÓGICAS SIGNIFICATIVAS",RES_PROC_UL,RES_PROC_GR,RES_GANG_D,RES_AG_D];
+const RES_M={
+  focal:"- Mucosa: De padrão entérico, com áreas de histoarquitetura alterada, apresentando vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado.",
+  atrAc:"- Mucosa: De padrão entérico, apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico acentuado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração, além de granulomas supurativos mucosos e submucosos, com eosinófilos ao seu redor.",
+  atrMod:"- Mucosa: De padrão entérico, apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico moderado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração.",
+  colAlt:"- Mucosa: De padrão colônico, apresentando alteração da arquitetura glandular (ramificação) e celularidade da lâmina própria preservada.",
+  entPres:"- Mucosa: De padrão entérico, com vilosidades preservadas e celularidade da lâmina própria preservada, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+  colPres:"- Mucosa: De padrão colônico, com arquitetura glandular e celularidade da lâmina própria preservadas, não sendo identificada criptite, microabscessos, erosão ou ulceração."};
+const RES_L_GANG="- Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.";
+// porções do texto: cabeçalho (h), fim dos diagnósticos (d) e fim da porção (f)
+function resPorcoes(ls){ const hs=ls.map((l,i)=>RE_RES_PORCAO.test(l.trim()) ? i : -1).filter(i=>i>=0);
+  return hs.map((h,k)=>{ const f=k+1<hs.length ? hs[k+1] : ls.length; let d=h+1; while(d<f && lineKind(ls[d])==="b") d++; return {h, d, f}; }); }
+const resDiagsDe=(ls,p)=>ls.slice(p.h+1, p.d).map(l=>l.trim().slice(2,-1));
+const resUlc=ach=>ach.some(l=>/^- Mucosa: /.test(l) && /áreas de ulceração/.test(l));
+const resGran=ach=>ach.some(l=>/granulomas supurativos/.test(l) && /^- (Mucosa: |Presença de granulomas supurativos)/.test(l));
+const resProc=ach=>resUlc(ach) ? (resGran(ach) ? RES_PROC_GR : RES_PROC_UL) : null;
+const resRank=x=>/^MUCOSA /.test(x) ? 0 : x===RES_GANG_D ? 2 : x===RES_AG_D ? 3 : 1;
+// diagnósticos da porção, na ordem: mucosa, processo, células ganglionares, agentes infecciosos
+function resSetDiags(ls, p, ds){ const ord=ds.map((x,i)=>[x,i]).sort((a,b)=>resRank(a[0])-resRank(b[0]) || a[1]-b[1]).map(a=>"- "+a[0]+":"); ls.splice(p.h+1, p.d-p.h-1, ...ord); }
+// achado -> diagnóstico (regras validadas 5 a 7): processo inflamatório e células ganglionares entram, trocam ou saem; agentes infecciosos só entram
+function resDiagsPelosAchados(ach, ds, so){
+  ds=ds.slice();
+  if(!so || so==="proc"){ const w=resProc(ach); ds=ds.filter(x=>!RE_PROC_D.test(x)); if(w) ds.push(w); }
+  if(!so || so==="gang"){ const g=ach.includes(RES_L_GANG); ds=ds.filter(x=>x!==RES_GANG_D); if(g) ds.push(RES_GANG_D); }
+  if((!so || so==="ag") && ach.some(l=>RE_RES_AG.test(l)) && !ds.includes(RES_AG_D)) ds.push(RES_AG_D);
+  return ds;
+}
+function resLinhaParaDiag(line){
+  const so=/^- Mucosa: /.test(line) || /granulomas/i.test(line) ? "proc" : line===RES_L_GANG ? "gang" : RE_RES_AG.test(line) ? "ag" : null; if(!so) return;
+  const ta=$("corpo"), ls=ta.value.split("\n"), ps=resPorcoes(ls), p=ps[ps.length-1]; if(!p) return;
+  resSetDiags(ls, p, resDiagsPelosAchados(ls.slice(p.d,p.f), resDiagsDe(ls,p), so)); ta.value=ls.join("\n");
+}
+// diagnóstico -> achado: só põe a frase padrão quando a camada ainda não tem linha
+function resDiagParaLinha(ls, p, x){
+  const ach=ls.slice(p.d,p.f); let nova=null;
+  if(RE_PROC_D.test(x) && !ach.some(l=>/^- Mucosa: /.test(l))) nova = x===RES_PROC_GR ? RES_M.atrAc : RES_M.atrMod;
+  else if(x===RES_GANG_D && !ach.includes(RES_L_GANG)) nova=RES_L_GANG;
+  if(!nova) return; let k=p.f; while(k>p.d && !ls[k-1].trim()) k--; ls.splice(k, 0, nova);
+}
+// edição à mão: diagnóstico novo põe a frase padrão; achados mudados refazem os diagnósticos (5 a 7)
+let resPrev=null;
+function resEstado(txt){ const ls=(txt||"").split("\n"); return resPorcoes(ls).map(p=>({d:resDiagsDe(ls,p), a:ls.slice(p.d,p.f).join("\n")})); }
+function resSincMao(){
+  const ta=$("corpo"), A=resPrev, ls=ta.value.split("\n"), ps=resPorcoes(ls), N=resEstado(ta.value);
+  if(A && A.length===N.length) for(let k=ps.length-1;k>=0;k--){
+    const novos=N[k].d.filter(x=>!A[k].d.includes(x));
+    if(novos.length) novos.forEach(x=>resDiagParaLinha(ls, ps[k], x));
+    else if(N[k].a!==A[k].a) resSetDiags(ls, ps[k], resDiagsPelosAchados(ls.slice(ps[k].d, ps[k].f), N[k].d));
+  }
+  ta.value=ls.join("\n"); resPrev=resEstado(ta.value);
+}
+// cabeçalho da porção no laudo: "MARGEM" antigo vira "MARGEM CIRÚRGICA"
+const resCab=l=>l.trim().replace(/^- MARGEM "/, '- MARGEM CIRÚRGICA "');
 // porção nova no fim do texto (margens numeradas em sequência)
 function resPorcao(tipo){
   const ta=$("corpo"), ls=ta.value.trim() ? ta.value.replace(/\s+$/,"").split("\n") : [];
-  const n=ls.filter(l=>/^- MARGEM "/.test(l.trim())).length+1;
-  ls.push(tipo==="seg" ? "- SEGMENTO DE INTESTINO:" : '- MARGEM "'+n+'":'); ta.value=ls.join("\n");
+  const n=ls.filter(l=>/^- MARGEM (CIRÚRGICA )?"/.test(l.trim())).length+1;
+  ls.push(tipo==="seg" ? "- SEGMENTO DE INTESTINO:" : '- MARGEM CIRÚRGICA "'+n+'":'); ta.value=ls.join("\n");
   prevTit=ultimoTitulo(ta.value); snapEditor();
 }
-// diagnóstico da porção: logo abaixo dos títulos da porção em edição (a última)
+// diagnóstico da porção: logo abaixo dos títulos da porção em edição (a última); põe a frase padrão da camada que faltar
 function resDiag(x){
   const ta=$("corpo"), ls=ta.value.trim() ? ta.value.replace(/\s+$/,"").split("\n") : [], b=blocoAtual(ls);
-  ls.splice(b.st+1, 0, "- "+x+":"); ta.value=ls.join("\n");
-  prevTit=ultimoTitulo(ta.value); snapEditor();
+  ls.splice(b.st+1, 0, "- "+x+":");
+  const ps=resPorcoes(ls), p=ps[ps.length-1]; if(p) resDiagParaLinha(ls, p, x);
+  ta.value=ls.join("\n"); prevTit=ultimoTitulo(ta.value); snapEditor(); renderAlertaEditor();
 }
-SEED_SITES.resseccao = {
-  nome:"Ressecção intestinal / ostomia", nomeAmostra:"Segmento intestinal", eos:"",
-  segmentos:["Intestino delgado","Cólon","Ostomia","Anastomose"],
+const RES_BASE = {
   presets:[
-    P("ENTERITE CRÔNICA AGUDIZADA, INESPECÍFICA",["Mucosa de padrão entérico com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado.","Submucosa apresenta edema, vasocongestão, infiltrado inflamatório mononuclear leve e presença de células ganglionares.","Camada muscular própria apresentando infiltrado inflamatório misto, com presença de neutrófilos, e focos de fibrose e neoformação vascular capilar, além de vasocongestão.","Subserosa/serosa apresentando edema, vasocongestão, neoformação vascular capilar, infiltrado inflamatório mononuclear leve e fibrose.","Não foram identificados granulomas.","Não foram identificadas células atípicas ou heterólogas."]),
-    P("SEGMENTO DE INTESTINO",["MUCOSA ENTÉRICA ATRÓFICA:","PROCESSO INFLAMATÓRIO MISTO, GRANULOMATOSO (GRANULOMAS SUPURATIVOS), ULCERADO:","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA:","Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico acentuado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração, além de granulomas supurativos mucosos e submucosos, com eosinófilos ao seu redor.","Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, rico em eosinófilos, edema e vasocongestão.","Subserosa apresenta infiltrado inflamatório, edema e vasocongestão.","Não foram identificados linfonodos peri-intestinais no material examinado.","A pesquisa para agentes infecciosos específicos foi negativa com as colorações histoquímicas realizadas (HE, PAS sem diastase, Grocott e Ziehl-Neelsen).","Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.","MARGEM \"1\":","MUCOSA ENTÉRICA ATRÓFICA:","PROCESSO INFLAMATÓRIO MISTO, ULCERADO:","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA:","A PESQUISA PARA AGENTES INFECCIOSOS ESPECÍFICOS FOI NEGATIVA COM AS COLORAÇÕES HISTOQUÍMICAS REALIZADAS:","Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico moderado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração.","Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, edema e vasocongestão.","Subserosa apresenta infiltrado inflamatório mononuclear leve associado a células gigantes multinucleadas tipo corpo estranho, edema e vasocongestão.","Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.","MARGEM \"2\":","MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA:","PRESENÇA DE CÉLULAS GANGLIONARES NOS PLEXOS NEURAIS SUBMUCOSO E DA CAMADA MUSCULAR PRÓPRIA:","Mucosa de padrão colônico apresentando alteração da arquitetura glandular (ramificação) e celularidade da lâmina própria preservada.","Submucosa apresenta vasocongestão.","Camada muscular própria de aspecto histológico preservado.","Subserosa apresenta edema e vasocongestão.","Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria.","Não foram identificadas células atípicas ou heterólogas no material examinado."])
+    P("ENTERITE CRÔNICA AGUDIZADA, INESPECÍFICA",[RES_M.focal.slice(2),"Submucosa: Edema, vasocongestão, infiltrado inflamatório mononuclear leve e presença de células ganglionares.","Camada muscular própria: Infiltrado inflamatório misto, com presença de neutrófilos, e focos de fibrose e neoformação vascular capilar, além de vasocongestão.","Subserosa/serosa: Edema, vasocongestão, neoformação vascular capilar, infiltrado inflamatório mononuclear leve e fibrose.","Não foram identificados granulomas.","Não foram identificadas células atípicas ou heterólogas."]),
+    P("SEGMENTO DE INTESTINO",["MUCOSA ENTÉRICA ATRÓFICA:",RES_PROC_GR+":",RES_GANG_D+":",RES_AG_D+":",RES_M.atrAc.slice(2),"Submucosa e camada muscular própria: Leve infiltrado inflamatório misto, rico em eosinófilos, edema e vasocongestão.","Subserosa/serosa: Infiltrado inflamatório, edema e vasocongestão.","Não foram identificados linfonodos peri-intestinais no material examinado.",RES_L_GANG.slice(2),
+      'MARGEM CIRÚRGICA "1":',"MUCOSA ENTÉRICA ATRÓFICA:",RES_PROC_UL+":",RES_GANG_D+":",RES_M.atrMod.slice(2),"Submucosa e camada muscular própria: Leve infiltrado inflamatório misto, edema e vasocongestão.","Subserosa/serosa: Infiltrado inflamatório mononuclear leve associado a células gigantes multinucleadas tipo corpo estranho, edema e vasocongestão.",RES_L_GANG.slice(2),
+      'MARGEM CIRÚRGICA "2":',"MUCOSA COLÔNICA COM ARQUITETURA GLANDULAR ALTERADA:",RES_GANG_D+":",RES_M.colAlt.slice(2),"Submucosa: Vasocongestão.","Camada muscular própria: Aspecto histológico preservado.","Subserosa/serosa: Edema e vasocongestão.",RES_L_GANG.slice(2),"Não foram identificadas células atípicas ou heterólogas no material examinado."])
   ],
   criterios:[
-    {g:"Porção", fx:[["Segmento de intestino",()=>resPorcao("seg")],["Margem (próxima)",()=>resPorcao("margem")]],
-      dica:"Entra no fim do texto; as margens são numeradas em sequência (\"1\", \"2\"…). No laudo, os diagnósticos de cada porção ficam no topo e as camadas sob \"- MICROSCOPIA:\"."},
-    {g:"Diagnósticos da porção", fx:RES_DIAG.map(x=>[x.charAt(0)+x.slice(1).toLowerCase().replace(/ \(vide notas\)$/, ""), ()=>resDiag(x)]), dica:"Entram logo abaixo do título da porção em edição, em caixa alta."},
-    {g:"Mucosa", opt:[["Mucosa de padrão entérico alterada (focal)","- Mucosa de padrão entérico com áreas de histoarquitetura alterada: vilosidades focalmente alargadas à custa de leve aumento da celularidade de leucócitos em lâmina própria (mononucleares, neutrófilos e esparsos eosinófilos), associada a metaplasia mucinosa focal. Não foi identificada criptite, microabscessos de cripta, erosão ou ulceração no material examinado."],["Mucosa de padrão entérico atrófica, atividade acentuada","- Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico acentuado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração, além de granulomas supurativos mucosos e submucosos, com eosinófilos ao seu redor."],["Mucosa de padrão entérico atrófica, atividade moderada","- Mucosa de padrão entérico apresentando vilosidades moderadamente atróficas com hiperplasias de criptas, além de focos de metaplasia mucinosa, não sendo identificada linfocitose intraepitelial; presença de infiltrado inflamatório neutrofílico moderado em áreas da mucosa, sendo identificadas áreas com criptite e microabscessos neutrofílicos, e áreas de ulceração."],["Mucosa de padrão colônico alterada","- Mucosa de padrão colônico apresentando alteração da arquitetura glandular (ramificação) e celularidade da lâmina própria preservada."],["Mucosa de padrão entérico preservada","- Mucosa de padrão entérico com vilosidades preservadas e celularidade da lâmina própria preservada, não sendo identificada criptite, microabscessos, erosão ou ulceração."]]},
-    {g:"Submucosa", opt:[["Edema, vasocongestão, infiltrado leve","- Submucosa apresenta edema, vasocongestão, infiltrado inflamatório mononuclear leve e presença de células ganglionares."],["Vasocongestão","- Submucosa apresenta vasocongestão."],["Com muscular própria: misto, rico em eosinófilos","- Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, rico em eosinófilos, edema e vasocongestão."],["Com muscular própria: misto","- Submucosa e camada muscular própria com presença de leve infiltrado inflamatório misto, edema e vasocongestão."]]},
-    {g:"Camada muscular própria", opt:[["Infiltrado misto, fibrose","- Camada muscular própria apresentando infiltrado inflamatório misto, com presença de neutrófilos, e focos de fibrose e neoformação vascular capilar, além de vasocongestão."],["Preservada","- Camada muscular própria de aspecto histológico preservado."]]},
-    {g:"Subserosa / serosa", opt:[["Edema, neoformação vascular, fibrose","- Subserosa/serosa apresentando edema, vasocongestão, neoformação vascular capilar, infiltrado inflamatório mononuclear leve e fibrose."],["Edema e vasocongestão","- Subserosa apresenta edema e vasocongestão."],["Células gigantes tipo corpo estranho","- Subserosa apresenta infiltrado inflamatório mononuclear leve associado a células gigantes multinucleadas tipo corpo estranho, edema e vasocongestão."]],
+    {g:"Porção", fx:[["Segmento de intestino",()=>resPorcao("seg")],["Margem cirúrgica (próxima)",()=>resPorcao("margem")]],
+      dica:"Entra no fim do texto; as margens cirúrgicas são numeradas em sequência (\"1\", \"2\"…). No laudo, os diagnósticos de cada porção ficam no topo e as camadas sob \"- MICROSCOPIA:\"."},
+    {g:"Diagnósticos da porção", fx:RES_DIAG.map(x=>[x.charAt(0)+x.slice(1).toLowerCase(), ()=>resDiag(x)]), dica:"Entram logo abaixo do título da porção em edição, em caixa alta. Processo inflamatório ulcerado, células ganglionares e pesquisa de agentes infecciosos acompanham os achados da porção."},
+    {g:"Mucosa", opt:[["Mucosa de padrão entérico alterada (focal)",RES_M.focal],["Mucosa de padrão entérico atrófica, atividade acentuada",RES_M.atrAc],["Mucosa de padrão entérico atrófica, atividade moderada",RES_M.atrMod],["Mucosa de padrão colônico alterada",RES_M.colAlt],["Mucosa de padrão entérico preservada",RES_M.entPres],["Mucosa de padrão colônico preservada",RES_M.colPres]]},
+    {g:"Submucosa", opt:[["Edema, vasocongestão, infiltrado leve","- Submucosa: Edema, vasocongestão, infiltrado inflamatório mononuclear leve e presença de células ganglionares."],["Vasocongestão","- Submucosa: Vasocongestão."],["Com muscular própria: misto, rico em eosinófilos","- Submucosa e camada muscular própria: Leve infiltrado inflamatório misto, rico em eosinófilos, edema e vasocongestão."],["Com muscular própria: misto","- Submucosa e camada muscular própria: Leve infiltrado inflamatório misto, edema e vasocongestão."]]},
+    {g:"Camada muscular própria", opt:[["Infiltrado misto, fibrose","- Camada muscular própria: Infiltrado inflamatório misto, com presença de neutrófilos, e focos de fibrose e neoformação vascular capilar, além de vasocongestão."],["Preservada","- Camada muscular própria: Aspecto histológico preservado."]]},
+    {g:"Subserosa / serosa", opt:[["Edema, neoformação vascular, fibrose","- Subserosa/serosa: Edema, vasocongestão, neoformação vascular capilar, infiltrado inflamatório mononuclear leve e fibrose."],["Edema e vasocongestão","- Subserosa/serosa: Edema e vasocongestão."],["Células gigantes tipo corpo estranho","- Subserosa/serosa: Infiltrado inflamatório mononuclear leve associado a células gigantes multinucleadas tipo corpo estranho, edema e vasocongestão."]],
       combo:{grupos:[[["leve","leve"],["moderado","moderado"],["acentuado","acentuado"]],[["mononuclear","mononuclear"],["neutrofílico","neutrofílico"],["misto","misto"]]],
-        monta:x=>"- Subserosa apresenta infiltrado inflamatório"+(x[1]?" "+x[1]:"")+(x[0]?" "+x[0]:"")+", edema e vasocongestão."},
+        monta:x=>"- Subserosa/serosa: Infiltrado inflamatório"+(x[1]?" "+x[1]:"")+(x[0]?" "+x[0]:"")+", edema e vasocongestão."},
       dica:"Infiltrado inflamatório: marque o grau e o tipo e clique em inserir; a linha da subserosa é trocada, não duplica."},
-    {g:"Células ganglionares", opt:[["Presentes nos plexos","- Presença de células ganglionares nos plexos neurais submucoso e da camada muscular própria."]]},
+    {g:"Células ganglionares", opt:[["Presentes nos plexos",RES_L_GANG]]},
     {g:"Granulomas", opt:[["Não identificados","- Não foram identificados granulomas."],["Supurativos","- Presença de granulomas supurativos mucosos e submucosos."]]},
     {g:"Agentes infecciosos", opt:[["Pesquisa negativa (HE, PAS, Grocott, ZN)","- A pesquisa para agentes infecciosos específicos foi negativa com as colorações histoquímicas realizadas (HE, PAS sem diastase, Grocott e Ziehl-Neelsen)."]]},
     {g:"Linfonodos", opt:[["Não identificados","- Não foram identificados linfonodos peri-intestinais no material examinado."]]},
     {g:"Células atípicas", opt:[["Não identificadas","- Não foram identificadas células atípicas ou heterólogas no material examinado."]]}
   ]
 };
+// sítios de ressecção (só aparecem com início de frase de ressecção em "Materiais"); todos usam os mesmos textos e achados
+[["res_delgado","Intestino delgado",["Duodeno","Jejuno","Íleo","Íleo terminal"]],["res_ceco","Ceco",[]],
+ ["res_colon","Cólon",["Cólon direito (ascendente)","Cólon transverso","Cólon esquerdo (descendente)","Cólon sigmoide"]],["res_reto","Reto",[]]].forEach(([k,nome,segs])=>{
+  SEED_SITES[k]={nome, nomeAmostra:"Segmento de "+nome.charAt(0).toLowerCase()+nome.slice(1), eos:"", segmentos:segs, presets:RES_BASE.presets, criterios:RES_BASE.criterios}; });
 
 const LIB = (()=>{
   const sites={}, siteOrder=Object.keys(SEED_SITES);
@@ -1423,6 +1487,7 @@ let WORK = load(LS_DRAFT);
 if(!validWork(WORK)) WORK = importV2Draft() || emptyWork();
 WORK.notasSel = WORK.notasSel.filter(id=>notaById(id));
 WORK.refsSel = WORK.refsSel.filter(id=>refById(id));
+WORK.samples.forEach(sm=>{ if(sm.site==="resseccao"){ sm.site = sm.seg==="Cólon" ? "res_colon" : "res_delgado"; sm.seg=""; } });
 
 function saveNow(){ store(LS_DRAFT, WORK); }
 let saveT;
@@ -1652,7 +1717,7 @@ function unidades(samples, rotDe){
 function reconciliaTrecho(){
   const site=siteAtivo(), ls=$("corpo").value.split("\n"), b=blocoAtual(ls); if(b.st<0) return;
   if(site==="hirschsprung"){ hsSinc(); return; }
-  if(site==="resseccao") return;
+  if(isRes(site)) return;
   const linhas=ls.slice(b.st+1, b.fim), teg=!!b.teg && porcaoAtiva==="gas";
   linhas.forEach(l=>{
     if(/^- Pesquisa para H\. pylori: /.test(l)) editTitle(t=>titleSetHp(t, /Positiva/.test(l)));
@@ -1681,6 +1746,7 @@ let tegPrev={}, duoPrev=null;
 function snapEditor(){
   const ls=$("corpo").value.split("\n"); tegPrev={}; porcoesIdx(ls).forEach(o=>{ tegPrev[o.p]=ls[o.ini]; });
   duoPrev={m:linhaDoBloco(RE_MARSH), atr:linhaDoBloco(RE_ATR_DUO), lie:linhaDoBloco(/^- Linfocitose intraepitelial: /)};
+  resPrev=resEstado(ls.join("\n"));
 }
 // duodeno: a linha editada à mão (Marsh, atrofia ou linfocitose) leva as outras junto
 function marshSincMao(){
@@ -2175,7 +2241,7 @@ function edsSinc(){
 function sincAposLinha(line){
   const site=siteAtivo();
   if(site==="hirschsprung"){ hsSinc(); return; }
-  if(site==="resseccao") return;
+  if(isRes(site)){ resLinhaParaDiag(line); return; }
   if(RE_NEUTRO.test(line)) editTitle(t=>tituloComAtiv(t, grauDaLinha(line)));
   else if(/^- Pesquisa para H\. pylori: /.test(line)){
     const pos=/Positiva/.test(line);
@@ -2280,7 +2346,7 @@ function ressincEditor(){
   corrigeCampo("corpo");
   if(isTEG() && porcoesIdx(ta.value.split("\n")).length){ ressincTEG(); prevTit=ultimoTitulo(ta.value); renderAlertaEditor(); return; }
   if(site==="hirschsprung"){ if(hsBloco(ta.value).tits.join("\n")!==hsPrev) hsTitParaLinhas(); hsSinc(); }
-  if(site==="resseccao"){ prevTit=ultimoTitulo(ta.value); renderAlertaEditor(); return; }
+  if(isRes(site)){ resSincMao(); prevTit=ultimoTitulo(ta.value); renderAlertaEditor(); return; }
   let tit=ultimoTitulo(ta.value), mudou=!!tit && tit!==prevTit;
   if(mudou && bloqueiaAtiv(prevTit)){ tit=ultimoTitulo(ta.value); mudou=false; }
   if(site==="gastrica" && mudou){ const g=Object.values(GAS_SEG).find(x=>x.re.test(tit)); if(g) setLinha("- "+g.am); }
@@ -2560,6 +2626,12 @@ function alertasDe(samples, rotDe){
   samples.forEach((s,i)=>{ if(!MUC_SITIO[s.site] || porcoesIdx((s.corpo||"").split("\n")).length) return; const c=tiraMarcas(s.corpo||"");
     const tPre=c.split("\n").some(l=>lineKind(l)==="b" && RE_AM_PRE.test(l.trim().replace(/^- /,""))), lPre=c.split("\n").some(l=>RE_AM_LINHA.test(l));
     if(tPre!==lPre) out.push({conf:false, msg:"Amostra "+rotDe(i)+": título e linha de representatividade da amostra não batem; confira."}); });
+  samples.forEach((s,i)=>{ if(!isRes(s.site)) return; const ls=(s.corpo||"").split("\n");
+    resPorcoes(ls).forEach(p=>{ const ach=ls.slice(p.d,p.f), ds=resDiagsDe(ls,p), rot="Amostra "+rotDe(i)+", "+resCab(ls[p.h]).slice(2,-1).toLowerCase()+": ", w=resProc(ach), dp=ds.find(x=>RE_PROC_D.test(x));
+      if(dp && dp!==w) out.push({conf:false, msg:rot+(w ? "o diagnóstico diz "+dp.toLowerCase()+", mas a mucosa descrita indica "+w.toLowerCase() : "o diagnóstico de processo inflamatório ulcerado não tem ulceração descrita na mucosa")+"; confira."});
+      if(w && !dp) out.push({conf:false, msg:rot+"a mucosa descreve ulceração e falta o diagnóstico \""+w.toLowerCase()+"\"; confira."});
+      if(ach.includes(RES_L_GANG)!==ds.includes(RES_GANG_D)) out.push({conf:false, msg:rot+"células ganglionares: o diagnóstico e o achado não batem; confira."});
+      if(ach.some(l=>RE_RES_AG.test(l)) && !ds.includes(RES_AG_D)) out.push({conf:false, msg:rot+"a pesquisa de agentes infecciosos está nos achados e falta no diagnóstico; confira."}); }); });
   samples.forEach((s,i)=>{ if(s.site==="hirschsprung") hsAlertas("Amostra "+rotDe(i), s.corpo, s.seg).forEach(a=>out.push(a)); });
   return out;
 }
@@ -2637,8 +2709,9 @@ function contaMaterial(nome){ const uso=load(LS_MATS)||{}; uso[nome]=(uso[nome]|
 /* ============================ RENDER SÍTIO ============================ */
 function currentSite(){ return siteById($("fSitio").value); }
 
-function renderSitioSelect(){
-  $("fSitio").innerHTML = LIB.siteOrder.map(k=>`<option value="${k}">${LIB.sites[k].nome}</option>`).join("");
+function renderSitioSelect(modoRes){
+  const res = modoRes===undefined ? isResPrefixo() : modoRes;
+  $("fSitio").innerHTML = LIB.siteOrder.filter(k=>isRes(k)===res).map(k=>`<option value="${k}">${LIB.sites[k].nome}</option>`).join("");
 }
 function renderSeg(){
   const all=[""].concat(currentSite().segmentos||[]);
@@ -2743,6 +2816,7 @@ function applyDefaultName(){
   let base=site.nomeAmostra;
   if(site.id==="hirschsprung"){ $("fNome").value = HS_NOME[seg] || base; return; }
   $("nomeBtns").hidden = site.id!=="esofago";
+  if(isRes(site.id)){ $("fNome").value = seg ? "Segmento de "+seg.charAt(0).toLowerCase()+seg.slice(1) : base; return; }
   if(site.id==="esofago" && seg in ESO_NOME){ $("fNome").value = ESO_NOME[seg]; return; }
   if(site.id==="ileo"){ $("fNome").value = ILEO_NOME[seg] || base; return; }
   if(seg){ base = (site.nome==="Cólon"||site.nome==="Reto") ? seg : base+" ("+seg.toLowerCase()+")"; }
@@ -2804,7 +2878,7 @@ function move(i,d){ const j=i+d; if(j<0||j>=WORK.samples.length)return; const t=
 function editSample(i){
   editIndex=i; const s=WORK.samples[i];
   draft={ dech:s.dech||null };
-  if(s.site && siteById(s.site)){ $("fSitio").value=s.site; onSiteChange(); $("fSeg").value=s.seg||""; }
+  if(s.site && siteById(s.site)){ if(isRes(s.site)!==isRes($("fSitio").value)) renderSitioSelect(isRes(s.site)); $("fSitio").value=s.site; onSiteChange(); $("fSeg").value=s.seg||""; }
   $("fNome").value=s.nome; $("corpo").value=s.corpo; prevTit=ultimoTitulo(s.corpo); snapEditor(); $("fLetra").value=letterOf(i); renderAlertaEditor();
   $("btnSalvar").textContent="✓ Atualizar amostra "+letterOf(i);
   $("btnCancelEdit").style.display="inline-block";
@@ -2838,8 +2912,8 @@ function formataAmostra(corpo){
     // ressecção: cada porção com os diagnósticos no topo; as camadas sob "- MICROSCOPIA:", em cada porção
     const topo=ls.slice(0, ir[0]).filter(l=>l.trim()).map(l=>lineKind(l)==="b" ? fechaTitulo(l) : l), micro=[];
     ir.forEach((ini,k)=>{ const fim=k+1<ir.length ? ir[k+1] : ls.length; let j=ini+1;
-      topo.push(ls[ini].trim()); while(j<fim && lineKind(ls[j])==="b"){ topo.push(fechaTitulo(ls[j])); j++; }
-      const h=ls[ini].trim().slice(2,-1); micro.push("- "+h.charAt(0)+h.slice(1).toLowerCase()+":"); micro.push(...limpa(ls.slice(j, fim))); });
+      topo.push(resCab(ls[ini])); while(j<fim && lineKind(ls[j])==="b"){ topo.push(fechaTitulo(ls[j])); j++; }
+      micro.push(resCab(ls[ini])); micro.push(...limpa(ls.slice(j, fim))); });
     return topo.join(L)+L+" "+L+MICRO+L+micro.join(L);
   }
   let i=0; while(i<ls.length && !ls[i].trim()) i++;
@@ -2888,7 +2962,7 @@ function lineKind(line){
 }
 // no laudo, o título do topo termina em "." e continua em negrito
 function laudoKind(line){
-  if(line.trim()===MICRO) return "";
+  if(line.trim()===MICRO || RE_RES_PORCAO.test(resCab(line))) return "";
   const k=lineKind(line); if(k) return k;
   const t=line.trim(); return /^- .*\.$/.test(t) && /[A-ZÀ-Ý]{3}/.test(t) && !/[a-zà-ÿ]/.test(t.replace(SPECIES_RE,"")) ? "b" : "";
 }
@@ -2992,7 +3066,9 @@ $("fSeg").onchange=()=>{ applyDefaultName(); const st=$("fSitio").value;
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
 [["nb_eso","Esôfago"],["nb_esoprox","Esôfago proximal"],["nb_esodist","Esôfago distal"],["nb_esomuc","Mucosa esofágica"]].forEach(([id,n])=>{ $(id).onclick=()=>{ $("fNome").value=n; }; });
 $("fPrefixoSel").onchange=()=>{ const v=$("fPrefixoSel").value, outro=v==="__outro";
-  $("fPrefixo").hidden=!outro; WORK.prefixo = outro ? $("fPrefixo").value : v; if(outro) $("fPrefixo").focus(); save(); renderLaudo(); };
+  $("fPrefixo").hidden=!outro; WORK.prefixo = outro ? $("fPrefixo").value : v; if(outro) $("fPrefixo").focus();
+  if(isResPrefixo()!==isRes($("fSitio").value)){ renderSitioSelect(); onSiteChange(); }
+  save(); renderLaudo(); };
 $("notas").oninput=()=>{ WORK.notasFree=$("notas").value; save(); renderLaudo(); };
 $("notas").onchange=()=>{ if(corrigeCampo("notas")){ WORK.notasFree=$("notas").value; save(); renderLaudo(); } };
 $("refsFree").oninput=()=>{ WORK.refsFree=$("refsFree").value; save(); renderLaudo(); };
