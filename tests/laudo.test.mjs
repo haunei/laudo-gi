@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,montaBloco,titleSetCron,cronDaLinha,linhaComCron,gasTitulo,gasBlocos,CRON_SITIO,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,RES_M,RES_L_GANG,resEstado,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,montaBloco,titleSetCron,cronDaLinha,linhaComCron,gasTitulo,gasBlocos,CRON_SITIO,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,linhaNaini,RES_M,RES_L_GANG,resEstado,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -1476,6 +1476,51 @@ const alL = t.alertas().filter(a => /campo livre/.test(a.msg));
 ok(alL.length === 1 && !alL[0].conf, "campo livre não preenchido: alerta que não bloqueia");
 t.WORK.samples[0].corpo = t.WORK.samples[0].corpo.replace("___", "2");
 eq(t.alertas().filter(a => /campo livre/.test(a.msg)).length, 0, "campo preenchido: sem alerta");
+
+// 30. v3.14: cronicidade graduada (gastrite: Sydney; colite/retite: Geboes), topografia gástrica, Crohn e escore de Naini e Cortina
+({ t, els } = boot({}));
+eq(t.titleSetCron("- GASTRITE CRÔNICA INATIVA:", "LEVE"), "- GASTRITE CRÔNICA LEVE, INATIVA:", "grau entra antes da atividade");
+eq(t.titleSetCron("- GASTRITE CRÔNICA LEVE, EM ATIVIDADE MODERADA, EM MUCOSA DE PADRÃO ANTRAL:", "ACENTUADA"), "- GASTRITE CRÔNICA ACENTUADA, EM ATIVIDADE MODERADA, EM MUCOSA DE PADRÃO ANTRAL:", "grau trocado");
+eq(t.titleSetCron("- COLITE CRÔNICA MODERADA, INATIVA:", null), "- COLITE CRÔNICA INATIVA:", "sem grau: sai, com a vírgula");
+eq(t.titleSetCron("- GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA (VIDE NOTAS):", "LEVE"), "- GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA (VIDE NOTAS):", "gastrite atrófica autoimune: sem grau");
+eq(t.cronDaLinha("- Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada."), "ACENTUADA", "severamente = acentuada");
+eq(t.cronDaLinha("- Celularidade habitual de leucócitos mononucleares em lâmina própria."), null, "habitual: sem grau");
+const GT = t.SEED_SITES.gastrica, CT = t.SEED_SITES.colon;
+eq(GT.presets.filter(p => /^GASTRITE CRÔNICA (INATIVA|EM ATIVIDADE (LEVE|MODERADA|ACENTUADA))$/.test(p.titulo)).length, 4, "gastrite: 4 cartões (inativa e 3 graus de atividade)");
+ok(GT.criterios.find(c => /^Celularidade/.test(c.g)).opt.filter(o => /Sydney/.test(o[1])).length === 3, "gastrite: as 3 celularidades graduadas citam o Sydney");
+ok(CT.criterios.find(c => c.g === "Celularidade mononuclear").opt.filter(o => /\(graduação conforme Geboes \[@geboes\]\)/.test(o[1])).length === 3, "colite: as 3 celularidades graduadas citam o Geboes");
+eq(t.montaBloco("gastrica", t.presetText(GT.presets.find(p => p.titulo === "GASTRITE CRÔNICA EM ATIVIDADE MODERADA"))).split("\n")[0], "- GASTRITE CRÔNICA LEVE, EM ATIVIDADE MODERADA, EM MUCOSA DE PADRÃO ANTRAL:", "inserção: grau e topografia no título do editor");
+eq(t.montaBloco("colon", t.presetText(CT.presets.find(p => p.titulo === "COLITE CRÔNICA INATIVA"))).split("\n")[0], "- COLITE CRÔNICA LEVE, INATIVA:", "colite: grau no título do editor");
+eq(t.montaBloco("reto", t.presetText(t.SEED_SITES.reto.presets.find(p => p.titulo === "RETITE CRÔNICA INATIVA"))).split("\n")[0], "- RETITE CRÔNICA LEVE, INATIVA:", "retite: grau no título do editor");
+// editor: celularidade troca só o grau; título acompanha; título editado leva a linha
+els.fSitio.value = "colon"; els.fSitio.onchange(); els.fSeg.value = "Ceco";
+els.corpo.value = t.montaBloco("colon", t.presetText(CT.presets.find(p => p.titulo === "COLITE CRÔNICA INATIVA"))); els.corpo.onfocus();
+t.appendLine(CT.criterios.find(c => c.g === "Celularidade mononuclear").opt[3][1]);
+ok(/^- COLITE CRÔNICA ACENTUADA, INATIVA:/.test(els.corpo.value) && els.corpo.value.includes("- Celularidade de leucócitos mononucleares em lâmina própria severamente aumentada (graduação conforme Geboes [@geboes]), com presença de infiltrado inflamatório linfoplasmocitário leve, não sendo identificada eosinofilia") && els.corpo.value.split("\n").filter(l => /^- Celularidade/.test(l)).length === 1, "celularidade: troca o grau sem duplicar nem perder a contagem; título acompanha");
+els.corpo.onfocus(); els.corpo.value = els.corpo.value.replace("COLITE CRÔNICA ACENTUADA", "COLITE CRÔNICA MODERADA"); els.corpo.onchange();
+ok(els.corpo.value.includes("- Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria (graduação conforme Geboes [@geboes]), com presença"), "título editado: grau vai à linha de celularidade");
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Ceco", corpo: "- COLITE CRÔNICA LEVE, INATIVA:\n- Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria.\n- Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.", site: "colon", seg: "Ceco" });
+ok(t.alertas().some(a => /o título diz cronicidade leve, mas a linha de celularidade diz moderada/.test(a.msg)), "alerta: grau do título e da linha não batem");
+// topografia gástrica: amostragem sem padrão e editor sem segmento
+t.WORK.samples[0] = { nome: "Estômago", corpo: "- GASTRITE CRÔNICA LEVE, INATIVA:\n- Amostragem: Mucosa gástrica superficial, não sendo identificadas glândulas profundas.\n- Celularidade levemente aumentada de leucócitos mononucleares em lâmina própria.", site: "gastrica", seg: "" };
+ok(t.alertas().some(a => /não traz a topografia gástrica/.test(a.msg)), "alerta: amostragem sem padrão, título sem topografia");
+els.fSitio.value = "gastrica"; els.fSitio.onchange(); els.fSeg.value = "";
+els.corpo.value = ""; els.corpo.onfocus(); t.appendLine("- Amostragem: Mucosa gástrica de padrão antral.");
+ok(/topografia gástrica não definida pelo segmento/.test(els.alertEditor.innerHTML), "editor sem segmento: alerta de topografia");
+// Crohn e Naini e Cortina 2012
+const IT = t.SEED_SITES.ileo, cIl = IT.presets.find(p => /DOENÇA DE CROHN/.test(p.titulo)), cCo = CT.presets.find(p => /DOENÇA DE CROHN/.test(p.titulo));
+eq(cIl.titulo, "ILEÍTE CRÔNICA EM ATIVIDADE MODERADA, COM ACHADOS QUE FAVORECEM DOENÇA DE CROHN (VIDE NOTAS)", "Crohn no íleo");
+ok(cCo && t.SEED_SITES.reto.presets.some(p => /^RETITE CRÔNICA .*DOENÇA DE CROHN/.test(p.titulo)), "Crohn no cólon e no reto");
+ok(cIl.bullets.includes("Granulomas: Presentes, epitelioides, não necrosantes, não relacionados a criptas rotas.") && cIl.bullets.includes("Metaplasia de glândulas pilóricas: Presente.") && cIl.bullets.some(b => /\[@geboes\]/.test(b)), "Crohn: granulomas, metaplasia pilórica e criptite pela escala de Geboes");
+eq(t.linhaNaini("ileo", [2, 1, 2, 2, 0]), "- Escore histológico de ileíte crônica (Naini e Cortina 2012 [@naini12]): 7/10 (distorção arquitetural 2, linfoplasmocitose da lâmina própria 1, neutrófilos/erosão 2, granulomas 2, metaplasia pilórica 0); probabilidade de doença inflamatória intestinal alta.", "Naini: ileíte, alta");
+eq(t.linhaNaini("colon", [2, 1, 1, 0, 0, 0, 0, 1, 0, 0]), "- Escore histológico de colite crônica (Naini e Cortina 2012 [@naini12]): 5/17 (distorção das criptas 2, linfoplasmocitose basal 1, criptite 1, eosinófilos 0, erosão/úlcera 0, granulomas 0, metaplasia de Paneth/pilórica 0, nódulos linfoides basais 1, muscular da mucosa 0, hiperplasia endócrina 0); probabilidade de doença inflamatória intestinal moderada.", "Naini: colite, moderada");
+ok(/: 2\/10 .*baixa\.$/.test(t.linhaNaini("ileo", [1, 1, 0, 0, 0])) && /: 3\/10 .*moderada\.$/.test(t.linhaNaini("ileo", [1, 1, 1, 0, 0])) && /: 9\/17 .*alta\.$/.test(t.linhaNaini("colon", [2, 2, 2, 1, 2, 0, 0, 0, 0, 0])) && /: 3\/17 .*baixa\.$/.test(t.linhaNaini("colon", [1, 1, 1, 0, 0, 0, 0, 0, 0, 0])), "Naini: limites das faixas");
+ok(IT.criterios.some(c => c.escore === "ileo") && CT.criterios.some(c => c.escore === "colon") && t.SEED_SITES.reto.criterios.some(c => c.escore === "colon"), "escore como achado opcional no íleo, no cólon e no reto");
+t.WORK.samples.length = 0; t.WORK.samples.push({ nome: "Íleo terminal", corpo: t.presetText(cIl) + "\n" + t.linhaNaini("ileo", [2, 1, 2, 2, 2]), site: "ileo", seg: "Íleo terminal" });
+const l30 = t.buildLaudo();
+ok(/- Amostra A: os achados favorecem doença de Crohn; granulomas não relacionados a criptas rotas são o achado mais confiável para distingui-la da retocolite ulcerativa \[\d+\]\./.test(l30) && /- Amostra A: o escore histológico de Naini e Cortina estima a probabilidade de doença inflamatória intestinal, mas não distingue doença de Crohn de retocolite ulcerativa \[\d+\]\./.test(l30), "notas de Crohn e do escore");
+ok(l30.includes(t.CITE.feakins13) && l30.includes(t.CITE.naini12) && !/\[@/.test(l30), "referências Feakins 2013 e Naini 2012 numeradas");
+ok(l30.includes("- ILEÍTE CRÔNICA EM ATIVIDADE MODERADA, COM ACHADOS QUE FAVORECEM DOENÇA DE CROHN (VIDE NOTAS).\n \n- MICROSCOPIA:\n- Arquitetura alterada:"), "Crohn: título, linha em branco, MICROSCOPIA e achados");
 
 console.log(`OK — ${n} asserts`);
 

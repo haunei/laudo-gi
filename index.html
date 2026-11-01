@@ -631,6 +631,13 @@ const SEED_SITES = {
         "Celularidade aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
         "Presença de infiltrado inflamatório neutrofílico em lâmina própria, com criptite, não sendo identificados microabscessos, erosão ou ulceração.",
         "Hiperplasia folicular linfoide: Presente.","Presença de edema e vasocongestão."]),
+      P("ILEÍTE CRÔNICA EM ATIVIDADE MODERADA, COM ACHADOS QUE FAVORECEM DOENÇA DE CROHN (VIDE NOTAS)",[
+        "Arquitetura alterada: Vilosidades encurtadas e alargadas, com hiperplasia das criptas.",
+        "Metaplasia de glândulas pilóricas: Presente.",
+        "Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
+        "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite, sem formar microabscessos.",
+        "Granulomas: Presentes, epitelioides, não necrosantes, não relacionados a criptas rotas.",
+        "Hiperplasia folicular linfoide: Presente."]),
       P("ILEÍTE CRÔNICA EM ATIVIDADE MODERADA",[
         "Arquitetura alterada: Encurtamento focal de vilosidades, focalmente associado a leve linfocitose intraepitelial das mesmas.",
         "Celularidade aumentada de leucócitos mononucleares em lâmina própria, com presença de infiltrado inflamatório linfoplasmocitário, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
@@ -691,6 +698,13 @@ const SEED_SITES = {
         "Amostra exígua, pouco representativa.","Arquitetura glandular alterada: Perda do paralelismo glandular.",
         "Presença de infiltrado inflamatório mononuclear (linfohistoplasmocitário) moderado em lâmina própria, não sendo identificada eosinofilia (até 10 eosinófilos/campo de grande aumento (CGA)).",
         "Ausência de infiltrado inflamatório neutrofílico em lâmina própria, não sendo identificada criptite, microabscessos, erosão ou ulceração.",
+        "Agregado linfoide: Presente."]),
+      P("COLITE CRÔNICA EM ATIVIDADE MODERADA, COM ACHADOS QUE FAVORECEM DOENÇA DE CROHN (VIDE NOTAS)",[
+        "Arquitetura glandular alterada: Distorção arquitetural focal.",
+        "Plasmocitose em base de glândulas: Presente, focal.",
+        "Celularidade moderadamente aumentada de leucócitos mononucleares em lâmina própria, não sendo identificada eosinofilia (até 7 eosinófilos/campo de grande aumento (CGA)).",
+        "Presença de infiltrado inflamatório neutrofílico moderado em lâmina própria, com criptite, sem formar microabscessos.",
+        "Granulomas: Presentes, epitelioides, não necrosantes, não relacionados a criptas rotas.",
         "Agregado linfoide: Presente."]),
       P("COLOPATIA DE PADRÃO LINFOCITÁRIO, INATIVA (VIDE NOTAS)",[
         "Arquitetura glandular alterada: Perda do paralelismo glandular e hiperplasia de células caliciformes focal.",
@@ -781,10 +795,24 @@ const CRIT_COLON = [
     ["Agregado linfoide presente","- Agregado linfoide: Presente."],
     ["Agregados exuberantes","- Agregados foliculares linfoides: Presentes, exuberantes, com linfócitos de tamanhos variáveis."],
     ["Não identificado","- Agregado linfoide: Não identificado."]]},
-  {g:"Edema / vasocongestão", opt:[["Presente","- Presença de edema e vasocongestão."]]}
+  {g:"Edema / vasocongestão", opt:[["Presente","- Presença de edema e vasocongestão."]]},
+  {g:"Granulomas", opt:[["Não identificados","- Granulomas: Não identificados."],["Não necrosantes, sem relação com criptas","- Granulomas: Presentes, epitelioides, não necrosantes, não relacionados a criptas rotas."]]}
 ];
 SEED_SITES.colon.criterios = CRIT_COLON;
 SEED_SITES.reto.criterios = CRIT_COLON;
+
+// escore histológico de Naini e Cortina 2012 (ileíte e colite crônicas): pontos por item, total e probabilidade de doença inflamatória intestinal
+const NAINI = {
+  ileo:{rot:"ileíte", tot:10, faixas:[[2,"baixa"],[4,"moderada"],[99,"alta"]], itens:[["distorção arquitetural",[0,1,2]],["linfoplasmocitose da lâmina própria",[0,1,2]],["neutrófilos/erosão",[0,1,2]],["granulomas",[0,2]],["metaplasia pilórica",[0,2]]]},
+  colon:{rot:"colite", tot:17, faixas:[[3,"baixa"],[8,"moderada"],[99,"alta"]], itens:[["distorção das criptas",[0,1,2]],["linfoplasmocitose basal",[0,1,2]],["criptite",[0,1,2]],["eosinófilos",[0,1,2]],["erosão/úlcera",[0,2]],["granulomas",[0,2]],["metaplasia de Paneth/pilórica",[0,2]],["nódulos linfoides basais",[0,1]],["muscular da mucosa",[0,1]],["hiperplasia endócrina",[0,1]]]}
+};
+function linhaNaini(k, pts){ const e=NAINI[k], tot=pts.reduce((a,b)=>a+b,0), prob=e.faixas.find(f=>tot<=f[0])[1];
+  return "- Escore histológico de "+e.rot+" crônica (Naini e Cortina 2012 [@naini12]): "+tot+"/"+e.tot+" ("+e.itens.map((it,i)=>it[0]+" "+pts[i]).join(", ")+"); probabilidade de doença inflamatória intestinal "+prob+"."; }
+const grupoNaini=k=>({g:"Escore histológico de "+NAINI[k].rot+" crônica (Naini e Cortina 2012)", escore:k,
+  dica:"Opcional. Marque os pontos de cada item e clique em inserir: sai uma linha com o total, os itens e a probabilidade de doença inflamatória intestinal ("+(k==="ileo" ? "até 2 baixa, 3 a 4 moderada, 5 ou mais alta" : "até 3 baixa, 4 a 8 moderada, 9 ou mais alta")+"). O escore não distingue doença de Crohn de retocolite ulcerativa."});
+CRIT_COLON.push(grupoNaini("colon"));
+SEED_SITES.ileo.criterios.push({g:"Metaplasia de glândulas pilóricas", opt:[["Não identificada","- Metaplasia de glândulas pilóricas: Não identificada."],["Presente","- Metaplasia de glândulas pilóricas: Presente."]]},
+  {g:"Granulomas", opt:[["Não identificados","- Granulomas: Não identificados."],["Não necrosantes, sem relação com criptas","- Granulomas: Presentes, epitelioides, não necrosantes, não relacionados a criptas rotas."]]}, grupoNaini("ileo"));
 
 // Achados associados aos eosinófilos (pilha), logo depois do grupo de contagem de cada sítio
 // A densidade isolada não basta: distribuição na parede, degranulação, criptite e abscessos entram no laudo (Campora 2022; no esôfago, Giordano 2026).
@@ -1239,6 +1267,8 @@ const CITE = {
   youssef:"Youssef R, Saeed O, Lin J, González IA. Characterization of Esophageal Biopsies from Stem Cell Transplant Patients With and Without Esophageal Graft-Versus-Host Disease. Mod Pathol. 2025;38(6):100727. doi:10.1016/j.modpat.2025.100727.",
   mostafa:"Mostafa M, Hartley CP, Hagen CE. Evaluation of the lower histologic threshold for gastric graft versus host disease. Mod Pathol. 2020;33(5):962-970. doi:10.1038/s41379-019-0421-7.",
   sydney:"Dixon MF, Genta RM, Yardley JH, Correa P. Classification and grading of gastritis. The updated Sydney System. International Workshop on the Histopathology of Gastritis, Houston 1994. Am J Surg Pathol. 1996;20(10):1161-81. doi:10.1097/00000478-199610000-00001.",
+  naini12:"Naini BV, Cortina G. A histopathologic scoring system as a tool for standardized reporting of chronic (ileo)colitis and independent risk assessment for inflammatory bowel disease. Hum Pathol. 2012;43(12):2187-96. doi:10.1016/j.humpath.2012.03.008.",
+  feakins13:"Feakins RM. Inflammatory bowel disease biopsies: updated British Society of Gastroenterology reporting guidelines. J Clin Pathol. 2013;66(12):1005-26. doi:10.1136/jclinpath-2013-201885.",
   geboes:"Geboes K, Riddell R, Ost A, Jensfelt B, Persson T, Löfberg R. A reproducible grading scale for histological assessment of inflammation in ulcerative colitis. Gut. 2000;47(3):404-9. doi:10.1136/gut.47.3.404.",
   dixon86:"Dixon MF, O'Connor HJ, Axon AT, King RF, Johnston D. Reflux gastritis: distinct histopathological entity? J Clin Pathol. 1986;39(5):524-30. doi:10.1136/jcp.39.5.524.",
   veras:"Veras LV, Arnold M, Avansino JR, Bove K, Cowles RA, Durham MM, et al. Guidelines for synoptic reporting of surgery and pathology in Hirschsprung disease. J Pediatr Surg. 2019;54(10):2017-2023. doi:10.1016/j.jpedsurg.2019.03.010.",
@@ -1299,6 +1329,8 @@ function notaCeliaca(corpo){
 const NOTA_EOS_QUAL="os achados eosinofílicos associados descritos reforçam o padrão eosinofílico; a densidade isolada não é suficiente, e o diagnóstico de doença eosinofílica primária exige exclusão de causas secundárias (parasitoses, medicamentos, alergia alimentar, doença inflamatória intestinal, infecções) [@campora22].";
 const NOTA_EOE_QUAL="microabscessos eosinofílicos e eosinófilos em camada superficial são característicos de esofagite eosinofílica e raros em outras esofagites [@gio].";
 const NOTA_BARRETT="a metaplasia intestinal (epitélio colunar com células caliciformes) é o critério histológico de esôfago de Barrett adotado pelo CAP, com controvérsia sobre incluir epitélio colunar sem células caliciformes [@capeso]; imprescindível correlação endoscópica.";
+const NOTA_CROHN="os achados favorecem doença de Crohn; granulomas não relacionados a criptas rotas são o achado mais confiável para distingui-la da retocolite ulcerativa [@feakins13]. O diagnóstico de doença inflamatória intestinal e sua classificação dependem da correlação clínica, endoscópica e radiológica.";
+const NOTA_NAINI="o escore histológico de Naini e Cortina estima a probabilidade de doença inflamatória intestinal, mas não distingue doença de Crohn de retocolite ulcerativa [@naini12].";
 const NOTA_AUTOIMUNE="o padrão de gastrite atrófica do corpo/fundo, com metaplasia pseudopilórica e hiperplasia de células enterocromafins-símile, sem H. pylori, favorece gastrite autoimune; a hiperplasia de células enterocromafins-símile pode faltar nas fases iniciais [@hall19]; em crianças, pode haver atrofia também no antro [@kulak21] e associação com outras doenças autoimunes, imunodeficiência e anemia ferropriva [@pogoriler15]; imprescindível correlação clínica-laboratorial (anticorpos anticélula parietal e antifator intrínseco, gastrina e vitamina B12), lembrando que os autoanticorpos podem ser negativos no início [@pogoriler15].";
 const NOTA_EDS="os achados histológicos (aspecto em dois tons, descamação superficial com clivagem intraepitelial e paraqueratose) são compatíveis com esofagite dissecante superficial [@rubrecht25,hart15]; o diagnóstico requer correlação com o achado endoscópico de descamação da mucosa em tiras ou membranas e exclusão de infecção fúngica; sem achado endoscópico característico, o diagnóstico deve permanecer descritivo [@carmack09]. Em crianças, o achado endoscópico clássico nem sempre está presente [@rubrecht25], e há associação com esofagite eosinofílica, doença inflamatória intestinal e doença do refluxo gastroesofágico [@ebigbo21].";
 const NOTA_DESC_INESP="os achados de descamação superficial descritos são inespecíficos e podem ocorrer em diversas esofagites [@carmack09,rubrecht25].";
@@ -1345,7 +1377,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.13.0";
+const APP_VERSION="3.14.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1778,7 +1810,7 @@ function vr(text){
 }
 // linha "- Rótulo: valor" troca a linha de mesmo rótulo do bloco atual (não duplica); o mesmo vale para as famílias abaixo
 const FAMILIAS = [/^- Arquitetura/, /hiperplasia .*camada basal/i, /metaplasia intestinal/i, /^- (Atrofia:|Ausência de atrofia)/,
-  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- (Amostra .+, pouco representativa\.|Representatividade da amostra: )/, /^- Subserosa/, /^- Classificação de Marsh-Oberhuber \(1999\): /];
+  /infiltrado inflamatório neutrofílico/, /exocitose de neutrófilos/, /^- (Ascensão vascular|Ausência de ascensão vascular)/, /^- (Espongiose|Ausência de espongiose)/, /^- Mucosa (retal|de cólon sigmoide|de cólon proximal): /, /^- (Amostra .+, pouco representativa\.|Representatividade da amostra: )/, /^- Subserosa/, /^- Escore histológico de (ileíte|colite) crônica \(Naini/, /^- Classificação de Marsh-Oberhuber \(1999\): /];
 function setLinha(line){
   const ta=$("corpo"), ls=ta.value ? ta.value.split("\n") : [], b=blocoAtual(ls), start=b.st;
   const lab=line.match(/^- ([^:(]{3,45}): /), fam=FAMILIAS.find(f=>f.test(line));
@@ -2529,6 +2561,8 @@ function autoNotas(){
     if(s.site==="hirschsprung"){ hsNotas(s.corpo, s.seg).forEach(n=>add(L_, n)); if(hsPedeIhq(s.corpo, s.seg) && !extra.includes(NOTA_IHQ_CAL)) extra.push(NOTA_IHQ_CAL); }
     if(s.site==="duodeno"){ const nc=notaCeliaca(s.corpo); if(nc) add(L_, nc); }
     if(s.site==="esofago" && /^- Metaplasia intestinal: Presente/m.test(s.corpo||"")) add(L_, NOTA_BARRETT);
+    if(["ileo","colon","reto"].includes(s.site)){ if(/DOENÇA DE CROHN/.test((s.corpo||"").split("\n").filter(l=>lineKind(l)==="b").join(" "))) add(L_, NOTA_CROHN);
+      if(/^- Escore histológico de (ileíte|colite) crônica \(Naini/m.test(s.corpo||"")) add(L_, NOTA_NAINI); }
     if(s.site==="gastrica" && /DE PADRÃO AUTOIMUNE/.test((s.corpo||"").split("\n").filter(l=>lineKind(l)==="b").join(" "))) add(L_, NOTA_AUTOIMUNE);
     if(s.site==="esofago"){ const ed=edsEstado(s.corpo); if(ed==="suficiente") add(L_, NOTA_EDS); else if(ed==="inesp") add(L_, NOTA_DESC_INESP); if(ed && /^- Achados de descamação superficial: .*bolhas intraepiteliais/mi.test(s.corpo)) add(L_, NOTA_EDS_BOLHA); }
     if(RE_EOS_ASSOC_POS.test(s.corpo||"")){
@@ -2796,6 +2830,13 @@ function renderCrit(){
       mkb(opts, "inserir linha", ()=>{ if(!sel.length){ toast("Marque ao menos um modificador"); return; }
         toast(amostraMods(sel.slice()) ? "Amostra pouco representativa" : "Sem título no editor: só a linha foi inserida"); }, "go");
       mkb(opts, "Adequada", ()=>{ toast(amostraMods([]) ? "Amostra adequada" : "Sem título no editor: só a linha foi inserida"); });
+    }
+    if(c.escore){
+      const e=NAINI[c.escore], pts=e.itens.map(()=>0);
+      e.itens.forEach(([rot,vals],i)=>{ const sp=document.createElement("span"); sp.className="muted"; sp.textContent=rot+":"; opts.appendChild(sp);
+        const bs=vals.map(v=>mkb(opts, String(v), b=>{ pts[i]=v; bs.forEach(x=>{ x.className = x===b ? "on" : ""; }); }, v===0 ? "on" : ""));
+        const sep=document.createElement("span"); sep.className="sep"; opts.appendChild(sep); });
+      mkb(opts, "inserir linha", ()=>{ appendLine(linhaNaini(c.escore, pts.slice())); toast("Escore inserido"); }, "go");
     }
     if(c.ativ){
       const mkn=()=>{ const w=document.createElement("span"); w.className="num"; const i=document.createElement("input"); i.type="number"; i.min="0"; i.placeholder="nº"; w.appendChild(i); opts.appendChild(w); return i; };
