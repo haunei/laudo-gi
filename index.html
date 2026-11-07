@@ -148,6 +148,7 @@ table.eos td:first-child{font-weight:800;color:var(--accent-d);white-space:nowra
 .out .ll.b{font-weight:bold;}
 .out .ll.sp{height:.6em;}
 .tbar{display:flex;gap:4px;margin:6px 0 4px;}
+.tbar[hidden]{display:none;}
 .tbar button{min-width:34px;padding:3px 8px;font-size:12px;line-height:1.2;}
 .out .empty{color:var(--muted);font-size:.85rem;font-style:italic;}
 .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--dark);
@@ -260,7 +261,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
     <label class="fld" style="grid-column:1/-1;">Nome da amostra (vai em “Materiais” e no cabeçalho)
       <input type="text" id="fNome" list="matList" placeholder="ex.: Mucosa esofágica">
       <datalist id="matList"></datalist>
-      <span class="tbar" id="nomeBtns" hidden><button type="button" class="ghost" id="nb_eso">Esôfago</button><button type="button" class="ghost" id="nb_esoprox">Esôfago proximal</button><button type="button" class="ghost" id="nb_esodist">Esôfago distal</button><button type="button" class="ghost" id="nb_esomuc">Mucosa esofágica</button></span>
+      <span class="tbar" id="nomeBtns" hidden></span>
     </label>
   </div>
   <div class="subpanel acc-dx grow">
@@ -1066,6 +1067,8 @@ const HS_L = {
 };
 const ESO_NOME = {"":"Esôfago", "Terço proximal":"Esôfago proximal", "Terço distal":"Esôfago distal", "Transição esôfago-gástrica":"Transição esofagogástrica"};
 const ILEO_NOME = {"Íleo terminal":"Mucosa de íleo terminal","Íleo (neoterminal)":"Mucosa de íleo neoterminal","Bolsa ileal":"Mucosa de bolsa ileal"};
+// botões de nome rápido: acompanham o sítio (pólipo, Hirschsprung e ressecção têm nome automático próprio)
+const NOME_BTNS = {esofago:["Esôfago","Esôfago proximal","Esôfago distal","Mucosa esofágica"], gastrica:["Estômago","Antro gástrico","Corpo gástrico","Mucosa gástrica"], duodeno:["Duodeno","Bulbo duodenal","Segunda porção duodenal","Mucosa duodenal"], ileo:["Íleo terminal","Íleo neoterminal","Mucosa de íleo terminal"], colon:["Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Mucosa colônica"], reto:["Reto","Junção retossigmoide","Mucosa retal"]};
 const HS_NOME = {"Congelação / nivelamento":"Biópsias de nivelamento (congelação)","Peça de abaixamento":"Produto de abaixamento de retossigmoide","Rebiopsia / reoperação":"Biópsia retal pós-abaixamento"};
 const HS_AMOSTRAGEM = ["Fragmentos examinados: 3.","Examinados 10 níveis de corte.","Bloco esgotado: Sim."];
 
@@ -1377,7 +1380,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.14.0";
+const APP_VERSION="3.14.1";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -2852,11 +2855,16 @@ function renderCrit(){
     box.appendChild(div);
   });
 }
+function renderNomeBtns(id){
+  const box=$("nomeBtns"), nomes=NOME_BTNS[id]||[];
+  box.innerHTML=""; box.hidden=!nomes.length;
+  nomes.forEach(n=>{ const b=document.createElement("button"); b.type="button"; b.className="ghost"; b.textContent=n; b.onclick=()=>{ $("fNome").value=n; }; box.appendChild(b); });
+}
 function applyDefaultName(){
   const site=currentSite(), seg=$("fSeg").value;
+  renderNomeBtns(site.id);
   let base=site.nomeAmostra;
   if(site.id==="hirschsprung"){ $("fNome").value = HS_NOME[seg] || base; return; }
-  $("nomeBtns").hidden = site.id!=="esofago";
   if(isRes(site.id)){ $("fNome").value = seg ? "Segmento de "+seg.charAt(0).toLowerCase()+seg.slice(1) : base; return; }
   if(site.id==="esofago" && seg in ESO_NOME){ $("fNome").value = ESO_NOME[seg]; return; }
   if(site.id==="ileo"){ $("fNome").value = ILEO_NOME[seg] || base; return; }
@@ -3105,7 +3113,6 @@ $("fSeg").onchange=()=>{ applyDefaultName(); const st=$("fSitio").value;
   if(st==="hirschsprung" || st==="esofago"){ porcaoAtiva="eso"; renderPresets(); renderCrit(); }
   if(st==="gastrica"){ renderPresets(); const ta=$("corpo"), n=adaptaGas(ta.value, $("fSeg").value); if(n!==ta.value){ ta.value=n; prevTit=ultimoTitulo(n); snapEditor(); toast("Texto ajustado ao segmento"); } } };
 $("fPrefixo").oninput=()=>{ WORK.prefixo=$("fPrefixo").value; save(); renderLaudo(); };
-[["nb_eso","Esôfago"],["nb_esoprox","Esôfago proximal"],["nb_esodist","Esôfago distal"],["nb_esomuc","Mucosa esofágica"]].forEach(([id,n])=>{ $(id).onclick=()=>{ $("fNome").value=n; }; });
 $("fPrefixoSel").onchange=()=>{ const v=$("fPrefixoSel").value, outro=v==="__outro";
   $("fPrefixo").hidden=!outro; WORK.prefixo = outro ? $("fPrefixo").value : v; if(outro) $("fPrefixo").focus();
   if(isResPrefixo()!==isRes($("fSitio").value)){ renderSitioSelect(); onSiteChange(); }

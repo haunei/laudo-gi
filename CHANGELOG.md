@@ -1,5 +1,8 @@
 # Changelog
 
+## v3.14.1 — 2026-11-07
+- Nome da amostra: os botões de nome rápido acompanham o sítio (esôfago, estômago, duodeno, íleo, cólon, reto); pólipo, Hirschsprung e ressecção ficam sem botões. Corrige os botões do esôfago, que apareciam em qualquer sítio.
+
 ## v3.14.0 — 2026-10-31
 - Formato do laudo: todo bloco sai com o título em negrito fechado com ".", linha em branco, "- MICROSCOPIA:" e os achados, inclusive os descritivos ("MUCOSA … SEM PARTICULARIDADES …."; "… APRESENTANDO OS ACHADOS DESCRITOS NA MICROSCOPIA."). Laudo de referência A–G atualizado (blocos A e C).
 - Estômago: cronicidade graduada pelo Sistema Sydney atualizado (Dixon 1996). O título leva "GASTRITE CRÔNICA LEVE|MODERADA|ACENTUADA" pela linha de celularidade mononuclear (levemente, moderadamente, severamente aumentada), nos dois sentidos, e a linha graduada cita o Sydney. Alerta quando o grau do título e o da linha não batem.

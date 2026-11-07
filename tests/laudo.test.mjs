@@ -936,8 +936,8 @@ ok(els.fPrefixoSel.value === "__outro" && els.fPrefixo.value === "Peças cirúrg
 for (const [sg, nm] of [["", "Esôfago"], ["Terço proximal", "Esôfago proximal"], ["Terço distal", "Esôfago distal"], ["Terço médio", "Mucosa esofágica (terço médio)"], ["Transição esôfago-gástrica", "Transição esofagogástrica"]]) {
   els.fSitio.value = "esofago"; els.fSeg.value = sg; els.fSeg.onchange(); eq(els.fNome.value, nm, "nome do esôfago: " + (sg || "sem segmento")); }
 ok(!els.nomeBtns.hidden, "botões de nome visíveis no esôfago");
-els.nb_esodist.onclick(); eq(els.fNome.value, "Esôfago distal", "botão Esôfago distal");
-els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.fSeg.onchange(); ok(els.nomeBtns.hidden, "botões escondidos fora do esôfago");
+els.nomeBtns.children.find(b => b.textContent === "Esôfago distal").onclick(); eq(els.fNome.value, "Esôfago distal", "botão Esôfago distal");
+els.fSitio.value = "colon"; els.fSeg.value = "Ceco"; els.fSeg.onchange(); ok(!els.nomeBtns.children.some(b => /Esôfago/.test(b.textContent)), "fora do esôfago: sem botões do esôfago (v3.14.1)");
 ok(t.MATS_PADRAO.includes("Esôfago proximal") && t.MATS_PADRAO.includes("Esôfago distal"), "nomes no autocompletar");
 // EDS
 const gE = t.SEED_SITES.esofago.criterios.find(c => /^Descamação superficial/.test(c.g));
@@ -1521,6 +1521,17 @@ const l30 = t.buildLaudo();
 ok(/- Amostra A: os achados favorecem doença de Crohn; granulomas não relacionados a criptas rotas são o achado mais confiável para distingui-la da retocolite ulcerativa \[\d+\]\./.test(l30) && /- Amostra A: o escore histológico de Naini e Cortina estima a probabilidade de doença inflamatória intestinal, mas não distingue doença de Crohn de retocolite ulcerativa \[\d+\]\./.test(l30), "notas de Crohn e do escore");
 ok(l30.includes(t.CITE.feakins13) && l30.includes(t.CITE.naini12) && !/\[@/.test(l30), "referências Feakins 2013 e Naini 2012 numeradas");
 ok(l30.includes("- ILEÍTE CRÔNICA EM ATIVIDADE MODERADA, COM ACHADOS QUE FAVORECEM DOENÇA DE CROHN (VIDE NOTAS).\n \n- MICROSCOPIA:\n- Arquitetura alterada:"), "Crohn: título, linha em branco, MICROSCOPIA e achados");
+
+// 31. v3.14.1: botões de nome rápido acompanham o sítio
+({ t, els } = boot({}));
+const rot31 = () => els.nomeBtns.children.map(b => b.textContent).join(" | ");
+const BT31 = { esofago: "Esôfago | Esôfago proximal | Esôfago distal | Mucosa esofágica", gastrica: "Estômago | Antro gástrico | Corpo gástrico | Mucosa gástrica", duodeno: "Duodeno | Bulbo duodenal | Segunda porção duodenal | Mucosa duodenal", ileo: "Íleo terminal | Íleo neoterminal | Mucosa de íleo terminal", colon: "Ceco | Cólon ascendente | Cólon transverso | Cólon descendente | Cólon sigmoide | Mucosa colônica", reto: "Reto | Junção retossigmoide | Mucosa retal" };
+for (const [k, v] of Object.entries(BT31)) { els.fSitio.value = k; els.fSitio.onchange(); ok(!els.nomeBtns.hidden && rot31() === v, "botões de nome: " + k); }
+els.fSitio.value = "esofago"; els.fSitio.onchange(); els.fSitio.value = "gastrica"; els.fSitio.onchange();
+ok(rot31() === BT31.gastrica && !/Esôfago/.test(rot31()), "esôfago -> gástrica: os botões trocam (caso da foto)");
+els.nomeBtns.children.find(b => b.textContent === "Antro gástrico").onclick(); eq(els.fNome.value, "Antro gástrico", "clique preenche o nome");
+for (const k of ["polipo", "hirschsprung", "res_delgado", "res_ceco", "res_colon", "res_reto"]) { els.fSitio.value = "esofago"; els.fSitio.onchange(); els.fSitio.value = k; els.fSitio.onchange(); ok(els.nomeBtns.hidden && els.nomeBtns.children.length === 0, "sem botões: " + k); }
+els.fSitio.value = "esofago"; els.fSitio.onchange(); ok(rot31() === BT31.esofago, "volta ao esôfago sem resto");
 
 console.log(`OK — ${n} asserts`);
 
