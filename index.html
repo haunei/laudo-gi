@@ -98,6 +98,9 @@ button.danger{color:var(--danger);}button.danger:hover{background:var(--alc-bg);
 .preset:hover{border-color:var(--accent);background:var(--accent-soft);}
 .preset b{display:block;font-size:.9rem;color:var(--ink);margin-bottom:2px;}
 .preset span{font-size:.8rem;color:var(--muted);}
+.preset span.fontes{display:block;font-size:.75rem;margin-top:2px;}
+details.fontesTP{margin:4px 0 0;}details.fontesTP summary{cursor:pointer;}details.fontesTP ol{margin:6px 0 0;padding-left:20px;}
+.linrow{display:flex;gap:4px;}.linrow input{flex:1;min-width:0;}
 .crit{margin:0 0 11px;padding:0 0 10px;border-bottom:1px solid var(--line);}
 .crit:last-child{border-bottom:none;}
 .crit .glabel{display:block;font-size:.95rem;font-weight:600;color:var(--ink);margin-bottom:6px;}
@@ -267,6 +270,7 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
   <div class="subpanel acc-dx grow">
     <h3><span class="tile t-dx"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h7a2 2 0 0 1 2 2v13a2 2 0 0 0-2-2H4zM20 5h-5a2 2 0 0 0-2 2v13a2 2 0 0 1 2-2h5z"/></svg></span>Textos prontos (1 clique insere o bloco)</h3>
     <div id="presetBox"></div>
+    <details class="hint fontesTP" id="fontesTP"><summary>Fontes dos textos prontos (números nos cartões)</summary><ol id="fontesLista"></ol></details>
   </div>
 </section>
 
@@ -283,6 +287,10 @@ header.top .ver{font-size:.8rem;font-weight:500;color:var(--muted);font-family:'
 
 <section class="card col" id="colC">
   <div class="noprint">
+    <label class="fld">Linha livre (autocompletar): Enter insere no editor
+      <span class="linrow"><input type="text" id="fLinha" list="linList" spellcheck="true" lang="pt-BR" placeholder="comece a digitar um achado…"><button type="button" class="ghost" id="btnLinha">inserir</button><button type="button" class="ghost" id="btnLinhaMem" title="Apaga as linhas aprendidas (só neste navegador)">apagar memória</button></span>
+      <datalist id="linList"></datalist>
+    </label>
     <label class="fld">Editor da amostra: texto livre. Marcas como [@pap] viram o número da referência no laudo
       <span class="tbar" id="tbar"><button type="button" class="ghost" id="tb_up" data-fx="up" title="Caixa alta no trecho selecionado">AA</button><button type="button" class="ghost" id="tb_low" data-fx="low" title="Caixa baixa no trecho selecionado">aa</button><button type="button" class="ghost" id="tb_b" data-fx="b" title="Negrito"><b>N</b></button><button type="button" class="ghost" id="tb_i" data-fx="i" title="Itálico"><i>I</i></button><button type="button" class="ghost" id="tb_u" data-fx="u" title="Sublinhado"><u>S</u></button><button type="button" class="ghost" id="tb_sync" title="Atualizar título e achados (sincronia título ↔ linhas)" aria-label="Atualizar título e achados">⟳</button></span>
       <textarea id="corpo" rows="10" spellcheck="true" lang="pt-BR" placeholder="O cabeçalho do diagnóstico e os bullets aparecem aqui. Edite à vontade."></textarea>
@@ -1298,6 +1306,31 @@ const EOS_VR = {
 };
 const ESO_EOS_CAMPO=12;            // 15 por 0,3 mm² no campo FN 22
 const ESO_LINF = {"Transição esôfago-gástrica":62, "Terço distal":46, "Terço médio":41, "Terço proximal":41}; // Putra 2016
+// fontes dos textos prontos (catálogo de títulos de 2026-10-03): o número aparece no cartão; a lista, no painel abaixo dos cartões. Não vão ao laudo.
+const FONTES_CITE = ["deb","agree","mast","gio"];   // fontes 6 a 9 do catálogo (artigos já em CITE)
+const FONTES_LIVROS = ["Voltaggio L, Montgomery EA. Biopsy Interpretation of the Gastrointestinal Tract Mucosa. Volume 1: Non-Neoplastic. 4th ed.",
+  "Lewin, Weinstein and Riddell's Gastrointestinal Pathology and Its Clinical Implications. 2nd ed.",
+  "Stocker and Dehner's Pediatric Pathology. 5th ed.",
+  "Biopsy Interpretation of Pediatric Lesions. 2nd ed.",
+  "WHO Classification of Tumours. Digestive System Tumours. 6th ed."].concat(FONTES_CITE.map(k=>CITE[k]));
+const FONTES_COLRET = [[/^MUCOSA (COLÔNICA|RETAL) SEM/,[1]], [/DOENÇA DE CROHN/,[2,3,4]], [/PADRÃO LINFOCITÁRIO/,[2,3]], [/^(COLITE|RETITE) CRÔNICA.*EM ATIVIDADE/,[1,2]], [/^(COLITE|RETITE) CRÔNICA.*INATIVA/,[2]], [/^(COLITE|RETITE) ATIVA/,[1,2,3,4]]];
+const FONTES_TP = {
+  esofago:[[/DE PADRÃO EOSINOFÍLICO/,[3,4,7,8,9]], [/FÚNGICA/,[1,3]], [/DISSECANTE SUPERFICIAL/,[1]], [/^ESOFAGITE CRÔNICA/,[1,3,7,8,9]], [/^MUCOSA ESOFÁGICA SEM/,[1,6]]],
+  gastrica:[[/^MUCOSA GÁSTRICA.*SEM PARTICULARIDADES/,[1,6]], [/^GASTROPATIA REATIVA/,[1,2]], [/^GASTROPATIA DE PADRÃO LINFOCITÁRIO/,[2,3]], [/AUTOIMUNE/,[1,2]], [/METAPLASIA INTESTINAL/,[1,2]], [/^GASTRITE CRÔNICA.*(EM ATIVIDADE|H\. pylori)/,[1,2,3,4]], [/^GASTRITE CRÔNICA.*INATIVA/,[1,3]]],
+  duodeno:[[/^MUCOSA DUODENAL SEM/,[2,3]], [/PADRÃO LINFOCÍTICO/,[2,3,4]], [/^DUODENITE CRÔNICA LEVE/,[2]]],
+  ileo:[[/^MUCOSA DE ÍLEO SEM/,[2,6]], [/DOENÇA DE CROHN/,[2,3,4]], [/^ILEÍTE/,[2,3]]],
+  colon:FONTES_COLRET, reto:FONTES_COLRET,
+  polipo:[[/^PÓLIPO JUVENIL/,[2,3,4]], [/^PÓLIPO INFLAMATÓRIO/,[2]], [/PEUTZ-JEGHERS/,[2,3,4]], [/^ADENOMA TUBULAR/,[2,3,4]], [/GLÂNDULAS FÚNDICAS/,[2,5]], [/HIPERPLÁSICO GÁSTRICO/,[2,5]], [/HIPERPLASIA NODULAR LINFOIDE/,[2]]],
+  hirschsprung:[[/^Células ganglionares presentes/,[4]], [/^Células ganglionares ausentes/,[1,3,4]], [/^Amostra inadequada/,[1,3,4]], [/^Congelação/,[3,4]], [/^Peça/,[1,3,4]]]
+};
+function citeCurta(k){ const s=CITE[k], y=(s.match(/\.\s((?:19|20)\d{2})[;.(:]/)||s.match(/\b((?:19|20)\d{2})\b/)||[])[1]; return s.split(/[ ,]/)[0]+(y ? " "+y : ""); }
+// linha do cartão: números do catálogo + artigos já citados nas linhas do texto pronto (sem repetir as fontes 6 a 9)
+function fontesCartao(id, p){
+  const t=p.rot||p.titulo, r=(FONTES_TP[id]||[]).find(([re])=>re.test(t));
+  const arts=[...new Set(((p.bullets||[]).join(" ").match(/\[@\w+\]/g)||[]).map(m=>m.slice(2,-1)))].filter(k=>CITE[k] && !FONTES_CITE.includes(k)).map(citeCurta);
+  const nums=r ? r[1].slice().sort((a,b)=>a-b).join(", ") : "";
+  return [nums, ...new Set(arts)].filter(Boolean).join(" · ");
+}
 const MATS_PADRAO = ["Esôfago","Esôfago proximal","Esôfago distal","Mucosa esofágica","Lesão de esôfago","Mucosa gástrica","Estômago","Duodeno","Mucosa duodenal","Íleo","Íleo terminal","Mucosa de íleo terminal","Ceco","Cólon ascendente","Cólon transverso","Cólon descendente","Cólon sigmoide","Reto","Anastomose íleo-retal"];
 const PREFIXO_PADRAO = "Biópsias endoscópicas/colonoscópicas de:";
 const PREFIXOS = [PREFIXO_PADRAO, "Biópsia endoscópica/colonoscópica de:", "Biópsias endoscópicas de:", "Biópsia endoscópica de:", "Biópsias colonoscópicas de:", "Biópsia colonoscópica de:", "Ressecção intestinal de:", "Ressecção de ostomia de:", "Ressecção de anastomose de:"];
@@ -1380,7 +1413,7 @@ const SEED_REFS = [
 ];
 
 /* ============================ VERSÃO ============================ */
-const APP_VERSION="3.14.1";
+const APP_VERSION="3.15.0";
 
 /* ============================ ESTADO (v3) ============================ */
 // Biblioteca = SEED imutável (vem da versão publicada). Só o rascunho do laudo em montagem é salvo no navegador.
@@ -1389,6 +1422,7 @@ const LS_DB_V2="laudoGI_db_v2";                  // legado v2: só leitura (expo
 const LS_LEGACY_DISMISS="laudoGI_v2_banner_off";
 const LS_TEMA="laudoGI_tema";                   // "escuro" | "claro" (escolha fixa do usuário)
 const LS_DECH_ABERTO="laudoGI_dech_aberto";
+const LS_LINHAS="laudoGI_linhas_v1";             // linhas escritas à mão no editor, por sítio (autocompletar da linha livre)
 const LS_MATS="laudoGI_mats_v3";               // nomes de material mais usados (autocompletar)
 let editIndex = -1; // -1 = nova amostra; >=0 = editando
 let draft = { dech:null }; // DECH da amostra em edição
@@ -2741,6 +2775,35 @@ function renderMatList(){
   const nomes=[...new Set(Object.keys(uso).sort((a,b)=>uso[b]-uso[a]).concat(MATS_PADRAO))];
   $("matList").innerHTML=nomes.map(n=>'<option value="'+esc(n).replace(/"/g,"&quot;")+'">').join("");
 }
+/* ============================ LINHA LIVRE (autocompletar: achados e textos prontos do sítio + linhas aprendidas) ============================ */
+function linhasSitio(id){
+  const s=siteById(id), out=[];
+  (s.criterios||[]).forEach(c=>(c.opt||[]).forEach(o=>{ if(typeof o[1]==="string") o[1].split("\n").forEach(l=>{ if(/^- ./.test(l)) out.push(l); }); }));
+  (s.presets||[]).forEach(p=>(p.bullets||[]).forEach(b=>out.push("- "+b)));
+  return [...new Set(out)];
+}
+function siteLinha(){ return isTEG() && porcaoAtiva==="gas" ? "gastrica" : currentSite().id; }
+function renderLinList(){
+  const id=siteLinha(), m=(load(LS_LINHAS)||{})[id]||{};
+  // sem o "- " no início, para o filtro do navegador casar com o que se digita (o hífen volta na inserção)
+  const nomes=[...new Set(Object.keys(m).sort((a,b)=>m[b]-m[a]).concat(linhasSitio(id)).map(l=>l.replace(/^- /,"")))];
+  $("linList").innerHTML=nomes.map(n=>'<option value="'+esc(n).replace(/"/g,"&quot;")+'">').join("");
+}
+function insereLinha(){
+  let v=$("fLinha").value.trim(); if(!v) return;
+  v="- "+v.replace(/^-\s*/,"");
+  appendLine(v); $("fLinha").value=""; toast("Linha inserida");
+}
+// ao salvar: as linhas do editor que não são achado nem texto pronto do sítio entram na memória (até 200 por sítio, as mais usadas ficam)
+function aprendeLinhas(id, corpo){
+  const base=linhasSitio(id), conhecidas=new Set(base.concat(base.map(vr)));
+  const mem=load(LS_LINHAS)||{}, m=mem[id]||(mem[id]={});
+  corpo.split("\n").map(l=>l.trim()).forEach(l=>{
+    if(!/^- ./.test(l) || lineKind(l)==="b" || l===MICRO || RE_RES_PORCAO.test(resCab(l)) || conhecidas.has(l)) return;
+    m[l]=(m[l]||0)+1; });
+  Object.keys(m).sort((a,b)=>m[b]-m[a]).slice(200).forEach(k=>{ delete m[k]; });
+  store(LS_LINHAS, mem);
+}
 function contaMaterial(nome){ const uso=load(LS_MATS)||{}; uso[nome]=(uso[nome]||0)+1; store(LS_MATS, uso); }
 
 /* ============================ RENDER SÍTIO ============================ */
@@ -2760,7 +2823,8 @@ function renderPresets(){
     [["eso","Porção esofágica",site.presets],["gas","Porção gástrica",gasTextos(siteById("gastrica"), "Cárdia", true)]].forEach(([p,rotulo,lista])=>{
       const h=document.createElement("p"); h.className="hint"; h.textContent=rotulo+" (o clique substitui esta porção no bloco da transição)"; box.appendChild(h);
       lista.forEach(pr=>{ const b=document.createElement("button"); b.type="button"; b.className="preset";
-        b.innerHTML=`<b>${fmtInline(toSub("- "+pr.titulo+":", p).slice(2,-1))}</b><span>${(pr.bullets||[]).length} itens · ${rotulo.toLowerCase()}</span>`;
+        const f=fontesCartao(p==="gas" ? "gastrica" : "esofago", pr);
+        b.innerHTML=`<b>${fmtInline(toSub("- "+pr.titulo+":", p).slice(2,-1))}</b><span>${(pr.bullets||[]).length} itens · ${rotulo.toLowerCase()}</span>`+(f ? `<span class="fontes">Fontes: ${esc(f)}</span>` : "");
         b.onclick=()=>{ inserePorcao(p, pr); toast(rotulo+" inserida"); };
         box.appendChild(b); });
     });
@@ -2770,7 +2834,8 @@ function renderPresets(){
   if(!lista.length){ box.innerHTML='<p class="hint">Nenhum diagnóstico pronto para este sítio.</p>'; return; }
   lista.forEach(p=>{
     const b=document.createElement("button"); b.type="button"; b.className="preset";
-    b.innerHTML=`<b>${fmtInline(p.rot||p.titulo)}</b><span>${(p.bullets||[]).length} itens · clique p/ inserir bloco</span>`;
+    const f=fontesCartao(site.id, p);
+    b.innerHTML=`<b>${fmtInline(p.rot||p.titulo)}</b><span>${(p.bullets||[]).length} itens · clique p/ inserir bloco</span>`+(f ? `<span class="fontes">Fontes: ${esc(f)}</span>` : "");
     b.onclick=()=>{ appendBlock(montaBloco(site.id, presetText(p))); toast("Bloco inserido"); };
     box.appendChild(b);
   });
@@ -2786,6 +2851,7 @@ function renderCrit(){
       if(porcaoAtiva===p) b.className="on"; b.onclick=()=>{ porcaoAtiva=p; renderCrit(); }; sel.appendChild(b); });
     box.appendChild(sel);
   }
+  renderLinList();
   const grupos=(site.id==="hirschsprung" ? hsGrupos(site, $("fSeg").value) : (site.criterios||[])).slice();
   if(["ileo","colon","reto"].includes(site.id)) grupos.unshift({g:"Atividade: criptas com criptite ou abscesso", ativ:true, dica:"Até 5% leve · mais de 5% até 50% moderada · acima de 50%, erosão ou úlcera: acentuada. Insere a linha e ajusta o título."});
   if(MUC_SITIO[site.id]) grupos.push(teg ? {g:"Amostra (modificador)", amostra:true, dica:"Exígua ou superficial: insere a linha, ajusta o início do título e gera a nota de viés amostral. Adequada desfaz."}
@@ -2895,12 +2961,15 @@ $("btnSalvar").onclick=()=>{
   const corpo=$("corpo").value.trim();
   const obj={nome, corpo, site:$("fSitio").value, seg:$("fSeg").value};
   if(draft.dech) obj.dech=draft.dech;
-  contaMaterial(nome); renderMatList();
+  contaMaterial(nome); renderMatList(); aprendeLinhas(obj.site, corpo);
   if(editIndex>=0){ WORK.samples[editIndex]=obj; toast("Amostra atualizada"); }
   else { WORK.samples.push(obj); toast("Amostra salva"); }
   saveNow(); resetEditor(); renderAll();
 };
 $("btnCancelEdit").onclick=()=>{ resetEditor(); };
+$("fLinha").onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); insereLinha(); } };
+$("btnLinha").onclick=insereLinha;
+$("btnLinhaMem").onclick=()=>{ if(!confirm("Apagar as linhas aprendidas de todos os sítios?")) return; store(LS_LINHAS, {}); renderLinList(); toast("Memória de linhas apagada"); };
 $("btnLimparEditor").onclick=()=>{ $("corpo").value=""; prevTit=""; snapEditor(); $("corpo").focus(); };
 
 /* ============================ LISTA / MONTAGEM ============================ */
@@ -3147,6 +3216,7 @@ function init(){
   $("fLetra").value=nextLetter();
   renderPrefixo();
   renderMatList();
+  $("fontesLista").innerHTML=FONTES_LIVROS.map(f=>"<li>"+esc(f)+"</li>").join("");
   $("notas").value=WORK.notasFree||"";
   $("refsFree").value=WORK.refsFree||"";
   renderLegacyBanner();

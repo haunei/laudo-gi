@@ -6,7 +6,7 @@ import assert from "node:assert/strict";
 
 const html = fs.readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const src = html.match(/<script>([\s\S]*?)<\/script>/)[1];
-const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,montaBloco,titleSetCron,cronDaLinha,linhaComCron,gasTitulo,gasBlocos,CRON_SITIO,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,linhaNaini,RES_M,RES_L_GANG,resEstado,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
+const EXPOSE = "\n;globalThis.__t={get WORK(){return WORK;},LIB,SEED_SITES,NOTAS_PADRAO,APP_VERSION,presetText,buildLaudo,lineKind,laudoToRichHTML,laudoToPreviewHTML,v2Customizations,saveNow,CITE,EOS_VR,eosKey,eosEval,comVR,eosNota,lieEval,lieNota,linfEval,contagens,ativGrade,ativLine,titleSetAtiv,dechTipo,dechCat,dechCatEso,dechCatGas,dechLines,dechLinesEso,dechLinesGas,titleSetDech,resolveCites,fmtNums,autoNotas,alertas,fraseEos,fraseLie,grauDoTitulo,grauDaLinha,tituloComAtiv,linhaAtiv,titleSetHp,titleSetMetaplasia,titleSetDisplasia,appendLine,concorda,HS_L,HS_NOTA,hsEstado,hsAchados,hsTitMucosa,hsTitGang,hsNotas,hsAlertas,hsGrupos,hsTextos,MUC_SITIO,notaEosConsenso,titleSetAmostra,amostraMod,amostraMods,marcaSel,fmtMarcas,tiraMarcas,adaptaGas,gasTextos,GAS_SEG,montaBloco,titleSetCron,cronDaLinha,linhaComCron,gasTitulo,gasBlocos,CRON_SITIO,titleSetGrauDuo,notaCeliaca,NOTA_CELIACA,NOTA_LINF_DUO,LINHA_ATIV,titleSetEos,eosEstado,PREFIXOS,MATS_PADRAO,edsEstado,titleSetEds,isTEG,inserePorcao,amostraMod,toSub,fromSub,grauDuoDaLinha,formataAmostra,linhaNaini,RES_M,RES_L_GANG,resEstado,fontesCartao,FONTES_LIVROS,linhasSitio,porcaoAtivaSet:(p)=>{porcaoAtiva=p;}};";
 
 class El {
   constructor(tag = "div", id = "") { this.tagName = tag.toUpperCase(); this.id = id; this.value = ""; this.textContent = "";
@@ -1532,6 +1532,46 @@ ok(rot31() === BT31.gastrica && !/Esôfago/.test(rot31()), "esôfago -> gástric
 els.nomeBtns.children.find(b => b.textContent === "Antro gástrico").onclick(); eq(els.fNome.value, "Antro gástrico", "clique preenche o nome");
 for (const k of ["polipo", "hirschsprung", "res_delgado", "res_ceco", "res_colon", "res_reto"]) { els.fSitio.value = "esofago"; els.fSitio.onchange(); els.fSitio.value = k; els.fSitio.onchange(); ok(els.nomeBtns.hidden && els.nomeBtns.children.length === 0, "sem botões: " + k); }
 els.fSitio.value = "esofago"; els.fSitio.onchange(); ok(rot31() === BT31.esofago, "volta ao esôfago sem resto");
+
+// 32. v3.15: fonte numerada em cada texto pronto (catálogo de 2026-10-03) e linha livre com autocompletar
+({ t, els } = boot({}));
+const card32 = (k, seg = "") => { els.fSitio.value = k; els.fSitio.onchange(); els.fSeg.value = seg; els.fSeg.onchange();
+  return Object.fromEntries(els.presetBox.children.map(b => [b._html.match(/<b>(.*?)<\/b>/)[1].replace(/<[^>]+>/g, ""), (b._html.match(/Fontes: ([^<]*)/) || [])[1] || ""])); };
+let c32 = card32("esofago");
+eq(c32["ESOFAGITE CRÔNICA EM ATIVIDADE"], "1, 3, 7, 8, 9 · Yerian 2011", "esôfago: refluxo (cat. 2) + Yerian");
+eq(c32["ESOFAGITE CRÔNICA INATIVA, DE PADRÃO EOSINOFÍLICO (VIDE NOTAS)"], "3, 4, 7, 8, 9", "esôfago eosinofílico: Giordano não repete (é a fonte 9)");
+eq(c32["ESOFAGITE EROSIVA FÚNGICA (VIDE NOTAS)"], "1, 3", "esôfago fúngica");
+c32 = card32("gastrica", "Antro");
+eq(c32["GASTROPATIA REATIVA"], "1, 2", "gastropatia reativa"); eq(c32["GASTRITE CRÔNICA INATIVA"], "1, 3 · Dixon 1996", "gastrite inativa + Sydney");
+eq(c32["GASTRITE CRÔNICA ATRÓFICA DE PADRÃO AUTOIMUNE, INATIVA (VIDE NOTAS)"], "1, 2", "autoimune antes da regra de inativa");
+c32 = card32("duodeno"); ok(Object.values(c32).filter(v => /^2, 3, 4 · Whitehead 1975 · Corazza 2007$/.test(v)).length === 2, "duodeno: padrão linfocítico com atrofia");
+c32 = card32("reto"); eq(c32["RETITE ATIVA LEVE"], "1, 2, 3, 4 · Geboes 2000", "retite ativa (cat. 73)"); eq(c32["RETITE CRÔNICA INATIVA"], "2 · Geboes 2000", "retite inativa (cat. 76)");
+c32 = card32("polipo"); eq(c32["PÓLIPO DE GLÂNDULAS FÚNDICAS, SEM DISPLASIA"], "2, 5", "pólipo fúndico (WHO)");
+c32 = card32("hirschsprung"); eq(c32["Células ganglionares ausentes, calretinina ausente"], "1, 3, 4 · Kyrklund 2020 · Veras 2019", "Hirschsprung: aganglionose");
+// sem livro: só APRESENTANDO, pouco representativa, rebiopsia e ressecção
+const sem32 = [];
+for (const [k, seg] of [["esofago", ""], ["gastrica", "Antro"], ["duodeno", ""], ["ileo", ""], ["colon", ""], ["reto", ""], ["polipo", ""], ["hirschsprung", ""]])
+  Object.entries(card32(k, seg)).forEach(([tit, f]) => { if (!/^\d/.test(f)) sem32.push(tit); });
+ok(sem32.length && sem32.every(x => /APRESENTANDO|^AMOSTRA POUCO REPRESENTATIVA|^Rebiopsia/.test(x)), "todo texto pronto do catálogo tem número; sem número só os que não estão no catálogo");
+ok(Object.values(card32("res_delgado")).every(f => f === ""), "ressecção sem fontes");
+eq(t.FONTES_LIVROS.length, 9, "9 fontes no painel"); ok(t.FONTES_LIVROS[8] === t.CITE.gio && t.FONTES_LIVROS[5] === t.CITE.deb, "fontes 6 a 9 = artigos de CITE");
+ok(/Fontes dos textos prontos/.test(html) && !/Fontes: /.test(t.buildLaudo()), "painel no HTML; nada vai ao laudo");
+// linha livre
+const st32 = {}; ({ t, els } = boot(st32));
+els.fSitio.value = "colon"; els.fSitio.onchange(); els.fSeg.value = "Ceco"; els.fSeg.onchange();
+ok(els.linList.innerHTML.includes('value="Presença de edema e vasocongestão."'), "sugestões: achados do sítio");
+ok(t.linhasSitio("colon").includes("- " + t.SEED_SITES.colon.presets[2].bullets[0]), "sugestões: linhas dos textos prontos");
+els.corpo.value = t.montaBloco("colon", t.presetText(t.SEED_SITES.colon.presets.find(p => p.titulo === "COLITE CRÔNICA INATIVA"))); els.corpo.onfocus();
+els.fLinha.value = "Presença de melanose coli focal."; els.fLinha.onkeydown({ key: "Enter", preventDefault() {} });
+ok(els.corpo.value.includes("\n- Presença de melanose coli focal.") && els.fLinha.value === "", "Enter insere a linha com hífen e limpa o campo");
+els.fLinha.value = "- Presença de edema e vasocongestão."; els.btnLinha.onclick(); ok(els.corpo.value.split("\n").filter(l => l === "- Presença de edema e vasocongestão.").length === 1, "botão inserir; hífen não dobra");
+els.fNome.value = "Ceco"; els.btnSalvar.onclick();
+const mem32 = JSON.parse(st32.laudoGI_linhas_v1 || "{}").colon || {};
+ok(mem32["- Presença de melanose coli focal."] === 1 && !("- Presença de edema e vasocongestão." in mem32) && !Object.keys(mem32).some(l => /^- COLITE/.test(l)), "ao salvar: aprende só a linha escrita à mão");
+els.fSitio.value = "colon"; els.fSitio.onchange();
+ok(els.linList.innerHTML.indexOf("melanose coli") >= 0 && els.linList.innerHTML.indexOf("melanose coli") < els.linList.innerHTML.indexOf("edema e vasocongestão"), "aprendida vem primeiro");
+els.fSitio.value = "gastrica"; els.fSitio.onchange(); ok(!els.linList.innerHTML.includes("melanose coli"), "memória por sítio");
+els.btnLinhaMem.onclick(); eq(st32.laudoGI_linhas_v1, "{}", "apagar memória");
 
 console.log(`OK — ${n} asserts`);
 

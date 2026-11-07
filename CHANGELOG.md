@@ -1,5 +1,9 @@
 # Changelog
 
+## v3.15.0 — 2026-11-07
+- Textos prontos: cada cartão mostra "Fontes:" com o número da fonte do catálogo de títulos (2026-10-03) e os artigos já citados nas linhas (ex.: "1, 3 · Dixon 1996"). Painel recolhível "Fontes dos textos prontos" com a lista numerada (Voltaggio-Montgomery 4e, Lewin 2e, Stocker 5e, Biopsy Interpretation of Pediatric Lesions 2e, WHO Digestivo 6ª, DeBrosse 2006, Dellon 2018, Mastracci 2020, Giordano 2026). Sem número: os cartões que não estão no catálogo (APRESENTANDO, amostra pouco representativa, rebiopsia de Hirschsprung, ressecção). Nada disso vai ao laudo.
+- Linha livre com autocompletar acima do editor: sugere os achados e as linhas dos textos prontos do sítio, além das linhas escritas à mão (aprendidas ao salvar a amostra, por sítio, só neste navegador, mais usadas primeiro, até 200 por sítio); Enter ou "inserir" põe a linha no editor com a mesma sincronia do clique nos achados; botão para apagar a memória.
+
 ## v3.14.1 — 2026-11-07
 - Nome da amostra: os botões de nome rápido acompanham o sítio (esôfago, estômago, duodeno, íleo, cólon, reto); pólipo, Hirschsprung e ressecção ficam sem botões. Corrige os botões do esôfago, que apareciam em qualquer sítio.
 
